@@ -1,0 +1,32 @@
+rosbag2_bagfile_information:
+  compression_format: ''
+  compression_mode: ''
+  duration:
+    nanoseconds: 31299492307
+  files:
+  - duration:
+      nanoseconds: 31299492307
+    message_count: 7743
+    path: leg_odom_vel_div2_0.db3
+    starting_time:
+      nanoseconds_since_epoch: 1778168853343703735
+  message_count: 7743
+  relative_file_paths:
+  - leg_odom_vel_div2_0.db3
+  starting_time:
+    nanoseconds_since_epoch: 1778168853343703735
+  storage_identifier: sqlite3
+  topics_with_message_count:
+  - message_count: 7742
+    topic_metadata:
+      name: /ekf
+      offered_qos_profiles: ''
+      serialization_format: cdr
+      type: nav_msgs/msg/Odometry
+  - message_count: 1
+    topic_metadata:
+      name: /trigger
+      offered_qos_profiles: ''
+      serialization_format: cdr
+      type: corgi_msgs/msg/TriggerStamped
+  version: 6
