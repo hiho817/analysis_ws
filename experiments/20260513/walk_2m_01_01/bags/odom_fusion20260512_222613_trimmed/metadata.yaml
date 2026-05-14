@@ -1,0 +1,130 @@
+rosbag2_bagfile_information:
+  compression_format: ''
+  compression_mode: ''
+  duration:
+    nanoseconds: 28015710689
+  files:
+  - duration:
+      nanoseconds: 28015710689
+    message_count: 119675
+    path: odom_fusion20260512_222613_trimmed_0.db3
+    starting_time:
+      nanoseconds_since_epoch: 1778595996802401893
+  message_count: 119675
+  relative_file_paths:
+  - odom_fusion20260512_222613_trimmed_0.db3
+  starting_time:
+    nanoseconds_since_epoch: 1778595996802401893
+  storage_identifier: sqlite3
+  topics_with_message_count:
+  - message_count: 2
+    topic_metadata:
+      name: /trigger
+      offered_qos_profiles: "- history: 3\n  depth: 0\n  reliability: 1\n  durability:\
+        \ 2\n  deadline:\n    sec: 9223372036\n    nsec: 854775807\n  lifespan:\n\
+        \    sec: 9223372036\n    nsec: 854775807\n  liveliness: 1\n  liveliness_lease_duration:\n\
+        \    sec: 9223372036\n    nsec: 854775807\n  avoid_ros_namespace_conventions:\
+        \ false"
+      serialization_format: cdr
+      type: corgi_msgs/msg/TriggerStamped
+  - message_count: 27906
+    topic_metadata:
+      name: /imu_raw
+      offered_qos_profiles: "- history: 3\n  depth: 0\n  reliability: 1\n  durability:\
+        \ 2\n  deadline:\n    sec: 9223372036\n    nsec: 854775807\n  lifespan:\n\
+        \    sec: 9223372036\n    nsec: 854775807\n  liveliness: 1\n  liveliness_lease_duration:\n\
+        \    sec: 9223372036\n    nsec: 854775807\n  avoid_ros_namespace_conventions:\
+        \ false"
+      serialization_format: cdr
+      type: corgi_msgs/msg/ImuStamped
+  - message_count: 21791
+    topic_metadata:
+      name: /gmo/contact_state
+      offered_qos_profiles: "- history: 3\n  depth: 0\n  reliability: 1\n  durability:\
+        \ 2\n  deadline:\n    sec: 9223372036\n    nsec: 854775807\n  lifespan:\n\
+        \    sec: 9223372036\n    nsec: 854775807\n  liveliness: 1\n  liveliness_lease_duration:\n\
+        \    sec: 9223372036\n    nsec: 854775807\n  avoid_ros_namespace_conventions:\
+        \ false"
+      serialization_format: cdr
+      type: corgi_msgs/msg/GMOContactStateStamped
+  - message_count: 10895
+    topic_metadata:
+      name: /ekf/orientation
+      offered_qos_profiles: "- history: 3\n  depth: 0\n  reliability: 1\n  durability:\
+        \ 2\n  deadline:\n    sec: 9223372036\n    nsec: 854775807\n  lifespan:\n\
+        \    sec: 9223372036\n    nsec: 854775807\n  liveliness: 1\n  liveliness_lease_duration:\n\
+        \    sec: 9223372036\n    nsec: 854775807\n  avoid_ros_namespace_conventions:\
+        \ false"
+      serialization_format: cdr
+      type: geometry_msgs/msg/Quaternion
+  - message_count: 10895
+    topic_metadata:
+      name: /ekf/bw
+      offered_qos_profiles: "- history: 3\n  depth: 0\n  reliability: 1\n  durability:\
+        \ 2\n  deadline:\n    sec: 9223372036\n    nsec: 854775807\n  lifespan:\n\
+        \    sec: 9223372036\n    nsec: 854775807\n  liveliness: 1\n  liveliness_lease_duration:\n\
+        \    sec: 9223372036\n    nsec: 854775807\n  avoid_ros_namespace_conventions:\
+        \ false"
+      serialization_format: cdr
+      type: geometry_msgs/msg/Vector3
+  - message_count: 25638
+    topic_metadata:
+      name: /motor/state
+      offered_qos_profiles: "- history: 3\n  depth: 0\n  reliability: 1\n  durability:\
+        \ 2\n  deadline:\n    sec: 9223372036\n    nsec: 854775807\n  lifespan:\n\
+        \    sec: 9223372036\n    nsec: 854775807\n  liveliness: 1\n  liveliness_lease_duration:\n\
+        \    sec: 9223372036\n    nsec: 854775807\n  avoid_ros_namespace_conventions:\
+        \ false"
+      serialization_format: cdr
+      type: corgi_msgs/msg/MotorStateStamped
+  - message_count: 10895
+    topic_metadata:
+      name: /ekf/ba
+      offered_qos_profiles: "- history: 3\n  depth: 0\n  reliability: 1\n  durability:\
+        \ 2\n  deadline:\n    sec: 9223372036\n    nsec: 854775807\n  lifespan:\n\
+        \    sec: 9223372036\n    nsec: 854775807\n  liveliness: 1\n  liveliness_lease_duration:\n\
+        \    sec: 9223372036\n    nsec: 854775807\n  avoid_ros_namespace_conventions:\
+        \ false"
+      serialization_format: cdr
+      type: geometry_msgs/msg/Vector3
+  - message_count: 10895
+    topic_metadata:
+      name: /ekf
+      offered_qos_profiles: "- history: 3\n  depth: 0\n  reliability: 1\n  durability:\
+        \ 2\n  deadline:\n    sec: 9223372036\n    nsec: 854775807\n  lifespan:\n\
+        \    sec: 9223372036\n    nsec: 854775807\n  liveliness: 1\n  liveliness_lease_duration:\n\
+        \    sec: 9223372036\n    nsec: 854775807\n  avoid_ros_namespace_conventions:\
+        \ false"
+      serialization_format: cdr
+      type: nav_msgs/msg/Odometry
+  - message_count: 239
+    topic_metadata:
+      name: /odom_mapping
+      offered_qos_profiles: "- history: 3\n  depth: 0\n  reliability: 1\n  durability:\
+        \ 2\n  deadline:\n    sec: 9223372036\n    nsec: 854775807\n  lifespan:\n\
+        \    sec: 9223372036\n    nsec: 854775807\n  liveliness: 1\n  liveliness_lease_duration:\n\
+        \    sec: 9223372036\n    nsec: 854775807\n  avoid_ros_namespace_conventions:\
+        \ false"
+      serialization_format: cdr
+      type: nav_msgs/msg/Odometry
+  - message_count: 239
+    topic_metadata:
+      name: /fusion/bv
+      offered_qos_profiles: "- history: 3\n  depth: 0\n  reliability: 1\n  durability:\
+        \ 2\n  deadline:\n    sec: 9223372036\n    nsec: 854775807\n  lifespan:\n\
+        \    sec: 9223372036\n    nsec: 854775807\n  liveliness: 1\n  liveliness_lease_duration:\n\
+        \    sec: 9223372036\n    nsec: 854775807\n  avoid_ros_namespace_conventions:\
+        \ false"
+      serialization_format: cdr
+      type: geometry_msgs/msg/Vector3Stamped
+  - message_count: 280
+    topic_metadata:
+      name: /lidar_odom
+      offered_qos_profiles: "- history: 3\n  depth: 0\n  reliability: 1\n  durability:\
+        \ 2\n  deadline:\n    sec: 9223372036\n    nsec: 854775807\n  lifespan:\n\
+        \    sec: 9223372036\n    nsec: 854775807\n  liveliness: 1\n  liveliness_lease_duration:\n\
+        \    sec: 9223372036\n    nsec: 854775807\n  avoid_ros_namespace_conventions:\
+        \ false"
+      serialization_format: cdr
+      type: nav_msgs/msg/Odometry
+  version: 5
