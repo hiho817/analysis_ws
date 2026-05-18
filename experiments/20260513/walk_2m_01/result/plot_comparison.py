@@ -90,17 +90,6 @@ fe_vx   = fekf['vx'][fe_mask]; fe_vy = fekf['vy'][fe_mask]; fe_vz = fekf['vz'][f
 om_mask = (fodom['t'] >= 0.0) & (fodom['t'] <= T_END)
 om_t    = fodom['t'][om_mask]
 om_px   = fodom['px'][om_mask]; om_py = fodom['py'][om_mask]; om_pz = fodom['pz'][om_mask]
-# odom_mapping twist is all-zero — compute velocity from central finite differences
-def _central_diff(t, x):
-    """Central finite difference; edges use forward/backward diff."""
-    v = np.empty_like(x)
-    v[1:-1]  = (x[2:] - x[:-2]) / (t[2:] - t[:-2])
-    v[0]     = (x[1] - x[0]) / (t[1] - t[0]) if len(t) > 1 else 0.0
-    v[-1]    = (x[-1] - x[-2]) / (t[-1] - t[-2]) if len(t) > 1 else 0.0
-    return v
-om_vx = _central_diff(om_t, om_px)
-om_vy = _central_diff(om_t, om_py)
-om_vz = _central_diff(om_t, om_pz)
 
 # ─── Ablation EKF arrays ──────────────────────────────────────────────────────
 ae_mask = (aekf['t'] >= 0.0) & (aekf['t'] <= T_END)
@@ -153,7 +142,7 @@ plt.close()
 # Figure 2: Velocity X / Y / Z
 # ══════════════════════════════════════════════════════════════════════════════
 fig, axes = plt.subplots(3, 1, figsize=(13, 9), sharex=True)
-fig.suptitle('Velocity Comparison  (VICON / Inner EKF / odom_mapping / Ablation EKF)',
+fig.suptitle('Velocity Comparison  (VICON / Inner EKF / Ablation EKF)',
              fontsize=12, fontweight='bold')
 
 # Shade velocity RMSE window
@@ -163,7 +152,6 @@ for ai, ax in enumerate(axes):
     vi_vok = ~np.isnan(vel_vi[:, ai])
     ax.plot(t_vi[vi_vok], vel_vi[vi_vok, ai], lw=LW+0.4, color=C_VI,   label='VICON (GT)',       zorder=4)
     ax.plot(fe_t,  [fe_vx, fe_vy, fe_vz][ai], lw=LW,     color=C_EKF,  label='Inner EKF (fusion bag)',  zorder=3)
-    ax.plot(om_t,  [om_vx, om_vy, om_vz][ai], lw=LW,     color=C_ODOM, label='odom_mapping',     zorder=2, ls='--')
     ax.plot(ae_t,  [ae_vx, ae_vy, ae_vz][ai], lw=LW,     color=C_ABL,  label='Ablation EKF',     zorder=1, ls=':')
     ax.axvspan(12, 17, color='gold', alpha=0.18, label='RMSE window 12-17 s')
     ax.set_ylabel(vel_labels[ai]); ax.grid(True, alpha=0.35)

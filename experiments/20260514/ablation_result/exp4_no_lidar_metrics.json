@@ -1,0 +1,21 @@
+{
+  "exp": "exp4",
+  "trial": "walk_2m_01_obs_odometry (run 1)",
+  "ablation": "no_lidar",
+  "bag_db": "/home/hiho817/analysis_ws/experiments/20260514/exp4/bags/ablation_no_lidar_20260515_124913/ablation_no_lidar_20260515_124913_0.db3",
+  "T_END": 23.686,
+  "position": {
+    "RMSE_X_cm": 2.724,
+    "RMSE_Y_cm": 9.2052,
+    "RMSE_Z_cm": 7.3297,
+    "RMSE_3D_cm": 12.0781,
+    "RMSE_2D_cm": 9.5998,
+    "MAX_3D_cm": 20.394
+  },
+  "velocity": {
+    "RMSE_vx": 0.047727
+  },
+  "attitude": {
+    "RMSE_yaw_deg": 0.3925
+  }
+}

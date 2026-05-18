@@ -428,31 +428,18 @@ m32={'RMSE_yaw_vs_VICON_deg':rmse(rpy_odom_deg[vy,2]-vi_yaw_o[vy]),
 fv_mask=(fv['t']>=0.)&(fv['t']<=T_END)
 ft=fv['t'][fv_mask]; fx=fv['x'][fv_mask]; fy=fv['y'][fv_mask]; fz=fv['z'][fv_mask]
 fv_mag=np.sqrt(fx**2+fy**2+fz**2)
-# For velocity quality: use odom_mapping twist (the actual fused velocity output)
-ov_vx=odom['vx'][om_mask]; ov_vy=odom['vy'][om_mask]
-vi_vx_om=interp_to(vi_t_v,v_body_vi[vi_valid,0],ot)
-vi_vy_om=interp_to(vi_t_v,v_body_vi[vi_valid,1],ot)
-ek_vx_om=interp_to(et,evx,ot); ek_vy_om=interp_to(et,evy,ot)
 # Also compute leg-odometry error to show fusion/bv corrects it
 ek_vx_err=interp_to(et,evx-vi_vx_e,ft)  # leg-odom vx error at bv timestamps
 ek_vy_err=interp_to(et,evy-vi_vy_e,ft)
 ek_vz_err=interp_to(et,evz-vi_vz_e,ft)
-# Velocity RMSE for odom_mapping restricted to t=12-17s
-_ovw=(ot>=12.)&(ot<=17.)
 m33={'bv_mean_x':float(np.mean(fx)),'bv_mean_y':float(np.mean(fy)),'bv_mean_z':float(np.mean(fz)),
-     'bv_mean_mag':float(np.mean(fv_mag)),'bv_max_mag':float(np.max(fv_mag)),
-     'RMSE_omvx_vs_VICON_12_17':rmse(ov_vx[_ovw]-vi_vx_om[_ovw]),
-     'RMSE_omvy_vs_VICON_12_17':rmse(ov_vy[_ovw]-vi_vy_om[_ovw]),
-     'RMSE_omvx_vs_EKF_12_17':rmse(ov_vx[_ovw]-ek_vx_om[_ovw]),
-     'vel_window':'12-17s'}
+     'bv_mean_mag':float(np.mean(fv_mag)),'bv_max_mag':float(np.max(fv_mag))}
 
 print(f'  3.1 RMSE 2D vs VICON={m31["RMSE_2D_vs_VICON"]*100:.1f}cm '
       f'vs EKF={m31["RMSE_2D_vs_EKF"]*100:.1f}cm MAX={m31["MAX_2D_vs_VICON"]*100:.1f}cm')
 print(f'  3.2 Yaw RMSE vs VICON={m32["RMSE_yaw_vs_VICON_deg"]:.2f}°')
 print(f'  3.3 fusion/bv correction: mean_x={m33["bv_mean_x"]:.4f} mean_y={m33["bv_mean_y"]:.4f} '
       f'mean_mag={m33["bv_mean_mag"]:.4f} m/s')
-print(f'  3.3 odom_mapping vel RMSE (12-17s): vx={m33["RMSE_omvx_vs_VICON_12_17"]:.3f} '
-      f'vy={m33["RMSE_omvy_vs_VICON_12_17"]:.3f} m/s vs VICON')
 
 # Plot 3a: XY
 fig,axes=plt.subplots(1,2,figsize=(14,5))
@@ -502,19 +489,6 @@ fig.suptitle(f'{TRIAL} — 3.3 fusion/bv: Velocity Bias Correction Signal')
 plt.tight_layout()
 plt.savefig(os.path.join(RESULTS,'fig_fusion_bv.png'),dpi=150); plt.close()
 print('Saved: fig_fusion_bv.png')
-fig,axes=plt.subplots(2,1,figsize=(14,6),sharex=True)
-for ax,lbl,omv,viv,ekv in[(axes[0],'vx[m/s]',ov_vx,vi_vx_om,ek_vx_om),
-                            (axes[1],'vy[m/s]',ov_vy,vi_vy_om,ek_vy_om)]:
-    ax.plot(ot,omv,lw=0.8,label='odom_mapping twist',color='#43A047')
-    ax.plot(ot,viv,lw=0.8,label='VICON SG',color='#1E88E5',alpha=0.8)
-    ax.plot(ot,ekv,lw=0.8,label='EKF',color='#FF5722',alpha=0.7)
-    ax.axvspan(12,17,color='yellow',alpha=0.12,label='RMSE window 12-17s')
-    ax.set_ylabel(lbl); ax.legend(fontsize=7); ax.grid(True,alpha=0.3)
-axes[-1].set_xlabel('Time [s]')
-fig.suptitle(f'{TRIAL} — 3.3 odom_mapping Velocity vs VICON vs EKF (12-17s window)')
-plt.tight_layout()
-plt.savefig(os.path.join(RESULTS,'fig_fusion_omvel.png'),dpi=150); plt.close()
-print('Saved: fig_fusion_omvel.png')
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # STEP 4: LiDAR Input Quality
