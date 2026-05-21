@@ -73,11 +73,11 @@
     "t_vel_e": 16.4514
   },
   "attitude": {
-    "RMSE_roll_deg": 0.4801791188819633,
-    "RMSE_pitch_deg": 0.34995539450971064,
-    "RMSE_yaw_deg": 0.30213432763136583,
+    "RMSE_roll_deg": 0.26292832502983127,
+    "RMSE_pitch_deg": 0.4687534735222762,
+    "RMSE_yaw_deg": 0.30328854671879,
     "final_yaw_EKF_deg": -9.127047529393561,
-    "final_yaw_VICON_deg": -9.60942977807602
+    "final_yaw_VICON_deg": -9.611161560485058
   },
   "ba": {
     "x": {
@@ -121,10 +121,10 @@
     "final_odom_y": -0.2300017774105072
   },
   "odom_yaw": {
-    "RMSE_yaw_vs_VICON_deg": 0.2321263430457688,
+    "RMSE_yaw_vs_VICON_deg": 0.2290790395433465,
     "RMSE_yaw_vs_EKF_deg": 0.4954569950051666,
     "final_yaw_odom_deg": -10.045006038849797,
-    "final_yaw_vicon_deg": -9.615111993557088
+    "final_yaw_vicon_deg": -9.616866086481553
   },
   "fusion_bv": {
     "mean_bv_x": -0.0019672580156326796,

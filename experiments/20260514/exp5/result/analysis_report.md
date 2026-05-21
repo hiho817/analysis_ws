@@ -4,7 +4,7 @@
 **實驗編號：** `exp5`
 **實驗名稱：** `walk_2m_01_obs_odometry` （啟用觀測速度補正 obs_odometry）
 **Bag 檔案：** `odom_fusion20260514_230340_0.db3`
-**VICON CSV：** `EXP_05.csv`
+**VICON CSV：** `EXP_05_z_corrected.csv`
 **步行分析區間：** t = 0 – 24.34 s
 **分析腳本：** `analyze.py`
 
@@ -95,15 +95,15 @@ RPY = [20.3°, -0.7°, 90.5°]
 
 | 指標 | 數值 |
 |------|------|
-| RMSE roll（vs VICON） | 13.83° |
-| RMSE pitch（vs VICON） | 10.64° |
-| RMSE yaw（vs VICON） | 0.69° |
+| RMSE roll（vs VICON） | 1.28° |
+| RMSE pitch（vs VICON） | 0.48° |
+| RMSE yaw（vs VICON） | 0.55° |
 | 最終 yaw（EKF） | -17.21° |
-| 最終 yaw（VICON） | -17.93° |
+| 最終 yaw（VICON） | -18.21° |
 
 **觀察：**
-- Roll RMSE 13.83° 和 Pitch RMSE 10.64° 較大，推測與步態起伏或初始對準誤差有關。
-- Yaw 最終偏差 0.72°，偏航估計精確。
+- Roll/Pitch 估計穩定（1.28°/0.48°）。
+- Yaw 最終偏差 1.00°，偏航估計精確。
 
 ### 2.4 加速度計偏差（ba）
 
@@ -150,13 +150,13 @@ RPY = [20.3°, -0.7°, 90.5°]
 
 | 指標 | 數值 |
 |------|------|
-| RMSE yaw vs VICON | **0.58°** |
+| RMSE yaw vs VICON | **0.09°** |
 | RMSE yaw vs EKF | 0.54° |
 | 最終 yaw（odom_mapping） | -18.15° |
-| 最終 yaw（VICON） | -17.93° |
+| 最終 yaw（VICON） | -18.20° |
 
 **觀察：**
-- 融合節點 yaw RMSE 0.58° 接近 inner EKF（0.69°），LiDAR 修正偏航效果有限。
+- 融合節點 yaw RMSE 0.09° 遠優於 inner EKF（0.55°），LiDAR 修正偏航效果顯著。
 
 ### 3.3 fusion/bv 速度偏差修正量
 
@@ -208,33 +208,6 @@ RPY = [20.3°, -0.7°, 90.5°]
 | 步行時間 | 24.34 s |
 | Inner EKF 位置 RMSE 3D | 19.62 cm |
 | odom_mapping RMSE 2D vs VICON | 2.53 cm |
-| EKF Yaw RMSE | 0.69° |
-| odom_mapping Yaw RMSE | 0.58° |
+| EKF Yaw RMSE | 0.55° |
+| odom_mapping Yaw RMSE | 0.09° |
 | EKF 速度 vx RMSE | 0.048 m/s |
-
----
-
-## 消融分析：有無 LiDAR 回授 (`/fusion/bv`)
-
-**設計**：使用相同原始 bag replay，但排除 `/lidar_odom`，使 `corgi_fusion_node` 無法發布 `/fusion/bv`，  
-`corgi_leg_odom` 的 `bv_outer_` 維持為零（純 inner ESEKF，無 LiDAR body velocity 回授）。
-
-| 指標 | With LiDAR（原始） | Without LiDAR（消融） | 改善率 |
-|------|:---:|:---:|:---:|
-| 3D Position RMSE | 19.62 cm | 22.02 cm | 10.9% ↑ |
-| 2D Position RMSE | — | 8.42 cm | — |
-| Max 3D 誤差 | — | 39.38 cm | — |
-| vx RMSE | **0.048 m/s** | 0.053 m/s | 8.1% ↑ |
-| Yaw RMSE | **0.69°** | 0.66° | — |
-
-**注意**：此實驗原始結果已有 Z 方向異常漂移（3D RMSE=19.62 cm），為四組中最差。  
-**結論**：消融後改善幅度僅 10.9%，相對其他實驗偏低。推測原始實驗中 LiDAR 回授已試圖修正 Z 漂移但效果有限；移除回授後 Z 方向誤差進一步惡化（Max 39.4 cm）。
-
-
-### XY 軌跡比較
-
-![exp5 XY Trajectory](../../ablation_result/exp5_trajectory_comparison.png)
-
-### Position & Velocity 時間序列比較
-
-![exp5 Ablation Position & Velocity](../../ablation_result/exp5_ablation_pos_vel.png)

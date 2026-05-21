@@ -34,7 +34,7 @@ RESULTS   = BASE
 BAG_DB    = os.path.join(BASE, '..', 'bags',
                          'odom_fusion20260514_230340',
                          'odom_fusion20260514_230340_0.db3')
-VICON_CSV = os.path.join(BASE, '..', 'vicon', 'EXP_05.csv')
+VICON_CSV = os.path.join(BASE, '..', 'vicon', 'EXP_05_z_corrected.csv')
 TRIAL     = 'walk_2m_01_obs_odometry'
 DATE      = '20260514'
 EXP_ID    = 'exp5'
@@ -108,6 +108,23 @@ ecov_px = ekf['cov_px'][ekf_mask]
 ecov_py = ekf['cov_py'][ekf_mask]
 ecov_pz = ekf['cov_pz'][ekf_mask]
 rpy_ekf_deg = quat_to_rpy_deg(eqw, eqx, eqy, eqz)
+
+# ─── Align VICON initial orientation to EKF at t=0 ───────────────────────────
+# R_align = R_EKF(t=0) @ R_VICON(t=0)^T  applied to every VICON body frame,
+# so that at t=0 the VICON RPY matches the EKF RPY exactly.
+_vi_rot_ok = ~np.isnan(rpy_vicon).any(1)
+_idx_vi0   = int(np.argmax(_vi_rot_ok))
+_R_vi0     = Rotation.from_euler('ZYX', rpy_vicon[_idx_vi0, ::-1]).as_matrix()
+_R_ekf0    = Rotation.from_quat([eqx[0], eqy[0], eqz[0], eqw[0]]).as_matrix()
+_R_align   = _R_ekf0 @ _R_vi0.T
+_rpy_vicon_aligned = rpy_vicon.copy()
+for _i in np.where(_vi_rot_ok)[0]:
+    _Rv = Rotation.from_euler('ZYX', rpy_vicon[_i, ::-1]).as_matrix()
+    _rpy_vicon_aligned[_i] = Rotation.from_matrix(_R_align @ _Rv).as_euler('ZYX')[::-1]
+rpy_vicon = _rpy_vicon_aligned
+print(f'[VICON→EKF align] before={np.degrees(rpy_vicon[_idx_vi0])}, '
+      f'EKF_t0={rpy_ekf_deg[0]}')
+# ─────────────────────────────────────────────────────────────────────────────
 
 vi_valid = ~np.isnan(pos_vicon).any(1)
 vi_t_v   = t_win[vi_valid]

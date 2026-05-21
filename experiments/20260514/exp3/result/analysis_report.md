@@ -38,9 +38,9 @@
 | 最終位置（VICON） | (1.852, 0.341) m |
 
 **觀察：**
-- X 與 Y 方向誤差相近（6.03 / 7.26 cm），無明顯主導誤差方向。
-- Z 方向誤差 1.78 cm，高度估計良好。
-- Legacy（Information Filter）無 LiDAR 修正，位置誤差約為 ESEKF 的 2 倍。
+- Y 方向誤差（7.26 cm）為主要誤差來源，顯示側向漂移嚴重。
+- X 方向 RMSE 6.03 cm，前進方向估計尚可。
+- Legacy（Information Filter）無 LiDAR 修正，位置誤差遠大於 ESEKF。
 
 ---
 
@@ -73,4 +73,4 @@
 | 速度 vx RMSE | 0.037 m/s |
 | 速度 vy RMSE | 0.043 m/s |
 
-> **結論：** Information Filter（Legacy）在前進速度估計上表現與 ESEKF 相當（vx RMSE 0.037 m/s），但側向速度誤差（vy 0.113 m/s）較大。位置 RMSE 9.61 cm，約為 ESEKF（~4.8 cm）的 2 倍，反映無 LiDAR 修正下的積分漂移。
+> **結論：** Information Filter（Legacy）在速度估計上表現與 ESEKF 相當，但位置估計因缺乏 LiDAR 修正而累積漂移顯著（9.61 cm vs ESEKF ~4.8 cm）。

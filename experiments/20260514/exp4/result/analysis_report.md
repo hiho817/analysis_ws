@@ -95,14 +95,14 @@ RPY = [20.6°, 0.3°, 90.1°]
 
 | 指標 | 數值 |
 |------|------|
-| RMSE roll（vs VICON） | 0.64° |
-| RMSE pitch（vs VICON） | 0.84° |
+| RMSE roll（vs VICON） | 0.29° |
+| RMSE pitch（vs VICON） | 1.02° |
 | RMSE yaw（vs VICON） | 0.21° |
 | 最終 yaw（EKF） | -21.69° |
 | 最終 yaw（VICON） | -21.68° |
 
 **觀察：**
-- Roll/Pitch 估計穩定（0.64°/0.84°）。
+- Roll/Pitch 估計穩定（0.29°/1.02°）。
 - Yaw 最終偏差 0.00°，偏航估計精確。
 
 ### 2.4 加速度計偏差（ba）
@@ -150,13 +150,13 @@ RPY = [20.6°, 0.3°, 90.1°]
 
 | 指標 | 數值 |
 |------|------|
-| RMSE yaw vs VICON | **0.12°** |
+| RMSE yaw vs VICON | **0.11°** |
 | RMSE yaw vs EKF | 0.21° |
 | 最終 yaw（odom_mapping） | -21.73° |
 | 最終 yaw（VICON） | -21.71° |
 
 **觀察：**
-- 融合節點 yaw RMSE 0.12° 遠優於 inner EKF（0.21°），LiDAR 修正偏航效果顯著。
+- 融合節點 yaw RMSE 0.11° 遠優於 inner EKF（0.21°），LiDAR 修正偏航效果顯著。
 
 ### 3.3 fusion/bv 速度偏差修正量
 
@@ -209,32 +209,5 @@ RPY = [20.6°, 0.3°, 90.1°]
 | Inner EKF 位置 RMSE 3D | 4.83 cm |
 | odom_mapping RMSE 2D vs VICON | 2.42 cm |
 | EKF Yaw RMSE | 0.21° |
-| odom_mapping Yaw RMSE | 0.12° |
+| odom_mapping Yaw RMSE | 0.11° |
 | EKF 速度 vx RMSE | 0.041 m/s |
-
----
-
-## 消融分析：有無 LiDAR 回授 (`/fusion/bv`)
-
-**設計**：使用相同原始 bag replay，但排除 `/lidar_odom`，使 `corgi_fusion_node` 無法發布 `/fusion/bv`，  
-`corgi_leg_odom` 的 `bv_outer_` 維持為零（純 inner ESEKF，無 LiDAR body velocity 回授）。
-
-| 指標 | With LiDAR（原始） | Without LiDAR（消融） | 改善率 |
-|------|:---:|:---:|:---:|
-| 3D Position RMSE | **4.83 cm** | 12.08 cm | 60.0% ↑ |
-| 2D Position RMSE | — | 9.60 cm | — |
-| Max 3D 誤差 | — | 20.39 cm | — |
-| vx RMSE | **0.041 m/s** | 0.048 m/s | 13.9% ↑ |
-| Yaw RMSE | **0.21°** | 0.39° | 46.2% ↑ |
-
-**結論**：加入 LiDAR 回授後，3D 位置誤差從 12.08 cm 降至 4.83 cm（改善 **60.0%**）。  
-此實驗的 vx RMSE 與 Yaw RMSE 在消融後均明顯惡化，顯示 obs_odometry 步態下 LiDAR 回授對速度與偏航的修正效益更為顯著。
-
-
-### XY 軌跡比較
-
-![exp4 XY Trajectory](../../ablation_result/exp4_trajectory_comparison.png)
-
-### Position & Velocity 時間序列比較
-
-![exp4 Ablation Position & Velocity](../../ablation_result/exp4_ablation_pos_vel.png)

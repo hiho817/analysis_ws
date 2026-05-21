@@ -27,7 +27,7 @@ def f(v, fmt='.2f'):
 # ═══════════════════════════════════════════════════════════════════════════════
 # ESEKF report generator
 # ═══════════════════════════════════════════════════════════════════════════════
-def write_esekf_report(exp_id, bag_name, vicon_csv, trial_name, exp_num):
+def write_esekf_report(exp_id, bag_name, vicon_csv, trial_name, exp_num, script_name='analyze.py'):
     mi = m[exp_num]
     pos = mi['position']; vel = mi['velocity']
     att = mi['attitude']; ba = mi['ba']; bw = mi['bw']
@@ -48,7 +48,7 @@ def write_esekf_report(exp_id, bag_name, vicon_csv, trial_name, exp_num):
 **Bag 檔案：** `{bag_name}`
 **VICON CSV：** `{vicon_csv}`
 **步行分析區間：** t = 0 – {T_END:.2f} s
-**分析腳本：** `analyze.py`
+**分析腳本：** `{script_name}`
 
 ---
 
@@ -269,7 +269,7 @@ RPY = [{f(tco['RPY_deg'][0],'.1f')}°, {f(tco['RPY_deg'][1],'.1f')}°, {f(tco['R
 # ═══════════════════════════════════════════════════════════════════════════════
 # Legacy report generator
 # ═══════════════════════════════════════════════════════════════════════════════
-def write_legacy_report(exp_id, bag_name, vicon_csv, trial_name, exp_num):
+def write_legacy_report(exp_id, bag_name, vicon_csv, trial_name, exp_num, script_name='analyze.py'):
     mi = m[exp_num]
     pos = mi['position']; vel = mi['velocity']
     T_END = mi['T_END']
@@ -283,7 +283,7 @@ def write_legacy_report(exp_id, bag_name, vicon_csv, trial_name, exp_num):
 **Bag 檔案：** `{bag_name}`
 **VICON CSV：** `{vicon_csv}`
 **步行分析區間：** t = 0 – {T_END:.2f} s
-**分析腳本：** `analyze.py`
+**分析腳本：** `{script_name}`
 
 ---
 
@@ -356,19 +356,19 @@ def write_legacy_report(exp_id, bag_name, vicon_csv, trial_name, exp_num):
 
 # ─── Write reports ────────────────────────────────────────────────────────────
 reports = [
-    ('exp1', 'odom_fusion20260514_215405_0.db3', 'EXP_01.csv', 'walk_2m_01_plain_odometry', 1, 'esekf'),
-    ('exp2', 'odom_fusion20260514_220252_0.db3', 'EXP_02.csv', 'walk_2m_01_plain_odometry', 2, 'esekf'),
-    ('exp3', 'legacy_odom20260514_222433_0.db3', 'EXP_03.csv', 'walk_2m_01_plain_odometry_legacy', 3, 'legacy'),
-    ('exp4', 'odom_fusion20260514_225104_0.db3', 'EXP_04.csv', 'walk_2m_01_obs_odometry', 4, 'esekf'),
-    ('exp5', 'odom_fusion20260514_230340_0.db3', 'EXP_05.csv', 'walk_2m_01_obs_odometry', 5, 'esekf'),
-    ('exp6', 'legacy_odom20260514_232823_0.db3', 'EXP_06.csv', 'walk_2m_01_obs_odometry_legacy', 6, 'legacy'),
+    ('exp1', 'odom_fusion20260514_215405_0.db3', 'EXP_01.csv', 'walk_2m_01_plain_odometry', 1, 'esekf', 'analyze.py'),
+    ('exp2', 'odom_fusion20260514_220252_0.db3', 'EXP_02.csv', 'walk_2m_01_plain_odometry', 2, 'esekf', 'analyze.py'),
+    ('exp3', 'legacy_odom20260514_222433_0.db3', 'EXP_03.csv', 'walk_2m_01_plain_odometry_legacy', 3, 'legacy', 'analyze.py'),
+    ('exp4', 'odom_fusion20260514_225104_0.db3', 'EXP_04.csv', 'walk_2m_01_obs_odometry', 4, 'esekf', 'analyze.py'),
+    ('exp5', 'odom_fusion20260514_230340_0.db3', 'EXP_05_z_corrected.csv', 'walk_2m_01_obs_odometry', 5, 'esekf', 'analyze.py'),
+    ('exp6', 'legacy_odom20260514_232823_0.db3', 'EXP_06_z_corrected.csv', 'walk_2m_01_obs_odometry_legacy', 6, 'legacy', 'analyze.py'),
 ]
 
-for (exp_id, bag, vicon, trial, num, kind) in reports:
+for (exp_id, bag, vicon, trial, num, kind, script) in reports:
     if kind == 'esekf':
-        txt = write_esekf_report(exp_id, bag, vicon, trial, num)
+        txt = write_esekf_report(exp_id, bag, vicon, trial, num, script)
     else:
-        txt = write_legacy_report(exp_id, bag, vicon, trial, num)
+        txt = write_legacy_report(exp_id, bag, vicon, trial, num, script)
     out_path = os.path.join(BASE, 'experiments', '20260514', exp_id, 'result', 'analysis_report.md')
     with open(out_path, 'w', encoding='utf-8') as f_out:
         f_out.write(txt)

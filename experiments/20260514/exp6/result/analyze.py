@@ -30,7 +30,7 @@ RESULTS   = BASE
 BAG_DB    = os.path.join(BASE, '..', 'bags',
                          'legacy_odom20260514_232823',
                          'legacy_odom20260514_232823_0.db3')
-VICON_CSV = os.path.join(BASE, '..', 'vicon', 'EXP_06.csv')
+VICON_CSV = os.path.join(BASE, '..', 'vicon', 'EXP_06_z_corrected.csv')
 TRIAL     = 'walk_2m_01_obs_odometry_legacy'
 DATE      = '20260514'
 EXP_ID    = 'exp6'

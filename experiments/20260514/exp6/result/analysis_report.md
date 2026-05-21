@@ -4,7 +4,7 @@
 **實驗編號：** `exp6`
 **實驗名稱：** `walk_2m_01_obs_odometry_legacy` （啟用觀測速度補正 obs_odometry）
 **Bag 檔案：** `legacy_odom20260514_232823_0.db3`
-**VICON CSV：** `EXP_06.csv`
+**VICON CSV：** `EXP_06_z_corrected.csv`
 **步行分析區間：** t = 0 – 24.51 s
 **分析腳本：** `analyze.py`
 
@@ -38,9 +38,9 @@
 | 最終位置（VICON） | (1.705, 0.663) m |
 
 **觀察：**
-- X 方向誤差（11.94 cm）為主要誤差來源，反映前進方向的積分漂移。
-- Y 與 Z 方向誤差相近（7.74 / 8.54 cm）。
-- Legacy（Information Filter）無 LiDAR 修正，位置誤差約為 ESEKF 的 3–4 倍。
+- Y 方向誤差（7.74 cm）為主要誤差來源，顯示側向漂移嚴重。
+- X 方向 RMSE 11.94 cm，前進方向估計尚可。
+- Legacy（Information Filter）無 LiDAR 修正，位置誤差遠大於 ESEKF。
 
 ---
 
@@ -73,4 +73,4 @@
 | 速度 vx RMSE | 0.037 m/s |
 | 速度 vy RMSE | 0.044 m/s |
 
-> **結論：** Information Filter（Legacy，obs_odometry）在前進速度估計上與 ESEKF 相當（vx RMSE 0.037 m/s），但側向速度誤差較大（vy 0.110 m/s）。位置 RMSE 16.60 cm，約為 ESEKF（~4.8 cm）的 3–4 倍，反映無 LiDAR 修正下更顯著的積分漂移。
+> **結論：** Information Filter（Legacy）在速度估計上表現與 ESEKF 相當，但位置估計因缺乏 LiDAR 修正而累積漂移顯著（16.60 cm vs ESEKF ~4.8 cm）。
