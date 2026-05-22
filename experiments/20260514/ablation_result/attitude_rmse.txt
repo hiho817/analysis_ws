@@ -1,0 +1,7 @@
+Attitude RMSE vs VICON [degrees]
+Exp    Source                   Roll [°]  Pitch [°]    Yaw [°]
+--------------------------------------------------------------
+exp2   ESEKF /ekf/orientation    1.929°    0.702°    0.559°
+exp4   ESEKF /ekf/orientation    0.364°    1.127°    0.210°
+exp3   CX5 AHRS /imu             0.169°    0.214°    0.256°
+exp6   CX5 AHRS /imu             0.850°    1.633°    0.246°

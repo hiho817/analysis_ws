@@ -50,7 +50,7 @@
 | 指標 | plain（exp1,2 avg） | obs（exp4,5 avg） | Δ |
 |------|-------------------|-----------------|---|
 | odom 2D RMSE vs VICON [cm] | 2.58 | 2.47 | +0.10 |
-| EKF Yaw RMSE [°] | 0.44 | 0.45 | -0.01 |
+| EKF Yaw RMSE [°] | 0.44 | 0.38 | +0.06 |
 
 個別數字：
 
@@ -59,11 +59,11 @@
 | exp1 | 3.11 | 0.30 | plain |
 | exp2 | 2.05 | 0.57 | plain |
 | exp4 | 2.42 | 0.21 | obs |
-| exp5 | 2.53 | 0.69 | obs |
+| exp5 | 2.53 | 0.55 | obs |
 
 **觀察：**
 - odom_mapping 2D RMSE：plain 平均 2.58 cm，obs 平均 2.47 cm，差異 0.10 cm。
-- Yaw RMSE：plain 0.44° vs obs 0.45°，幾乎相同。
+- Yaw RMSE：plain 0.44° vs obs 0.38°，幾乎相同。
 - **結論：** 外部融合節點效果與 plain/obs 選擇無顯著關聯，LiDAR 融合主導了最終精度。
 
 ---
@@ -74,11 +74,11 @@
 
 | 指標 | plain（exp3） | obs（exp6） | Δ |
 |------|-------------|-----------|---|
-| 位置 RMSE 3D [cm] | 30.85 | 70.03 | -39.18 |
+| 位置 RMSE 3D [cm] | 9.61 | 16.60 | -6.99 |
 | 速度 vx RMSE [m/s] | 0.037 | 0.037 | +0.0008 |
 
 **觀察：**
-- exp6（obs_legacy）位置 RMSE 3D 高達 70.03 cm，遠差於 exp3（plain_legacy）的 30.85 cm。
+- exp6（obs_legacy）位置 RMSE 3D 高達 16.60 cm，遠差於 exp3（plain_legacy）的 9.61 cm。
 - Y 方向漂移是主要原因：exp3 RMSE_Y = 30.2 cm，exp6 RMSE_Y = 68.5 cm。
 - 速度 RMSE 相當（均約 0.037 m/s），顯示兩者速度估計品質相同，但位置積分誤差差距懸殊。
 - **結論：** obs_odometry 在 Legacy（Information Filter）條件下位置估計顯著退步。推測 obs 補正量與 Information Filter 的積分機制不相容，導致偏差累積加速。

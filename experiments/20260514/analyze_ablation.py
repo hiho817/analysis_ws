@@ -64,7 +64,7 @@ EXPS = {
     'exp5': {
         'trial':        'walk_2m_01_obs_odometry (run 2)',
         'orig_bag':     'odom_fusion20260514_230340',
-        'vicon_csv':    'EXP_05.csv',
+        'vicon_csv':    'EXP_05_z_corrected.csv',
         'orig_metrics': os.path.join(EXP_ROOT, 'exp5', 'result', 'metrics.json'),
     },
 }
