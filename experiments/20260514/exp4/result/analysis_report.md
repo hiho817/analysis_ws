@@ -66,8 +66,8 @@ RPY = [20.6°, 0.3°, 90.1°]
 | RMSE Z（vs VICON） | 2.14 cm |
 | RMSE 3D（vs VICON） | **4.83 cm** |
 | 最大 3D 誤差 | 7.54 cm |
-| 最終位置（EKF） | (1.705, -0.576) m |
-| 最終位置（VICON） | (1.707, -0.626) m |
+| 最終位置（EKF） | (1.705, -0.576, -0.032) m |
+| 最終位置（VICON） | (1.707, -0.626, 0.002) m |
 
 **觀察：**
 - Y 方向誤差（4.11 cm）為主要誤差來源，X 方向追蹤良好（1.37 cm）。
@@ -77,13 +77,11 @@ RPY = [20.6°, 0.3°, 90.1°]
 
 ![EKF 速度](fig_ekf_vel.png)
 
-> 速度 RMSE 計算窗口：t = 9.5 – 16.6 s（穩態步行段）
-
 | 指標 | 數值 |
 |------|------|
-| RMSE vx（vs VICON） | 0.041 m/s |
-| RMSE vy（vs VICON） | 0.061 m/s |
-| RMSE vz（vs VICON） | 0.023 m/s |
+| RMSE vx（vs VICON） | 0.048 m/s |
+| RMSE vy（vs VICON） | 0.058 m/s |
+| RMSE vz（vs VICON） | 0.022 m/s |
 | 最大前進速度 | 0.325 m/s |
 
 **觀察：**

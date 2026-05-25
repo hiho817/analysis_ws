@@ -305,24 +305,24 @@ metrics_pos = {
     'MAX_3D_cm':  float(np.max(err_3d[valid_p])) * 100,
     'final_EKF_x':   float(epx[-1]),
     'final_EKF_y':   float(epy[-1]),
+    'final_EKF_z':   float(epz[-1]),
     'final_VICON_x': float(vi_px_e[valid_p][-1]) if valid_p.any() else float('nan'),
     'final_VICON_y': float(vi_py_e[valid_p][-1]) if valid_p.any() else float('nan'),
+    'final_VICON_z': float(vi_pz_e[valid_p][-1]) if valid_p.any() else float('nan'),
 }
 print(f'  Pos RMSE: X={metrics_pos["RMSE_X_cm"]:.2f}cm '
       f'Y={metrics_pos["RMSE_Y_cm"]:.2f}cm '
       f'3D={metrics_pos["RMSE_3D_cm"]:.2f}cm')
 
-# 2.2 Velocity - stable window (40-70% of T_END)
-t_vel_s = T_END * 0.40; t_vel_e = T_END * 0.70
-vmask = (et >= t_vel_s) & (et <= t_vel_e)
+# 2.2 Velocity - full trigger window
+vmask = ~np.isnan(vi_vx_e) | ~np.isnan(vi_vy_e) | ~np.isnan(vi_vz_e)  # any valid VICON
 metrics_vel = {
-    'RMSE_vx': rmse((evx - vi_vx_e)[vmask & ~np.isnan(vi_vx_e)]),
-    'RMSE_vy': rmse((evy - vi_vy_e)[vmask & ~np.isnan(vi_vy_e)]),
-    'RMSE_vz': rmse((evz - vi_vz_e)[vmask & ~np.isnan(vi_vz_e)]),
-    'peak_vx': float(np.nanmax(np.abs(evx[vmask]))),
-    't_vel_s': t_vel_s, 't_vel_e': t_vel_e,
+    'RMSE_vx': rmse((evx - vi_vx_e)[~np.isnan(vi_vx_e)]),
+    'RMSE_vy': rmse((evy - vi_vy_e)[~np.isnan(vi_vy_e)]),
+    'RMSE_vz': rmse((evz - vi_vz_e)[~np.isnan(vi_vz_e)]),
+    'peak_vx': float(np.nanmax(np.abs(evx))),
 }
-print(f'  Vel RMSE (t={t_vel_s:.1f}-{t_vel_e:.1f}s): '
+print(f'  Vel RMSE (full window): '
       f'vx={metrics_vel["RMSE_vx"]:.3f} vy={metrics_vel["RMSE_vy"]:.3f} m/s')
 
 # 2.3 Attitude
@@ -356,16 +356,20 @@ metrics_bw = {ax: {'init': float(bw[ax][bw_mask][0]) if bw_mask.any() else float
               for ax in ['x', 'y', 'z']}
 
 # ─── EKF plots ────────────────────────────────────────────────────────────────
-# XY trajectory
+# XZ trajectory
 fig, ax = plt.subplots(figsize=(7, 5))
-ax.plot(vi_px_e[valid_p], vi_py_e[valid_p], 'k-', lw=1, label='VICON', zorder=4)
-sc = ax.scatter(epx, epy, c=et, cmap='viridis', s=2, lw=0)
-ax.plot(epx[0], epy[0], 'go', ms=8, label='EKF start', zorder=5)
-ax.plot(epx[-1], epy[-1], 'r^', ms=8, label='EKF end',   zorder=5)
+ax.plot(vi_px_e[valid_p], vi_pz_e[valid_p], 'k-', lw=1, label='VICON', zorder=4)
+sc = ax.scatter(epx, epz, c=et, cmap='viridis', s=2, lw=0)
+ax.plot(epx[0], epz[0], 'go', ms=8, label='EKF start', zorder=5)
+ax.plot(epx[-1], epz[-1], 'r^', ms=8, label='EKF end',   zorder=5)
 plt.colorbar(sc, ax=ax, label='Time [s]')
-ax.set_xlabel('X [m]'); ax.set_ylabel('Y [m]')
-ax.set_title(f'EKF XY Trajectory — {DATE} {EXP_ID}')
-ax.set_aspect('equal'); ax.legend(fontsize=8); ax.grid(True, alpha=0.4)
+_z_all = np.concatenate([epz, vi_pz_e[valid_p]])
+_z_mid = float(np.nanmean(_z_all))
+_z_half = max(float(np.nanmax(np.abs(_z_all - _z_mid))), 0.05) * 2.5
+ax.set_ylim(_z_mid - _z_half, _z_mid + _z_half)
+ax.set_xlabel('X [m]'); ax.set_ylabel('Z [m]')
+ax.set_title(f'EKF XZ Trajectory — {DATE} {EXP_ID}')
+ax.set_aspect('equal'); ax.legend(fontsize=8, loc='upper left'); ax.grid(True, alpha=0.4)
 fig.tight_layout()
 fig.savefig(os.path.join(RESULTS, 'fig_ekf_xy.png'), dpi=150)
 plt.close(fig)
@@ -398,7 +402,6 @@ for ax, ek_val, vi_val, lbl in zip(axes,
     ax.plot(et, ek_val, lw=0.8, label='EKF')
     valid_vi = ~np.isnan(vi_val)
     ax.plot(et[valid_vi], vi_val[valid_vi], 'k--', lw=1, alpha=0.7, label='VICON')
-    ax.axvspan(t_vel_s, t_vel_e, color='skyblue', alpha=0.12, label='vel window')
     _shade_window(ax, T_END, label=False)
     ax.axhline(0, color='k', lw=0.5, ls='--', alpha=0.3)
     ax.set_ylabel(f'{lbl} [m/s]'); ax.legend(fontsize=7); ax.grid(True, alpha=0.4)
@@ -572,6 +575,7 @@ lidar_mask = (lidar['t'] >= 0.0) & (lidar['t'] <= T_END)
 lt = lidar['t'][lidar_mask]
 lpx_o = lidar['px_odom'][lidar_mask]
 lpy_o = lidar['py_odom'][lidar_mask]
+lpz_o = lidar['pz_odom'][lidar_mask]
 
 # Rate
 if len(lt) > 1:
@@ -594,12 +598,16 @@ metrics_lidar = {
 print(f'  LiDAR: {metrics_lidar["n_msgs"]} msgs, {lidar_rate:.1f} Hz, {jumps} jumps>10cm')
 
 fig, ax = plt.subplots(figsize=(7, 5))
-ax.plot(pos_vicon[vi_valid, 0], pos_vicon[vi_valid, 1], 'k-', lw=1, label='VICON', alpha=0.7)
-ax.scatter(epx, epy, c=et, cmap='Blues', s=1, label='EKF')
-ax.scatter(lpx_o, lpy_o, c=lt, cmap='Reds', s=1, label='LiDAR (odom frame)')
-ax.set_xlabel('X [m]'); ax.set_ylabel('Y [m]')
-ax.set_title(f'LiDAR XY (odom frame) — {DATE} {EXP_ID}')
-ax.set_aspect('equal'); ax.legend(fontsize=8); ax.grid(True, alpha=0.4)
+ax.plot(pos_vicon[vi_valid, 0], pos_vicon[vi_valid, 2], 'k-', lw=1, label='VICON', alpha=0.7)
+ax.scatter(epx, epz, c=et, cmap='Blues', s=1, label='EKF')
+ax.scatter(lpx_o, lpz_o, c=lt, cmap='Reds', s=1, label='LiDAR (odom frame)')
+_lz_all = np.concatenate([epz, lpz_o, pos_vicon[vi_valid, 2]])
+_lz_mid = float(np.nanmean(_lz_all))
+_lz_half = max(float(np.nanmax(np.abs(_lz_all - _lz_mid))), 0.05) * 2.5
+ax.set_ylim(_lz_mid - _lz_half, _lz_mid + _lz_half)
+ax.set_xlabel('X [m]'); ax.set_ylabel('Z [m]')
+ax.set_title(f'LiDAR XZ (odom frame) — {DATE} {EXP_ID}')
+ax.set_aspect('equal'); ax.legend(fontsize=8, loc='upper left'); ax.grid(True, alpha=0.4)
 fig.tight_layout()
 fig.savefig(os.path.join(RESULTS, 'fig_lidar_xy.png'), dpi=150)
 plt.close(fig)

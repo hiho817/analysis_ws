@@ -34,8 +34,8 @@
 | RMSE Z（vs VICON） | 1.78 cm |
 | RMSE 3D（vs VICON） | **9.61 cm** |
 | 最大 3D 誤差 | 17.12 cm |
-| 最終位置（Legacy） | (1.955, 0.233) m |
-| 最終位置（VICON） | (1.852, 0.341) m |
+| 最終位置（Legacy） | (1.955, 0.233, -0.030) m |
+| 最終位置（VICON） | (1.852, 0.341, 0.002) m |
 
 **觀察：**
 - Y 方向誤差（7.26 cm）為主要誤差來源，顯示側向漂移嚴重。
@@ -48,13 +48,11 @@
 
 ![速度時序](fig_vel_time.png)
 
-> 速度 RMSE 計算窗口：t = 9.4 – 16.5 s（穩態步行段）
-
 | 指標 | 數值 |
 |------|------|
 | RMSE vx（vs VICON） | 0.037 m/s |
-| RMSE vy（vs VICON） | 0.043 m/s |
-| RMSE vz（vs VICON） | 0.058 m/s |
+| RMSE vy（vs VICON） | 0.041 m/s |
+| RMSE vz（vs VICON） | 0.059 m/s |
 | 最大前進速度 | 0.309 m/s |
 
 **觀察：**

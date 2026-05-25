@@ -107,8 +107,10 @@ metrics_pos = {
     'MAX_3D_cm':  float(np.max(err_3d[valid_p])) * 100 if valid_p.any() else float('nan'),
     'final_pos_x':   float(px[-1]) if len(px) > 0 else float('nan'),
     'final_pos_y':   float(py[-1]) if len(py) > 0 else float('nan'),
+    'final_pos_z':   float(pz[-1]) if len(pz) > 0 else float('nan'),
     'final_VICON_x': float(vi_px_p[valid_p][-1]) if valid_p.any() else float('nan'),
     'final_VICON_y': float(vi_py_p[valid_p][-1]) if valid_p.any() else float('nan'),
+    'final_VICON_z': float(vi_pz_p[valid_p][-1]) if valid_p.any() else float('nan'),
 }
 print(f'  Pos RMSE: X={metrics_pos["RMSE_X_cm"]:.2f}cm '
       f'Y={metrics_pos["RMSE_Y_cm"]:.2f}cm '
@@ -118,18 +120,15 @@ print(f'  Pos RMSE: X={metrics_pos["RMSE_X_cm"]:.2f}cm '
 # Velocity Metrics
 # ═══════════════════════════════════════════════════════════════════════════════
 print('\n' + '─'*60 + '\nVelocity Analysis')
-t_vel_s = T_END * 0.40; t_vel_e = T_END * 0.70
-vmask = (vt >= t_vel_s) & (vt <= t_vel_e)
 valid_vx = ~np.isnan(vi_vx_v)
 valid_vy = ~np.isnan(vi_vy_v)
 metrics_vel = {
-    'RMSE_vx': rmse((vx - vi_vx_v)[vmask & valid_vx]),
-    'RMSE_vy': rmse((vy - vi_vy_v)[vmask & valid_vy]),
-    'RMSE_vz': rmse((vz - vi_vz_v)[vmask & ~np.isnan(vi_vz_v)]),
-    'peak_vx': float(np.nanmax(np.abs(vx[vmask]))) if vmask.any() else float('nan'),
-    't_vel_s': t_vel_s, 't_vel_e': t_vel_e,
+    'RMSE_vx': rmse((vx - vi_vx_v)[valid_vx]),
+    'RMSE_vy': rmse((vy - vi_vy_v)[valid_vy]),
+    'RMSE_vz': rmse((vz - vi_vz_v)[~np.isnan(vi_vz_v)]),
+    'peak_vx': float(np.nanmax(np.abs(vx))) if len(vx) > 0 else float('nan'),
 }
-print(f'  Vel RMSE (t={t_vel_s:.1f}-{t_vel_e:.1f}s): '
+print(f'  Vel RMSE (full window): '
       f'vx={metrics_vel["RMSE_vx"]:.3f} vy={metrics_vel["RMSE_vy"]:.3f} m/s')
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -152,17 +151,21 @@ fig.tight_layout()
 fig.savefig(os.path.join(RESULTS, 'fig_pos_xy.png'), dpi=150)
 plt.close(fig)
 
-# -- Better XY plot using actual X vs Y
+# -- XZ trajectory plot
 fig, ax = plt.subplots(figsize=(7, 5))
-ax.plot(pos_vicon[vi_valid, 0], pos_vicon[vi_valid, 1],
+ax.plot(pos_vicon[vi_valid, 0], pos_vicon[vi_valid, 2],
         'k-', lw=1.5, label='VICON', zorder=4)
-sc = ax.scatter(px, py, c=pt, cmap='viridis', s=3, lw=0, label='Legacy')
-ax.plot(px[0], py[0], 'go', ms=8, label='start', zorder=5)
-ax.plot(px[-1], py[-1], 'r^', ms=8, label='end',   zorder=5)
+sc = ax.scatter(px, pz, c=pt, cmap='viridis', s=3, lw=0, label='Legacy')
+ax.plot(px[0], pz[0], 'go', ms=8, label='start', zorder=5)
+ax.plot(px[-1], pz[-1], 'r^', ms=8, label='end',   zorder=5)
 plt.colorbar(sc, ax=ax, label='Time [s]')
-ax.set_xlabel('X [m]'); ax.set_ylabel('Y [m]')
-ax.set_title(f'Legacy XY Trajectory — {DATE} {EXP_ID}')
-ax.set_aspect('equal'); ax.legend(fontsize=8); ax.grid(True, alpha=0.4)
+z_all = np.concatenate([pz, pos_vicon[vi_valid, 2]])
+z_mid = float(np.nanmean(z_all))
+z_half = max(float(np.nanmax(np.abs(z_all - z_mid))), 0.05) * 2.5
+ax.set_ylim(z_mid - z_half, z_mid + z_half)
+ax.set_xlabel('X [m]'); ax.set_ylabel('Z [m]')
+ax.set_title(f'Legacy XZ Trajectory — {DATE} {EXP_ID}')
+ax.set_aspect('equal'); ax.legend(fontsize=8, loc='upper left'); ax.grid(True, alpha=0.4)
 fig.tight_layout()
 fig.savefig(os.path.join(RESULTS, 'fig_traj_xy.png'), dpi=150)
 plt.close(fig)
@@ -191,7 +194,6 @@ for ax, lbl, lv, vi_v in zip(axes, ['vx', 'vy', 'vz'], leg_vvals, vi_vvals):
     ax.plot(vt, lv, lw=0.8, label='Legacy')
     valid_vi = ~np.isnan(vi_v)
     ax.plot(vt[valid_vi], vi_v[valid_vi], 'k--', lw=1, alpha=0.7, label='VICON')
-    ax.axvspan(t_vel_s, t_vel_e, color='skyblue', alpha=0.12, label='vel window')
     _shade_window(ax, T_END, label=False)
     ax.axhline(0, color='k', lw=0.5, ls='--', alpha=0.3)
     ax.set_ylabel(f'{lbl} [m/s]'); ax.legend(fontsize=7); ax.grid(True, alpha=0.4)
