@@ -1,0 +1,24 @@
+{
+  "exp_id": "FLAT_WLW_OLD_REAL_2",
+  "group": "OLD_WLW",
+  "bag": "legacy_odom20260528_164050",
+  "T_END": 35.058,
+  "exclude_stats": false,
+  "position": {
+    "RMSE_X_cm": 2.5604236189940828,
+    "RMSE_Y_cm": 9.570204969504076,
+    "RMSE_2D_cm": 9.906795257146644,
+    "MAX_2D_cm": 20.03844148413665,
+    "final_leg_x": 2.914212703704834,
+    "final_leg_y": 0.0,
+    "final_VICON_x": 2.868111844323303,
+    "final_VICON_y": -0.19459012766417844
+  },
+  "velocity": {
+    "RMSE_vx": 0.025502613410186687,
+    "RMSE_vy": 0.030130469560037787,
+    "mean_vi_vx": 0.099410510758606,
+    "std_vi_vx": 0.024244893062711645,
+    "mean_vi_vy": 0.00027945445619288045
+  }
+}

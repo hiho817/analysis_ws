@@ -174,9 +174,16 @@ def load_inner_ekf_bag(bag_db: str, rate: float = 2.0) -> dict:
     }
 
 
-def load_fusion_bag(bag_db: str, rate: float = 1.0) -> dict:
+def load_fusion_bag(bag_db: str, rate: float = 1.0, trigger_pair: int = 0) -> dict:
     """
     Load outer-fusion bag topics (inner EKF + odom_mapping + fusion/bv).
+
+    Parameters
+    ----------
+    trigger_pair : int
+        0-based index of the trigger ON/OFF pair to use.  Default 0 (first pair).
+        Use trigger_pair=1 when the first trigger window was aborted and the
+        experiment was restarted within the same bag.
 
     Returns
     -------
@@ -200,16 +207,33 @@ def load_fusion_bag(bag_db: str, rate: float = 1.0) -> dict:
     if not rows_trg:
         raise RuntimeError("No /trigger messages found in bag")
 
-    trg_msg = deserialize_message(rows_trg[0][1], TriggerStamped)
-    t_ros_trigger = trg_msg.header.stamp.sec + trg_msg.header.stamp.nanosec * 1e-9
-    trg_ts0 = rows_trg[0][0]
-    # Trigger OFF: second message (enable=False) if present
-    t_ros_trigger_off = None
-    if len(rows_trg) >= 2:
-        trg_off_msg = deserialize_message(rows_trg[1][1], TriggerStamped)
-        if not trg_off_msg.enable:
-            t_ros_trigger_off = (trg_off_msg.header.stamp.sec
-                                 + trg_off_msg.header.stamp.nanosec * 1e-9)
+    # ── Parse all trigger ON/OFF pairs ────────────────────────────────────────
+    _pairs = []   # list of (storage_ts_on, ros_t_on, storage_ts_off, ros_t_off)
+    _pending = None
+    for ts, data in rows_trg:
+        msg = deserialize_message(data, TriggerStamped)
+        ros_t = msg.header.stamp.sec + msg.header.stamp.nanosec * 1e-9
+        if msg.enable:
+            _pending = (ts, ros_t)
+        elif _pending is not None:
+            _pairs.append((*_pending, ts, ros_t))
+            _pending = None
+    if _pending is not None:
+        # Bag ended before trigger-OFF
+        _pairs.append((*_pending, None, None))
+    if not _pairs:
+        # Bag only has trigger-OFF (legacy recording mode)
+        ts0, data0 = rows_trg[0]
+        msg0 = deserialize_message(data0, TriggerStamped)
+        ros_t0 = msg0.header.stamp.sec + msg0.header.stamp.nanosec * 1e-9
+        _pairs.append((ts0, ros_t0, None, None))
+
+    if trigger_pair >= len(_pairs):
+        raise ValueError(f'trigger_pair={trigger_pair} requested but only '
+                         f'{len(_pairs)} pair(s) found in {bag_db}')
+    trg_ts0, t_ros_trigger, trg_ts_off, t_ros_trigger_off = _pairs[trigger_pair]
+    print(f'[bag_loader] Using trigger pair {trigger_pair}: '
+          f'ON={t_ros_trigger:.3f}s, OFF={t_ros_trigger_off}')
 
     ekf  = _parse_ekf(rows_ekf,  t_ros_trigger)
     ba   = _parse_vector3_bias(rows_ba,  trg_ts0, rate)
