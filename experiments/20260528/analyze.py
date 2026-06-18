@@ -11,7 +11,7 @@ CORGI Batch Analysis — 20260528
     python3 analyze.py                  # 跑所有 21 筆有效實驗
 """
 
-import os, sys, json, argparse
+import os, sys, json, argparse, re
 import numpy as np
 import matplotlib
 matplotlib.use('Agg')
@@ -120,6 +120,44 @@ def interp_gmo(gmo_t, gmo_leg, t_tgt, T_END):
                     bounds_error=False, fill_value=0.)(t_tgt) > 0.5
 
 
+def match_contact_edges(t, reference, estimate, max_abs_dt_s=0.1):
+    """One-to-one nearest rising-edge matching within a bounded time window.
+
+    Discontinuities in ``t`` are not treated as contact transitions.  Returns
+    signed delays (estimate - reference) in milliseconds.
+    """
+    t = np.asarray(t, dtype=float)
+    reference = np.asarray(reference, dtype=bool)
+    estimate = np.asarray(estimate, dtype=bool)
+    if len(t) < 2:
+        return np.array([], dtype=float)
+
+    dt = np.diff(t)
+    contiguous = dt <= max(0.01, 3.0 * np.nanmedian(dt))
+    ref_idx = np.where((~reference[:-1]) & reference[1:] & contiguous)[0] + 1
+    est_idx = np.where((~estimate[:-1]) & estimate[1:] & contiguous)[0] + 1
+    ref_t = t[ref_idx]
+    est_t = t[est_idx]
+
+    candidates = []
+    for i, tr in enumerate(ref_t):
+        for j, te in enumerate(est_t):
+            delta = te - tr
+            if abs(delta) <= max_abs_dt_s:
+                candidates.append((abs(delta), i, j, delta))
+
+    used_ref = set()
+    used_est = set()
+    delays = []
+    for _, i, j, delta in sorted(candidates):
+        if i in used_ref or j in used_est:
+            continue
+        used_ref.add(i)
+        used_est.add(j)
+        delays.append(delta * 1000.0)
+    return np.asarray(delays, dtype=float)
+
+
 def align_vicon_orientation(rpy_vicon, rpy_ekf_deg):
     """Align VICON initial orientation to EKF frame."""
     valid = ~np.isnan(rpy_vicon).any(1)
@@ -202,7 +240,7 @@ def analyze_new(exp_id, group, bag_name, vicon_csv, out_dir,
             ekf['vx'] = -ekf['vx']; fv['x'] = -fv['x']
         if 'vy' in flip:
             ekf['vy'] = -ekf['vy']; fv['y'] = -fv['y']
-        # Roll/pitch: negate qx, qy (flips roll & pitch while preserving yaw)
+        # Basis change S=Rz(pi): R' = S R S^-1, equivalent to qx,qy sign flip.
         if 'roll' in flip or 'pitch' in flip:
             ekf['qx'] = -ekf['qx']; ekf['qy'] = -ekf['qy']
 
@@ -307,14 +345,19 @@ def analyze_new(exp_id, group, bag_name, vicon_csv, out_dir,
             except Exception:
                 rmask = np.zeros(len(vi.t_traj), dtype=bool)
 
-            amask = mask_win_vi & rmask
+            # Compare only where both sensors actually contain data.  In
+            # particular, OFF-only bags may start several seconds after VICON.
+            finite_foot = np.isfinite(hf)
+            gmo_overlap = ((vi.t_traj >= gmo['t'][0]) &
+                           (vi.t_traj <= gmo['t'][-1]))
+            amask = mask_win_vi & rmask & finite_foot & gmo_overlap
             if amask.sum() < 10:
                 contact_results[leg] = None; continue
 
-            ta  = vi.t_traj[amask]; cva = cf[amask]
+            ta  = vi.t_traj[amask]
+            cva = hf[amask] < CONTACT_THRESHOLD_M
             cga = interp_gmo(gmo['t'], gmo[leg], ta, T_END)
-            valid_v = ~np.isnan(cva.astype(float))
-            tv = ta[valid_v]; cv_v = cva[valid_v]; cg_v = cga[valid_v]
+            tv = ta; cv_v = cva; cg_v = cga
             if len(tv) == 0:
                 contact_results[leg] = None; continue
 
@@ -326,21 +369,21 @@ def analyze_new(exp_id, group, bag_name, vicon_csv, out_dir,
             rec  = TP / (TP + FN) if (TP + FN) > 0 else float('nan')
             f1   = 2 * prec * rec / (prec + rec) if not np.isnan(prec + rec) and (prec + rec) > 0 else float('nan')
 
-            latencies = []
-            dt_v = np.diff(cv_v.astype(int), prepend=0)
-            dt_g = np.diff(cg_v.astype(int), prepend=0)
-            for i in np.where(dt_v == 1)[0]:
-                future = np.where((dt_g == 1) & (np.arange(len(tv)) >= i))[0]
-                if future.size > 0:
-                    latencies.append((tv[future[0]] - tv[i]) * 1000)
-            mean_lat = float(np.mean(latencies)) if latencies else float('nan')
+            latencies = match_contact_edges(tv, cv_v, cg_v, max_abs_dt_s=0.1)
+            mean_lat = float(np.mean(latencies)) if len(latencies) else float('nan')
+            mean_abs_lat = float(np.mean(np.abs(latencies))) if len(latencies) else float('nan')
 
             contact_results[leg] = {
                 'N': N, 'TP': TP, 'TN': TN, 'FP': FP, 'FN': FN,
                 'acc': acc, 'prec': prec, 'rec': rec, 'f1': f1,
                 'mean_lat_ms': mean_lat,
+                'mean_abs_lat_ms': mean_abs_lat,
+                'n_latency_matches': int(len(latencies)),
+                't_start': float(tv[0]), 't_end': float(tv[-1]),
             }
-            print(f'  [{leg}] Acc={acc:.1%} Prec={prec:.3f} Rec={rec:.3f} F1={f1:.4f} Lat={mean_lat:.1f}ms')
+            print(f'  [{leg}] Acc={acc:.1%} Prec={prec:.3f} Rec={rec:.3f} '
+                  f'F1={f1:.4f} |Lat|={mean_abs_lat:.1f}ms '
+                  f'(n={len(latencies)}, overlap={tv[0]:.2f}–{tv[-1]:.2f}s)')
 
         # Contact plot
         fig, axes = plt.subplots(4, 1, figsize=(13, 8), sharex=True)
@@ -388,6 +431,11 @@ def analyze_new(exp_id, group, bag_name, vicon_csv, out_dir,
         'RMSE_vz': rmse((evz - vi_vz_e)[vmask & ~np.isnan(vi_vz_e)]),
         'peak_vx': float(np.nanmax(np.abs(evx[vmask]))) if vmask.any() else float('nan'),
     }
+    vel_err = np.column_stack([evx - vi_vx_e, evy - vi_vy_e, evz - vi_vz_e])
+    valid_vel_3d = vmask & np.isfinite(vel_err).all(axis=1)
+    metrics_vel['RMSE_3D'] = rmse(np.linalg.norm(vel_err[valid_vel_3d], axis=1))
+    metrics_vel['window_start'] = float(t_vel_s)
+    metrics_vel['window_end'] = float(t_vel_e)
     print(f'  EKF Vel RMSE vx={metrics_vel["RMSE_vx"]:.3f} vy={metrics_vel["RMSE_vy"]:.3f} m/s')
 
     valid_roll  = ~np.isnan(vi_roll_e)
@@ -477,11 +525,25 @@ def analyze_new(exp_id, group, bag_name, vicon_csv, out_dir,
     fv_mask = (fv['t'] >= 0.0) & (fv['t'] <= T_END)
     ft = fv['t'][fv_mask]
     fvx = fv['x'][fv_mask]; fvy = fv['y'][fv_mask]
-    vi_fvx = interp_to(vi_t_v, v_body_vi[vi_valid, 0], ft)
-    vi_fvy = interp_to(vi_t_v, v_body_vi[vi_valid, 1], ft)
+    # /fusion/bv is published in odom/world frame.  Rotate VICON body velocity
+    # back to the robot-centric world frame before comparison.
+    vi_rot_valid = (~np.isnan(rpy_vicon).any(1) &
+                    ~np.isnan(v_body_vi).any(1))
+    vi_world_vel = np.full_like(v_body_vi, np.nan)
+    vi_world_vel[vi_rot_valid] = Rotation.from_euler(
+        'ZYX', rpy_vicon[vi_rot_valid, ::-1]).apply(v_body_vi[vi_rot_valid])
+    vi_fvx = interp_to(t_win[vi_rot_valid], vi_world_vel[vi_rot_valid, 0], ft)
+    vi_fvy = interp_to(t_win[vi_rot_valid], vi_world_vel[vi_rot_valid, 1], ft)
+    vi_fvz = interp_to(t_win[vi_rot_valid], vi_world_vel[vi_rot_valid, 2], ft)
+    fvz = fv['z'][fv_mask]
+    fv_err = np.column_stack([fvx - vi_fvx, fvy - vi_fvy, fvz - vi_fvz])
+    valid_fv_3d = np.isfinite(fv_err).all(axis=1)
     metrics_fv = {
         'RMSE_vx': rmse((fvx - vi_fvx)[~np.isnan(vi_fvx)]),
         'RMSE_vy': rmse((fvy - vi_fvy)[~np.isnan(vi_fvy)]),
+        'RMSE_vz': rmse((fvz - vi_fvz)[~np.isnan(vi_fvz)]),
+        'RMSE_3D': rmse(np.linalg.norm(fv_err[valid_fv_3d], axis=1)),
+        'frame': 'odom',
     }
 
     # XZ trajectory plot  (VICON Z shifted by z_offset to align to estimator frame)
@@ -519,6 +581,8 @@ def analyze_new(exp_id, group, bag_name, vicon_csv, out_dir,
     # ── Save metrics ───────────────────────────────────────────────────────────
     metrics = {
         'exp_id': exp_id, 'group': group, 'bag': bag_name, 'T_END': T_END,
+        'data_start': float(et[0]) if len(et) else float('nan'),
+        'data_end': float(et[-1]) if len(et) else float('nan'),
         'position': metrics_pos,
         'velocity': metrics_vel,
         'attitude': metrics_rpy,
@@ -581,7 +645,7 @@ def analyze_old(exp_id, group, bag_name, vicon_csv, out_dir, flip=None):
 
     vel_mask = (vel['t'] >= 0.0) & (vel['t'] <= T_END)
     vt = vel['t'][vel_mask]
-    vx = vel['x'][vel_mask]; vy = vel['y'][vel_mask]
+    vx = vel['x'][vel_mask]; vy = vel['y'][vel_mask]; vz = vel['z'][vel_mask]
 
     # ── Apply signal flips ────────────────────────────────────────────────────
     if flip:
@@ -591,30 +655,40 @@ def analyze_old(exp_id, group, bag_name, vicon_csv, out_dir, flip=None):
         if 'pz' in flip: pz = -pz
         if 'vx' in flip: vx = -vx
         if 'vy' in flip: vy = -vy
+        if 'vz' in flip: vz = -vz
 
     vi_px = interp_to(vi_t_v, pos_vicon[vi_valid, 0], pt)
     vi_py = interp_to(vi_t_v, pos_vicon[vi_valid, 1], pt)
+    vi_pz = interp_to(vi_t_v, pos_vicon[vi_valid, 2], pt)
     vi_vx = interp_to(vi_t_v, v_body_vi[vi_valid, 0], vt)
     vi_vy = interp_to(vi_t_v, v_body_vi[vi_valid, 1], vt)
+    vi_vz = interp_to(vi_t_v, v_body_vi[vi_valid, 2], vt)
 
     # Align initial position
     valid_px = ~np.isnan(vi_px)
     if valid_px.any():
         offset_x = px[valid_px][0] - vi_px[valid_px][0]
         offset_y = py[valid_px][0] - vi_py[valid_px][0]
+        offset_z = pz[valid_px][0] - vi_pz[valid_px][0]
     else:
-        offset_x = offset_y = 0.0
+        offset_x = offset_y = offset_z = 0.0
 
     err_px = px - vi_px - offset_x
     err_py = py - vi_py - offset_y
-    err_2d = np.sqrt(err_px**2 + err_py**2)
-    valid_p = ~np.isnan(err_2d)
+    err_pz = pz - vi_pz - offset_z
+    pos_err = np.column_stack([err_px, err_py, err_pz])
+    err_2d = np.linalg.norm(pos_err[:, :2], axis=1)
+    err_3d = np.linalg.norm(pos_err, axis=1)
+    valid_p = np.isfinite(pos_err).all(axis=1)
 
     metrics_pos = {
         'RMSE_X_cm':  rmse(err_px[valid_p]) * 100,
         'RMSE_Y_cm':  rmse(err_py[valid_p]) * 100,
+        'RMSE_Z_cm':  rmse(err_pz[valid_p]) * 100,
         'RMSE_2D_cm': rmse(err_2d[valid_p]) * 100,
+        'RMSE_3D_cm': rmse(err_3d[valid_p]) * 100,
         'MAX_2D_cm':  float(np.nanmax(err_2d[valid_p])) * 100 if valid_p.any() else float('nan'),
+        'MAX_3D_cm':  float(np.nanmax(err_3d[valid_p])) * 100 if valid_p.any() else float('nan'),
         'final_leg_x': float(px[-1]) if len(px) > 0 else float('nan'),
         'final_leg_y': float(py[-1]) if len(py) > 0 else float('nan'),
         'final_VICON_x': float(vi_px[valid_p][-1]) if valid_p.any() else float('nan'),
@@ -625,14 +699,19 @@ def analyze_old(exp_id, group, bag_name, vicon_csv, out_dir, flip=None):
 
     t_vel_s = T_END * 0.35; t_vel_e = T_END * 0.75
     vel_window = (vt >= t_vel_s) & (vt <= t_vel_e)
+    vel_err = np.column_stack([vx - vi_vx, vy - vi_vy, vz - vi_vz])
+    valid_vel = vel_window & np.isfinite(vel_err).all(axis=1)
     metrics_vel = {
-        'RMSE_vx': rmse((vx - vi_vx)[vel_window & ~np.isnan(vi_vx)]),
-        'RMSE_vy': rmse((vy - vi_vy)[vel_window & ~np.isnan(vi_vy)]),
+        'RMSE_vx': rmse(vel_err[valid_vel, 0]),
+        'RMSE_vy': rmse(vel_err[valid_vel, 1]),
+        'RMSE_vz': rmse(vel_err[valid_vel, 2]),
+        'RMSE_3D': rmse(np.linalg.norm(vel_err[valid_vel], axis=1)),
+        'window_start': float(t_vel_s),
+        'window_end': float(t_vel_e),
     }
     print(f'  Legacy Vel RMSE vx={metrics_vel["RMSE_vx"]:.3f} vy={metrics_vel["RMSE_vy"]:.3f} m/s')
 
     # XZ trajectory plot  (VICON Z shifted by offset_z to align to estimator frame)
-    offset_z = pz[valid_px][0] - pos_vicon[vi_valid, 2][0] if valid_px.any() and vi_valid.any() else 0.0
     vi_z_plot_old = pos_vicon[vi_valid, 2] + offset_z
     fig, ax = plt.subplots(figsize=(9, 5))
     ax.plot(pos_vicon[vi_valid, 0], vi_z_plot_old, lw=1.5, label='VICON', color='black')
@@ -659,6 +738,8 @@ def analyze_old(exp_id, group, bag_name, vicon_csv, out_dir, flip=None):
 
     metrics = {
         'exp_id': exp_id, 'group': group, 'bag': bag_name, 'T_END': T_END,
+        'data_start': float(pt[0]) if len(pt) else float('nan'),
+        'data_end': float(pt[-1]) if len(pt) else float('nan'),
         'exclude_stats': False,
         'position': metrics_pos,
         'velocity': metrics_vel,
@@ -957,6 +1038,199 @@ MPC 控制器以走到 X = 3 m 為目標停止。本節分析估測器回報的�
     print(f'\n[Summary] → {out_path}')
 
 
+def write_corrected_summary_report(all_metrics):
+    """Update the detailed report from metrics produced by this script.
+
+    This preserves the manually authored MPC/open-loop discussion while making
+    sections 1–5 reproducible from the raw bag/VICON calculation chain.
+    """
+    report_path = os.path.join(OUT_DIR, 'analysis_report.md')
+    if not os.path.exists(report_path):
+        write_summary_report(all_metrics)
+    with open(report_path) as fp:
+        report = fp.read()
+
+    included = [m for m in all_metrics if not m.get('exclude_stats', False)]
+    groups = [
+        ('NEW_WALK', 'Walk (步行)', 'ESEKF'),
+        ('OLD_WALK', 'Walk (步行)', 'Legacy'),
+        ('NEW_WLW',  'WLW (輪足步行)', 'ESEKF'),
+        ('OLD_WLW',  'WLW (輪足步行)', 'Legacy'),
+        ('NEW_MPC',  'MPC (模型預測控制)', 'ESEKF'),
+        ('OLD_MPC',  'MPC (模型預測控制)', 'Legacy'),
+    ]
+
+    def fmt(value, digits):
+        try:
+            value = float(value)
+            return 'N/A' if not np.isfinite(value) else f'{value:.{digits}f}'
+        except Exception:
+            return 'N/A'
+
+    def mean_std(rows, getter):
+        values = np.asarray([getter(m) for m in rows], dtype=float)
+        values = values[np.isfinite(values)]
+        if not len(values):
+            return float('nan'), float('nan')
+        std = np.std(values, ddof=1) if len(values) > 1 else 0.0
+        return float(np.mean(values)), float(std)
+
+    section1 = """## 1. 每次試驗結果
+
+位置誤差單位為 cm；速度誤差單位為 m/s。位置使用 VICON 與估測器的有效重疊區間；速度使用重疊區間內的 `35%–75% T_END` 穩態窗。3D RMSE 由同一時間點的三軸誤差向量計算。
+
+| 實驗編號 | 分組 | 有效資料 (s) | 位置 X | 位置 Y | 位置 Z | 位置 3D | 速度 X | 速度 Y | 速度 Z | 速度 3D |
+|----------|------|--------------|--------|--------|--------|---------|--------|--------|--------|---------|
+"""
+    for m in included:
+        p = m['position']; v = m['velocity']
+        section1 += (
+            f'| {m["exp_id"]} | {m["group"]} '
+            f'| {fmt(m.get("data_start"), 1)}–{fmt(m.get("data_end"), 1)} '
+            f'| {fmt(p.get("RMSE_X_cm"), 2)} | {fmt(p.get("RMSE_Y_cm"), 2)} '
+            f'| {fmt(p.get("RMSE_Z_cm"), 2)} | {fmt(p.get("RMSE_3D_cm"), 2)} '
+            f'| {fmt(v.get("RMSE_vx"), 3)} | {fmt(v.get("RMSE_vy"), 3)} '
+            f'| {fmt(v.get("RMSE_vz"), 3)} | {fmt(v.get("RMSE_3D"), 3)} |\n'
+        )
+    section1 += (
+        '\n> `FLAT_Walk_NEW_REAL_2` 資料異常，已完全排除，不列入個別結果、'
+        '分組統計及後續分析。`FLAT_Walk_NEW_REAL_1` 的 bag 僅涵蓋 '
+        '7.6–35.1 s，因此只在實際重疊區間計算。\n'
+    )
+
+    section2 = """## 2. 分組統計（平均 ± 樣本標準差）
+
+| 模式 | 系統 | n | Pos X (cm) | Pos Y (cm) | Pos Z (cm) | Pos 3D (cm) | Vel X (m/s) | Vel Y (m/s) | Vel Z (m/s) | Vel 3D (m/s) |
+|------|------|---|------------|------------|------------|-------------|-------------|-------------|-------------|--------------|
+"""
+    group_stats = {}
+    for key, label, system in groups:
+        rows = [m for m in included if m['group'] == key]
+        getters = [
+            lambda m: m['position']['RMSE_X_cm'],
+            lambda m: m['position']['RMSE_Y_cm'],
+            lambda m: m['position']['RMSE_Z_cm'],
+            lambda m: m['position']['RMSE_3D_cm'],
+            lambda m: m['velocity']['RMSE_vx'],
+            lambda m: m['velocity']['RMSE_vy'],
+            lambda m: m['velocity']['RMSE_vz'],
+            lambda m: m['velocity']['RMSE_3D'],
+        ]
+        stats = [mean_std(rows, getter) for getter in getters]
+        group_stats[key] = stats
+        cells = [f'{mean:.3f} ± {std:.3f}' for mean, std in stats]
+        section2 += f'| {label} | {system} | {len(rows)} | ' + ' | '.join(cells) + ' |\n'
+
+    section3 = """## 3. NEW vs OLD 比較（位置與速度 3D RMSE）
+
+### 3.1 位置 3D RMSE
+
+| 模式 | ESEKF (cm) | Legacy (cm) | 改善幅度 |
+|------|------------|-------------|----------|
+"""
+    pairs = [('Walk', 'NEW_WALK', 'OLD_WALK'),
+             ('WLW', 'NEW_WLW', 'OLD_WLW'),
+             ('MPC', 'NEW_MPC', 'OLD_MPC')]
+    for label, new_key, old_key in pairs:
+        new_mean, new_std = group_stats[new_key][3]
+        old_mean, old_std = group_stats[old_key][3]
+        imp = (old_mean - new_mean) / old_mean * 100.0
+        section3 += (f'| {label} | {new_mean:.2f} ± {new_std:.2f} '
+                     f'| {old_mean:.2f} ± {old_std:.2f} | {imp:+.1f}% |\n')
+    section3 += """
+
+### 3.2 速度 3D RMSE
+
+| 模式 | ESEKF (m/s) | Legacy (m/s) | 改善幅度 |
+|------|-------------|--------------|----------|
+"""
+    for label, new_key, old_key in pairs:
+        new_mean, new_std = group_stats[new_key][7]
+        old_mean, old_std = group_stats[old_key][7]
+        imp = (old_mean - new_mean) / old_mean * 100.0
+        section3 += (f'| {label} | {new_mean:.3f} ± {new_std:.3f} '
+                     f'| {old_mean:.3f} ± {old_std:.3f} | {imp:+.1f}% |\n')
+    section3 += (
+        '\n> NEW 與 OLD 均使用 X、Y、Z 三軸的 3D RMSE；改善幅度為 '
+        '`(Legacy − ESEKF) / Legacy × 100%`。\n'
+    )
+
+    section4 = """## 4. ESEKF 系統詳細指標
+
+### 4.1 姿態估計（Inner EKF RPY RMSE）
+
+| 實驗編號 | Roll (°) | Pitch (°) | Yaw (°) |
+|----------|----------|-----------|---------|
+"""
+    for m in included:
+        if 'NEW' in m['group'] and 'attitude' in m:
+            a = m['attitude']
+            section4 += (f'| {m["exp_id"]} | {fmt(a.get("RMSE_roll_deg"), 3)} '
+                         f'| {fmt(a.get("RMSE_pitch_deg"), 3)} '
+                         f'| {fmt(a.get("RMSE_yaw_deg"), 3)} |\n')
+    section4 += """
+
+### 4.2 odom_mapping 位置 RMSE
+
+| 實驗編號 | RMSE X (cm) | RMSE Y (cm) | RMSE 2D (cm) |
+|----------|-------------|-------------|--------------|
+"""
+    for m in included:
+        if 'NEW' in m['group'] and 'odom_pos' in m:
+            p = m['odom_pos']
+            section4 += (f'| {m["exp_id"]} | {fmt(p.get("RMSE_X_cm"), 2)} '
+                         f'| {fmt(p.get("RMSE_Y_cm"), 2)} '
+                         f'| {fmt(p.get("RMSE_2D_cm"), 2)} |\n')
+
+    section5 = """## 5. 接觸偵測指標（四腳平均）
+
+每筆實驗先對 LF、RF、RH、LH 四腳取算術平均。僅使用 VICON 腳標記有效且 GMO 實際有資料的重疊區間；落腳事件採一對一最近鄰配對，最大容許時間差為 100 ms。延遲欄為平均絕對延遲；沒有有效事件配對的腳不納入延遲平均。
+
+| 實驗編號 | Acc | Prec | Rec | F1 | Mean \|Lat\| (ms) | 配對事件數 |
+|----------|-----|------|-----|----|-------------------|------------|
+"""
+    for m in included:
+        if 'NEW' not in m['group'] or not m.get('contact'):
+            continue
+        legs = list(m['contact'].values())
+        def leg_mean(key):
+            values = [float(c[key]) for c in legs if np.isfinite(float(c.get(key, np.nan)))]
+            return float(np.mean(values)) if values else float('nan')
+        section5 += (
+            f'| {m["exp_id"]} | {leg_mean("acc"):.1%} '
+            f'| {fmt(leg_mean("prec"), 3)} | {fmt(leg_mean("rec"), 3)} '
+            f'| {fmt(leg_mean("f1"), 4)} '
+            f'| {fmt(leg_mean("mean_abs_lat_ms"), 1)} '
+            f'| {sum(int(c.get("n_latency_matches", 0)) for c in legs)} |\n'
+        )
+
+    report = re.sub(r'\*\*有效實驗數：\*\*.*',
+                    f'**有效實驗數：** {len(included)} / 31（排除 1 筆異常資料；RUGG 系列尚無資料）',
+                    report)
+    report = report.replace('| NEW_WALK | 平地步行 | ESEKF + fusion | 6 |',
+                            '| NEW_WALK | 平地步行 | ESEKF + fusion | 5 |')
+    replacements = [
+        (r'## 1\..*?(?=\n---\n\n## 2\.)', section1.rstrip()),
+        (r'## 2\..*?(?=\n---\n\n## 3\.)', section2.rstrip()),
+        (r'## 3\..*?(?=\n---\n\n## 4\.)', section3.rstrip()),
+        (r'## 4\..*?(?=\n---\n\n## 5\.)', section4.rstrip()),
+        (r'## 5\..*?(?=\n---\n\n## 6\.)', section5.rstrip()),
+    ]
+    for pattern, replacement in replacements:
+        report, count = re.subn(pattern, replacement.rstrip() + '\n', report, flags=re.S)
+        if count != 1:
+            raise RuntimeError(f'Could not uniquely replace report section: {pattern}')
+
+    report = re.sub(
+        r'\*報告由 .*?\*',
+        '*報告由 `analyze.py` 從 bag 與 VICON 資料重算。更新日期：2026-06-18*',
+        report,
+    )
+    with open(report_path, 'w') as fp:
+        fp.write(report)
+    print(f'\n[Corrected summary] → {report_path}')
+
+
 
 # ─── Comparison bar chart ──────────────────────────────────────────────────────
 def write_comparison_plots(all_metrics):
@@ -973,8 +1247,8 @@ def write_comparison_plots(all_metrics):
             if m.get('group', '') == gk and not m.get('exclude_stats', False):
                 p = m.get('position', {})
                 v = m.get('velocity', {})
-                rmse_p = p.get('RMSE_3D_cm') if 'NEW' in gk else p.get('RMSE_2D_cm')
-                rmse_v = v.get('RMSE_vx')
+                rmse_p = p.get('RMSE_3D_cm')
+                rmse_v = v.get('RMSE_3D')
                 if rmse_p is not None and not np.isnan(float(rmse_p)):
                     vals_p.append(float(rmse_p))
                 if rmse_v is not None and not np.isnan(float(rmse_v)):
@@ -989,8 +1263,8 @@ def write_comparison_plots(all_metrics):
     w = 0.65
 
     for ax, means, stds, ylabel, title in [
-        (axes[0], pos_means, pos_stds, 'Position RMSE [cm]', 'Position RMSE (NEW=3D, OLD=2D)'),
-        (axes[1], vel_means, vel_stds, 'Velocity RMSE vx [m/s]', 'Velocity RMSE (vx)'),
+        (axes[0], pos_means, pos_stds, 'Position 3D RMSE [cm]', 'Position 3D RMSE'),
+        (axes[1], vel_means, vel_stds, 'Velocity 3D RMSE [m/s]', 'Velocity 3D RMSE'),
     ]:
         bars = ax.bar(x, means, w, color=colors, alpha=0.85,
                       yerr=stds, capsize=4, error_kw=dict(lw=1.5))
@@ -1036,6 +1310,9 @@ def main():
                 m = analyze_old(exp_id, group, bag_name, vicon_csv, out_dir,
                                 flip=flip_old)
             m['exclude_stats'] = excl
+            # Persist the manifest exclusion flag in the per-trial artifact.
+            with open(os.path.join(out_dir, 'metrics.json'), 'w') as fp:
+                json.dump(m, fp, indent=2)
             all_metrics.append(m)
         except Exception as e:
             import traceback
@@ -1044,7 +1321,7 @@ def main():
             failed.append((exp_id, str(e)))
 
     if all_metrics:
-        write_summary_report(all_metrics)
+        write_corrected_summary_report(all_metrics)
         write_comparison_plots(all_metrics)
 
     if failed:
