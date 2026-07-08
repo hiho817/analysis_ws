@@ -36,10 +36,10 @@ EXPERIMENTS = [
     # ── FLAT Walk NEW (ESEKF fusion) ──────────────────────────────────────────
     ('FLAT_Walk_NEW_REAL_1', 'NEW_WALK', 'odom_fusion20260528_150739', 'FLAT_WALK_NEW_REAL_1.csv', 0, set(), set(), False),
     ('FLAT_Walk_NEW_REAL_2', 'NEW_WALK', 'odom_fusion20260528_151135', 'FLAT_WALK_NEW_REAL_2.csv', 0, set(), set(), True),   # 排除統計
-    ('FLAT_Walk_NEW_REAL_3', 'NEW_WALK', 'odom_fusion20260528_151411', 'FLAT_WALK_NEW_REAL_3.csv', 1, set(), set(), False),  # 兩段 trigger 用第二段
-    ('FLAT_Walk_NEW_REAL_4', 'NEW_WALK', 'odom_fusion20260528_151745', 'FLAT_WALK_NEW_REAL_4.csv', 0, set(), set(), False),
-    ('FLAT_Walk_NEW_REAL_5', 'NEW_WALK', 'odom_fusion20260528_152035', 'FLAT_WALK_NEW_REAL_5.csv', 0, set(), set(), False),
-    ('FLAT_Walk_NEW_REAL_6', 'NEW_WALK', 'odom_fusion20260528_153138', 'FLAT_WALK_NEW_REAL_6.csv', 0, set(), set(), False),
+    ('FLAT_Walk_NEW_REAL_3', 'NEW_WALK', 'odom_fusion20260528_151411_replay', 'FLAT_WALK_NEW_REAL_3.csv', 1, set(), set(), False),  # 兩段 trigger 用第二段
+    ('FLAT_Walk_NEW_REAL_4', 'NEW_WALK', 'odom_fusion20260528_151745_replay', 'FLAT_WALK_NEW_REAL_4.csv', 0, set(), set(), False),
+    ('FLAT_Walk_NEW_REAL_5', 'NEW_WALK', 'odom_fusion20260528_152035_replay', 'FLAT_WALK_NEW_REAL_5.csv', 0, set(), set(), False),
+    ('FLAT_Walk_NEW_REAL_6', 'NEW_WALK', 'odom_fusion20260528_153138_replay', 'FLAT_WALK_NEW_REAL_6.csv', 0, set(), set(), False),
     # ── FLAT Walk OLD (legacy) ────────────────────────────────────────────────
     ('FLAT_Walk_OLD_REAL_1', 'OLD_WALK', 'legacy_odom20260528_153558', 'FLAT_WALK_OLD_REAL_1.csv', 0, set(), set(), False),
     ('FLAT_Walk_OLD_REAL_2', 'OLD_WALK', 'legacy_odom20260528_153746', 'FLAT_WALK_OLD_REAL_2.csv', 0, set(), set(), False),
@@ -47,11 +47,11 @@ EXPERIMENTS = [
     ('FLAT_Walk_OLD_REAL_4', 'OLD_WALK', 'legacy_odom20260528_154223', 'FLAT_WALK_OLD_REAL_4.csv', 0, set(), set(), False),
     ('FLAT_Walk_OLD_REAL_5', 'OLD_WALK', 'legacy_odom20260528_154358', 'FLAT_WALK_OLD_REAL_5.csv', 0, set(), set(), False),
     # ── FLAT WLW NEW ──────────────────────────────────────────────────────────
-    ('FLAT_WLW_NEW_REAL_1', 'NEW_WLW', 'odom_fusion20260528_155304', 'FLAT_WLW_NEW_REAL_1.csv', 0, set(), set(), False),
-    ('FLAT_WLW_NEW_REAL_2', 'NEW_WLW', 'odom_fusion20260528_155857', 'FLAT_WLW_NEW_REAL_2.csv', 0, {'px','py','vx','vy','roll','pitch'}, set(), False),  # 反向
-    ('FLAT_WLW_NEW_REAL_3', 'NEW_WLW', 'odom_fusion20260528_160046', 'FLAT_WLW_NEW_REAL_3.csv', 0, set(), set(), False),
-    ('FLAT_WLW_NEW_REAL_4', 'NEW_WLW', 'odom_fusion20260528_161450', 'FLAT_WLW_NEW_REAL_4.csv', 0, {'px','py','vx','vy','roll','pitch'}, set(), False),  # 反向
-    ('FLAT_WLW_NEW_REAL_5', 'NEW_WLW', 'odom_fusion20260528_161821', 'FLAT_WLW_NEW_REAL_5.csv', 0, {'px','py','vx','vy','roll','pitch'}, set(), False),  # 反向
+    ('FLAT_WLW_NEW_REAL_1', 'NEW_WLW', 'odom_fusion20260528_155304_replay', 'FLAT_WLW_NEW_REAL_1.csv', 0, set(), set(), False),
+    ('FLAT_WLW_NEW_REAL_2', 'NEW_WLW', 'odom_fusion20260528_155857_replay', 'FLAT_WLW_NEW_REAL_2.csv', 0, {'px','py','vx','vy','roll','pitch'}, set(), False),  # 反向
+    ('FLAT_WLW_NEW_REAL_3', 'NEW_WLW', 'odom_fusion20260528_160046_replay', 'FLAT_WLW_NEW_REAL_3.csv', 0, set(), set(), False),
+    ('FLAT_WLW_NEW_REAL_4', 'NEW_WLW', 'odom_fusion20260528_161450_replay', 'FLAT_WLW_NEW_REAL_4.csv', 0, {'px','py','vx','vy','roll','pitch'}, set(), False),  # 反向
+    ('FLAT_WLW_NEW_REAL_5', 'NEW_WLW', 'odom_fusion20260528_161821_replay', 'FLAT_WLW_NEW_REAL_5.csv', 0, {'px','py','vx','vy','roll','pitch'}, set(), False),  # 反向
     # ── FLAT WLW OLD ──────────────────────────────────────────────────────────
     ('FLAT_WLW_OLD_REAL_1', 'OLD_WLW', 'legacy_odom20260528_163850', 'FLAT_WLW_OLD_REAL_1.csv', 0, set(), set(), False),
     ('FLAT_WLW_OLD_REAL_2', 'OLD_WLW', 'legacy_odom20260528_164050', 'FLAT_WLW_OLD_REAL_2.csv', 0, set(), set(), False),
