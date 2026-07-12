@@ -1,0 +1,15 @@
+/home/hiho817/.local/lib/python3.10/site-packages/matplotlib/projections/__init__.py:63: UserWarning: Unable to import Axes3D. This may be due to multiple versions of Matplotlib being installed (e.g. as a system package and as a pip package). As a result, the 3D projection is not available.
+  warnings.warn("Unable to import Axes3D. This may be due to multiple versions of "
+
+============================================================
+[OLD] OBS_MPC_OLD_REAL_5  (mpc_legacy_20260709_180331)
+============================================================
+[vicon_loader] Markers: ['O1', 'O2', 'O3', 'O4', 'Tigger', 'G1', 'G2', 'G3', 'G4']
+[vicon_loader] N=22894 frames, trigger frame=1700 (3.400 s), trigger_end frame=21774 (40.148 s after ON), contact_threshold=15 mm
+[bag_loader] legacy pos: 8030 msgs, t=[0.01, 40.16] s
+Analysis window: t ∈ [0, 40.15] s
+  Legacy Pos RMSE: X=21.76cm Y=6.40cm 2D=22.68cm
+  Legacy Vel RMSE vx=0.038 vy=0.043 m/s
+  → Saved metrics.json & figures to /home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/OBS_MPC_OLD_REAL_5/results/OBS_MPC_OLD_REAL_5
+
+Done. 1 experiments processed, 0 failed.

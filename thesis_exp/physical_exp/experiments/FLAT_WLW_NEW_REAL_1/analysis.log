@@ -1,0 +1,51 @@
+/home/hiho817/.local/lib/python3.10/site-packages/matplotlib/projections/__init__.py:63: UserWarning: Unable to import Axes3D. This may be due to multiple versions of Matplotlib being installed (e.g. as a system package and as a pip package). As a result, the 3D projection is not available.
+  warnings.warn("Unable to import Axes3D. This may be due to multiple versions of "
+/home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/FLAT_WLW_NEW_REAL_1/analyze_impl.py:1235: UserWarning: Glyph 23526 (\N{CJK UNIFIED IDEOGRAPH-5BE6}) missing from font(s) DejaVu Sans.
+  fig.tight_layout()
+/home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/FLAT_WLW_NEW_REAL_1/analyze_impl.py:1235: UserWarning: Glyph 39511 (\N{CJK UNIFIED IDEOGRAPH-9A57}) missing from font(s) DejaVu Sans.
+  fig.tight_layout()
+/home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/FLAT_WLW_NEW_REAL_1/analyze_impl.py:1235: UserWarning: Glyph 65306 (\N{FULLWIDTH COLON}) missing from font(s) DejaVu Sans.
+  fig.tight_layout()
+/home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/FLAT_WLW_NEW_REAL_1/analyze_impl.py:1235: UserWarning: Glyph 27604 (\N{CJK UNIFIED IDEOGRAPH-6BD4}) missing from font(s) DejaVu Sans.
+  fig.tight_layout()
+/home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/FLAT_WLW_NEW_REAL_1/analyze_impl.py:1235: UserWarning: Glyph 36611 (\N{CJK UNIFIED IDEOGRAPH-8F03}) missing from font(s) DejaVu Sans.
+  fig.tight_layout()
+/home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/FLAT_WLW_NEW_REAL_1/analyze_impl.py:1235: UserWarning: Tight layout not applied. The bottom and top margins cannot be made large enough to accommodate all Axes decorations.
+  fig.tight_layout()
+/home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/FLAT_WLW_NEW_REAL_1/analyze_impl.py:1236: UserWarning: Glyph 23526 (\N{CJK UNIFIED IDEOGRAPH-5BE6}) missing from font(s) DejaVu Sans.
+  fig.savefig(os.path.join(OUT_DIR, 'fig_comparison.pdf'), dpi=150)
+/home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/FLAT_WLW_NEW_REAL_1/analyze_impl.py:1236: UserWarning: Glyph 39511 (\N{CJK UNIFIED IDEOGRAPH-9A57}) missing from font(s) DejaVu Sans.
+  fig.savefig(os.path.join(OUT_DIR, 'fig_comparison.pdf'), dpi=150)
+/home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/FLAT_WLW_NEW_REAL_1/analyze_impl.py:1236: UserWarning: Glyph 65306 (\N{FULLWIDTH COLON}) missing from font(s) DejaVu Sans.
+  fig.savefig(os.path.join(OUT_DIR, 'fig_comparison.pdf'), dpi=150)
+/home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/FLAT_WLW_NEW_REAL_1/analyze_impl.py:1236: UserWarning: Glyph 27604 (\N{CJK UNIFIED IDEOGRAPH-6BD4}) missing from font(s) DejaVu Sans.
+  fig.savefig(os.path.join(OUT_DIR, 'fig_comparison.pdf'), dpi=150)
+/home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/FLAT_WLW_NEW_REAL_1/analyze_impl.py:1236: UserWarning: Glyph 36611 (\N{CJK UNIFIED IDEOGRAPH-8F03}) missing from font(s) DejaVu Sans.
+  fig.savefig(os.path.join(OUT_DIR, 'fig_comparison.pdf'), dpi=150)
+
+============================================================
+[NEW] FLAT_WLW_NEW_REAL_1  (odom_fusion20260528_155304_replay)
+============================================================
+[vicon_loader] Markers: ['ground1', 'ground2', 'ground3', 'ground4', 'O1', 'O2', 'O3', 'O4', 'Tigger', 'G1', 'G2', 'G3', 'G4']
+[vicon_loader] N=22007 frames, trigger frame=3184 (6.368 s), trigger_end frame=20542 (34.716 s after ON), contact_threshold=15 mm
+[bag_loader] Using trigger pair 0: ON=1779954790.781s, OFF=1779954825.4980717
+[bag_loader] EKF: 14429 msgs, odom: 346 msgs, fv: 346 msgs
+[bag_loader] t_ros_trigger = 1779954790.781 s, t_trigger_end = 34.716850996017456
+Analysis window: t ∈ [0, 34.72] s
+  [LF] accuracy=53.6% (N=12426, TP=6578, TN=77, FP=3982, FN=1789; overlap=0.00–24.85s)
+  [RF] accuracy=52.1% (N=11711, TP=5791, TN=306, FP=3857, FN=1757; overlap=0.00–23.42s)
+  [RH] accuracy=35.0% (N=11998, TP=3212, TN=988, FP=5593, FN=2205; overlap=4.76–28.75s)
+  [LH] accuracy=44.2% (N=12019, TP=4298, TN=1015, FP=2552, FN=4154; overlap=6.17–30.20s)
+  EKF Pos RMSE: X=6.23cm Y=1.22cm 3D=6.38cm
+  EKF Vel RMSE vx=0.019 vy=0.024 m/s
+  Odom RMSE: X=1.30cm Y=0.95cm 2D=1.61cm
+  → Saved metrics.json & figures to /home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/FLAT_WLW_NEW_REAL_1/results/FLAT_WLW_NEW_REAL_1
+
+[Corrected summary] → /home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/FLAT_WLW_NEW_REAL_1/results/analysis_report.md
+[Summary] → fig_comparison.pdf
+
+Done. 1 experiments processed, 0 failed.
+s/FLAT_WLW_NEW_REAL_1/results/analysis_report.md
+[Summary] → fig_comparison.pdf
+
+Done. 1 experiments processed, 0 failed.

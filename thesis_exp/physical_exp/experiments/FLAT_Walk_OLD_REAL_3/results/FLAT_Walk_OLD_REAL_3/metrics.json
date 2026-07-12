@@ -1,0 +1,30 @@
+{
+  "exp_id": "FLAT_Walk_OLD_REAL_3",
+  "group": "OLD_WALK",
+  "bag": "legacy_odom20260528_154024",
+  "T_END": 33.22,
+  "data_start": 0.010511424,
+  "data_end": 33.215493147,
+  "exclude_stats": false,
+  "position": {
+    "RMSE_X_cm": 16.629309517257784,
+    "RMSE_Y_cm": 19.112564020555308,
+    "RMSE_Z_cm": 1.8672919407088449,
+    "RMSE_2D_cm": 25.33424635667273,
+    "RMSE_3D_cm": 25.402968677940414,
+    "MAX_2D_cm": 48.63559678161209,
+    "MAX_3D_cm": 48.717643091304524,
+    "final_leg_x": 3.09660267829895,
+    "final_leg_y": 0.0,
+    "final_VICON_x": 2.803881356664047,
+    "final_VICON_y": -0.385028450935258
+  },
+  "velocity": {
+    "RMSE_vx": 0.049940375450595306,
+    "RMSE_vy": 0.06183441919261562,
+    "RMSE_vz": 0.04675323194230008,
+    "RMSE_3D": 0.09221388829284362,
+    "window_start": 11.626999999999999,
+    "window_end": 24.915
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "exp_id": "RUGG_Walk_OLD_REAL_2",
+  "group": "OLD_RUGG_WALK",
+  "bag": "legacy_odom20260709_165747",
+  "T_END": 32.142,
+  "data_start": 0.009950565,
+  "data_end": 32.140839699,
+  "exclude_stats": false,
+  "position": {
+    "RMSE_X_cm": 17.062283516684268,
+    "RMSE_Y_cm": 28.033113642245755,
+    "RMSE_Z_cm": 1.9533266564793568,
+    "RMSE_2D_cm": 32.817327424438155,
+    "RMSE_3D_cm": 32.87540819989454,
+    "MAX_2D_cm": 71.3507560760587,
+    "MAX_3D_cm": 71.36388444661145,
+    "final_leg_x": 3.024538040161133,
+    "final_leg_y": 0.0,
+    "final_VICON_x": 2.5558595425692934,
+    "final_VICON_y": -0.5373977160440644
+  },
+  "velocity": {
+    "RMSE_vx": 0.06951704914658939,
+    "RMSE_vy": 0.062193505350041416,
+    "RMSE_vz": 0.06333278126758801,
+    "RMSE_3D": 0.11274614588917488,
+    "window_start": 11.2497,
+    "window_end": 24.106500000000004
+  }
+}

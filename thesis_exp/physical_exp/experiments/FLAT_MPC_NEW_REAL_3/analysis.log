@@ -1,0 +1,47 @@
+/home/hiho817/.local/lib/python3.10/site-packages/matplotlib/projections/__init__.py:63: UserWarning: Unable to import Axes3D. This may be due to multiple versions of Matplotlib being installed (e.g. as a system package and as a pip package). As a result, the 3D projection is not available.
+  warnings.warn("Unable to import Axes3D. This may be due to multiple versions of "
+/home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/FLAT_MPC_NEW_REAL_3/analyze_impl.py:1235: UserWarning: Glyph 23526 (\N{CJK UNIFIED IDEOGRAPH-5BE6}) missing from font(s) DejaVu Sans.
+  fig.tight_layout()
+/home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/FLAT_MPC_NEW_REAL_3/analyze_impl.py:1235: UserWarning: Glyph 39511 (\N{CJK UNIFIED IDEOGRAPH-9A57}) missing from font(s) DejaVu Sans.
+  fig.tight_layout()
+/home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/FLAT_MPC_NEW_REAL_3/analyze_impl.py:1235: UserWarning: Glyph 65306 (\N{FULLWIDTH COLON}) missing from font(s) DejaVu Sans.
+  fig.tight_layout()
+/home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/FLAT_MPC_NEW_REAL_3/analyze_impl.py:1235: UserWarning: Glyph 27604 (\N{CJK UNIFIED IDEOGRAPH-6BD4}) missing from font(s) DejaVu Sans.
+  fig.tight_layout()
+/home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/FLAT_MPC_NEW_REAL_3/analyze_impl.py:1235: UserWarning: Glyph 36611 (\N{CJK UNIFIED IDEOGRAPH-8F03}) missing from font(s) DejaVu Sans.
+  fig.tight_layout()
+/home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/FLAT_MPC_NEW_REAL_3/analyze_impl.py:1236: UserWarning: Glyph 23526 (\N{CJK UNIFIED IDEOGRAPH-5BE6}) missing from font(s) DejaVu Sans.
+  fig.savefig(os.path.join(OUT_DIR, 'fig_comparison.pdf'), dpi=150)
+/home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/FLAT_MPC_NEW_REAL_3/analyze_impl.py:1236: UserWarning: Glyph 39511 (\N{CJK UNIFIED IDEOGRAPH-9A57}) missing from font(s) DejaVu Sans.
+  fig.savefig(os.path.join(OUT_DIR, 'fig_comparison.pdf'), dpi=150)
+/home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/FLAT_MPC_NEW_REAL_3/analyze_impl.py:1236: UserWarning: Glyph 65306 (\N{FULLWIDTH COLON}) missing from font(s) DejaVu Sans.
+  fig.savefig(os.path.join(OUT_DIR, 'fig_comparison.pdf'), dpi=150)
+/home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/FLAT_MPC_NEW_REAL_3/analyze_impl.py:1236: UserWarning: Glyph 27604 (\N{CJK UNIFIED IDEOGRAPH-6BD4}) missing from font(s) DejaVu Sans.
+  fig.savefig(os.path.join(OUT_DIR, 'fig_comparison.pdf'), dpi=150)
+/home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/FLAT_MPC_NEW_REAL_3/analyze_impl.py:1236: UserWarning: Glyph 36611 (\N{CJK UNIFIED IDEOGRAPH-8F03}) missing from font(s) DejaVu Sans.
+  fig.savefig(os.path.join(OUT_DIR, 'fig_comparison.pdf'), dpi=150)
+
+============================================================
+[NEW] FLAT_MPC_NEW_REAL_3  (mpc_esekf_20260528_192648)
+============================================================
+[vicon_loader] Markers: ['ground1', 'ground2', 'ground3', 'ground4', 'O1', 'O2', 'O3', 'O4', 'Tigger', 'G1', 'G2', 'G3', 'G4']
+[vicon_loader] N=29371 frames, trigger frame=5241 (10.482 s), trigger_end frame=26375 (42.268 s after ON), contact_threshold=15 mm
+[bag_loader] Using trigger pair 0: ON=1779967675.912s, OFF=1779967718.177175
+[bag_loader] EKF: 18613 msgs, odom: 421 msgs, fv: 421 msgs
+[bag_loader] t_ros_trigger = 1779967675.912 s, t_trigger_end = 42.265387296676636
+Analysis window: t ∈ [0, 42.27] s
+  [LF] accuracy=93.3% (N=13936, TP=9270, TN=3726, FP=21, FN=919; overlap=0.00–27.87s)
+  [RF] accuracy=90.8% (N=14423, TP=11351, TN=1749, FP=76, FN=1247; overlap=0.00–28.85s)
+  [RH] accuracy=88.0% (N=14022, TP=9841, TN=2504, FP=0, FN=1677; overlap=6.34–34.38s)
+  [LH] accuracy=94.9% (N=13957, TP=8502, TN=4744, FP=113, FN=598; overlap=5.45–33.36s)
+  EKF Pos RMSE: X=1.22cm Y=5.07cm 3D=5.30cm
+  EKF Vel RMSE vx=0.028 vy=0.049 m/s
+  Odom RMSE: X=1.86cm Y=2.98cm 2D=3.51cm
+  → Saved metrics.json & figures to /home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/FLAT_MPC_NEW_REAL_3/results/FLAT_MPC_NEW_REAL_3
+
+[Summary] → /home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/FLAT_MPC_NEW_REAL_3/results/analysis_report.md
+
+[Corrected summary] → /home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/FLAT_MPC_NEW_REAL_3/results/analysis_report.md
+[Summary] → fig_comparison.pdf
+
+Done. 1 experiments processed, 0 failed.

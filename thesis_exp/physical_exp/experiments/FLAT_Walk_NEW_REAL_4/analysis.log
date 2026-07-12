@@ -1,0 +1,47 @@
+/home/hiho817/.local/lib/python3.10/site-packages/matplotlib/projections/__init__.py:63: UserWarning: Unable to import Axes3D. This may be due to multiple versions of Matplotlib being installed (e.g. as a system package and as a pip package). As a result, the 3D projection is not available.
+  warnings.warn("Unable to import Axes3D. This may be due to multiple versions of "
+/home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/FLAT_Walk_NEW_REAL_4/analyze_impl.py:1235: UserWarning: Glyph 23526 (\N{CJK UNIFIED IDEOGRAPH-5BE6}) missing from font(s) DejaVu Sans.
+  fig.tight_layout()
+/home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/FLAT_Walk_NEW_REAL_4/analyze_impl.py:1235: UserWarning: Glyph 39511 (\N{CJK UNIFIED IDEOGRAPH-9A57}) missing from font(s) DejaVu Sans.
+  fig.tight_layout()
+/home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/FLAT_Walk_NEW_REAL_4/analyze_impl.py:1235: UserWarning: Glyph 65306 (\N{FULLWIDTH COLON}) missing from font(s) DejaVu Sans.
+  fig.tight_layout()
+/home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/FLAT_Walk_NEW_REAL_4/analyze_impl.py:1235: UserWarning: Glyph 27604 (\N{CJK UNIFIED IDEOGRAPH-6BD4}) missing from font(s) DejaVu Sans.
+  fig.tight_layout()
+/home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/FLAT_Walk_NEW_REAL_4/analyze_impl.py:1235: UserWarning: Glyph 36611 (\N{CJK UNIFIED IDEOGRAPH-8F03}) missing from font(s) DejaVu Sans.
+  fig.tight_layout()
+/home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/FLAT_Walk_NEW_REAL_4/analyze_impl.py:1236: UserWarning: Glyph 23526 (\N{CJK UNIFIED IDEOGRAPH-5BE6}) missing from font(s) DejaVu Sans.
+  fig.savefig(os.path.join(OUT_DIR, 'fig_comparison.pdf'), dpi=150)
+/home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/FLAT_Walk_NEW_REAL_4/analyze_impl.py:1236: UserWarning: Glyph 39511 (\N{CJK UNIFIED IDEOGRAPH-9A57}) missing from font(s) DejaVu Sans.
+  fig.savefig(os.path.join(OUT_DIR, 'fig_comparison.pdf'), dpi=150)
+/home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/FLAT_Walk_NEW_REAL_4/analyze_impl.py:1236: UserWarning: Glyph 65306 (\N{FULLWIDTH COLON}) missing from font(s) DejaVu Sans.
+  fig.savefig(os.path.join(OUT_DIR, 'fig_comparison.pdf'), dpi=150)
+/home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/FLAT_Walk_NEW_REAL_4/analyze_impl.py:1236: UserWarning: Glyph 27604 (\N{CJK UNIFIED IDEOGRAPH-6BD4}) missing from font(s) DejaVu Sans.
+  fig.savefig(os.path.join(OUT_DIR, 'fig_comparison.pdf'), dpi=150)
+/home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/FLAT_Walk_NEW_REAL_4/analyze_impl.py:1236: UserWarning: Glyph 36611 (\N{CJK UNIFIED IDEOGRAPH-8F03}) missing from font(s) DejaVu Sans.
+  fig.savefig(os.path.join(OUT_DIR, 'fig_comparison.pdf'), dpi=150)
+
+============================================================
+[NEW] FLAT_Walk_NEW_REAL_4  (odom_fusion20260528_151745_replay)
+============================================================
+[vicon_loader] Markers: ['ground1', 'ground2', 'ground3', 'ground4', 'O1', 'O2', 'O3', 'O4', 'Tigger', 'G1', 'G2', 'G3', 'G4']
+[vicon_loader] N=26181 frames, trigger frame=7128 (14.256 s), trigger_end frame=24609 (34.962 s after ON), contact_threshold=15 mm
+[bag_loader] Using trigger pair 0: ON=1779952671.879s, OFF=1779952706.8410947
+[bag_loader] EKF: 15528 msgs, odom: 349 msgs, fv: 349 msgs
+[bag_loader] t_ros_trigger = 1779952671.879 s, t_trigger_end = 34.96222996711731
+Analysis window: t ∈ [0, 34.96] s
+  [LF] accuracy=87.5% (N=12962, TP=8622, TN=2716, FP=664, FN=960; overlap=2.33–28.25s)
+  [RF] accuracy=90.0% (N=13004, TP=10056, TN=1642, FP=343, FN=963; overlap=3.23–29.23s)
+  [RH] accuracy=84.5% (N=13992, TP=10046, TN=1778, FP=0, FN=2168; overlap=6.97–34.96s)
+  [LH] accuracy=86.9% (N=13566, TP=8762, TN=3021, FP=405, FN=1378; overlap=7.83–34.96s)
+  EKF Pos RMSE: X=1.52cm Y=5.95cm 3D=6.29cm
+  EKF Vel RMSE vx=0.040 vy=0.054 m/s
+  Odom RMSE: X=0.60cm Y=4.80cm 2D=4.84cm
+  → Saved metrics.json & figures to /home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/FLAT_Walk_NEW_REAL_4/results/FLAT_Walk_NEW_REAL_4
+
+[Summary] → /home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/FLAT_Walk_NEW_REAL_4/results/analysis_report.md
+
+[Corrected summary] → /home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/FLAT_Walk_NEW_REAL_4/results/analysis_report.md
+[Summary] → fig_comparison.pdf
+
+Done. 1 experiments processed, 0 failed.

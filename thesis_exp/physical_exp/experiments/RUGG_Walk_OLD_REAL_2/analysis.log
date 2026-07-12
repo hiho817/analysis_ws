@@ -1,0 +1,15 @@
+/home/hiho817/.local/lib/python3.10/site-packages/matplotlib/projections/__init__.py:63: UserWarning: Unable to import Axes3D. This may be due to multiple versions of Matplotlib being installed (e.g. as a system package and as a pip package). As a result, the 3D projection is not available.
+  warnings.warn("Unable to import Axes3D. This may be due to multiple versions of "
+
+============================================================
+[OLD] RUGG_Walk_OLD_REAL_2  (legacy_odom20260709_165747)
+============================================================
+[vicon_loader] Markers: ['O1', 'O2', 'O3', 'O4', 'Tigger', 'G1', 'G2', 'G3', 'G4']
+[vicon_loader] N=21606 frames, trigger frame=4319 (8.638 s), trigger_end frame=20390 (32.142 s after ON), contact_threshold=15 mm
+[bag_loader] legacy pos: 6840 msgs, t=[0.01, 34.21] s
+Analysis window: t ∈ [0, 32.14] s
+  Legacy Pos RMSE: X=17.06cm Y=28.03cm 2D=32.82cm
+  Legacy Vel RMSE vx=0.070 vy=0.062 m/s
+  → Saved metrics.json & figures to /home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/RUGG_Walk_OLD_REAL_2/results/RUGG_Walk_OLD_REAL_2
+
+Done. 1 experiments processed, 0 failed.

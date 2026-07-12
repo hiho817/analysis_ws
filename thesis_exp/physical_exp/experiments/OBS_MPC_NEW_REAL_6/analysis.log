@@ -1,0 +1,18 @@
+/home/hiho817/.local/lib/python3.10/site-packages/matplotlib/projections/__init__.py:63: UserWarning: Unable to import Axes3D. This may be due to multiple versions of Matplotlib being installed (e.g. as a system package and as a pip package). As a result, the 3D projection is not available.
+  warnings.warn("Unable to import Axes3D. This may be due to multiple versions of "
+
+============================================================
+[NEW] OBS_MPC_NEW_REAL_6  (mpc_esekf_20260709_174531)
+============================================================
+[vicon_loader] Markers: ['O1', 'O2', 'O3', 'O4', 'Tigger', 'G1', 'G2', 'G3', 'G4']
+[vicon_loader] N=26454 frames, trigger frame=2688 (5.376 s), trigger_end frame=25072 (44.768 s after ON), contact_threshold=15 mm
+[bag_loader] Using trigger pair 0: ON=1783590349.123s, OFF=1783590393.8937407
+[bag_loader] EKF: 17546 msgs, odom: 447 msgs, fv: 447 msgs
+[bag_loader] t_ros_trigger = 1783590349.123 s, t_trigger_end = 44.77092671394348
+Analysis window: t ∈ [0, 44.77] s
+  EKF Pos RMSE: X=1.60cm Y=9.76cm 3D=10.11cm
+  EKF Vel RMSE vx=0.033 vy=0.045 m/s
+  Odom RMSE: X=0.73cm Y=3.14cm 2D=3.22cm
+  → Saved metrics.json & figures to /home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/OBS_MPC_NEW_REAL_6/results/OBS_MPC_NEW_REAL_6
+
+Done. 1 experiments processed, 0 failed.

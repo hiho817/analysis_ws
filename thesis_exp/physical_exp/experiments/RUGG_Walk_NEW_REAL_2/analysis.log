@@ -1,0 +1,18 @@
+/home/hiho817/.local/lib/python3.10/site-packages/matplotlib/projections/__init__.py:63: UserWarning: Unable to import Axes3D. This may be due to multiple versions of Matplotlib being installed (e.g. as a system package and as a pip package). As a result, the 3D projection is not available.
+  warnings.warn("Unable to import Axes3D. This may be due to multiple versions of "
+
+============================================================
+[NEW] RUGG_Walk_NEW_REAL_2  (odom_fusion20260709_161701)
+============================================================
+[vicon_loader] Markers: ['O1', 'O2', 'O3', 'O4', 'Tigger', 'G1', 'G2', 'G3', 'G4']
+[vicon_loader] N=30586 frames, trigger frame=5961 (11.922 s), trigger_end frame=22070 (32.218 s after ON), contact_threshold=15 mm
+[bag_loader] Using trigger pair 0: ON=1783585029.385s, OFF=1783585061.6014001
+[bag_loader] EKF: 14376 msgs, odom: 321 msgs, fv: 321 msgs
+[bag_loader] t_ros_trigger = 1783585029.385 s, t_trigger_end = 32.21646547317505
+Analysis window: t ∈ [0, 32.22] s
+  EKF Pos RMSE: X=3.68cm Y=4.80cm 3D=7.03cm
+  EKF Vel RMSE vx=0.069 vy=0.061 m/s
+  Odom RMSE: X=1.62cm Y=5.24cm 2D=5.48cm
+  → Saved metrics.json & figures to /home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/RUGG_Walk_NEW_REAL_2/results/RUGG_Walk_NEW_REAL_2
+
+Done. 1 experiments processed, 0 failed.
