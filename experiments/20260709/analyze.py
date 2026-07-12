@@ -132,35 +132,10 @@ def analyze_new(exp_id, group, bag_name, vicon_csv, out_dir,
     ekf   = bag['ekf']; ba = bag['ba']; bw = bag['bw']
     odom = bag['odom']; fv = bag['fv']; lidar = bag['lidar']
 
-    # Time alignment:
-    # If the bag only recorded trigger-OFF (enable=False), bag times are relative to
-    # trigger OFF and will be negative (e.g. -27s to 0).  Offset them to VICON time
-    # by adding vi.t_trigger_end so the analysis window becomes [0, T_END] in VICON frame.
+    # Both ROS and VICON are already expressed relative to their trigger-ON event.
+    # Do not infer an additional offset from recording duration or trigger-OFF.
     _bag_t_end = bag['t_trigger_end']
     _vi_t_end  = vi.t_trigger_end
-    if _bag_t_end is None and len(ekf['t']) > 0 and ekf['t'][-1] < 1.0:
-        # bag trigger = trigger-OFF; shift everything to VICON time
-        t_offset = float(_vi_t_end) if _vi_t_end is not None else 0.0
-        for d in [ekf, ba, bw, odom, fv, lidar]:
-            if len(d['t']) > 0:
-                d['t'] = d['t'] + t_offset
-        print(f'  [time-align] trigger-OFF-only bag → offset +{t_offset:.2f}s to VICON frame')
-    else:
-        t_offset = 0.0
-
-    # The VICON trigger marker can appear before the ROS trigger-ON event.
-    # When both trigger-OFF timestamps exist, align the common OFF event.  This
-    # corrects trials such as OBS_MPC_NEW_REAL_1 and _7 without fitting against
-    # the estimator trajectory itself.
-    if _bag_t_end is not None and _vi_t_end is not None:
-        off_offset = float(_vi_t_end - _bag_t_end)
-        if abs(off_offset) > 1e-6:
-            for d in [ekf, ba, bw, odom, fv, lidar]:
-                if len(d['t']) > 0:
-                    d['t'] = d['t'] + off_offset
-            t_offset += off_offset
-            print(f'  [time-align] trigger-OFF alignment → offset {off_offset:+.3f}s')
-
     if _bag_t_end is None and _vi_t_end is None:
         _bag_t_end = float(ekf['t'][-1]) if len(ekf['t']) > 0 else 30.0
     T_END = min(x for x in [_vi_t_end, _bag_t_end] if x is not None)
@@ -423,7 +398,6 @@ def analyze_new(exp_id, group, bag_name, vicon_csv, out_dir,
     # ── Save metrics ───────────────────────────────────────────────────────────
     metrics = {
         'exp_id': exp_id, 'group': group, 'bag': bag_name, 'T_END': T_END,
-        'time_alignment': {'method': 'trigger_off', 'offset_s': t_offset},
         'data_start': float(et[0]) if len(et) else float('nan'),
         'data_end': float(et[-1]) if len(et) else float('nan'),
         'position': metrics_pos,
@@ -468,12 +442,6 @@ def analyze_old(exp_id, group, bag_name, vicon_csv, out_dir, flip=None):
     pos = bag['pos']; vel = bag['vel']
     _bag_t_end = bag['t_trigger_end']
     _vi_t_end  = vi.t_trigger_end
-    if _bag_t_end is not None and _vi_t_end is not None:
-        off_offset = float(_vi_t_end - _bag_t_end)
-        for d in [pos, vel]:
-            if len(d['t']) > 0:
-                d['t'] = d['t'] + off_offset
-        print(f'  [time-align] trigger-OFF alignment → offset {off_offset:+.3f}s')
     if _bag_t_end is None and _vi_t_end is None:
         _bag_t_end = float(pos['t'][-1]) if len(pos['t']) > 0 else 30.0
     T_END = min(x for x in [_vi_t_end, _bag_t_end] if x is not None)
@@ -585,8 +553,6 @@ def analyze_old(exp_id, group, bag_name, vicon_csv, out_dir, flip=None):
 
     metrics = {
         'exp_id': exp_id, 'group': group, 'bag': bag_name, 'T_END': T_END,
-        'time_alignment': {'method': 'trigger_off',
-                           'offset_s': off_offset if _bag_t_end is not None and _vi_t_end is not None else 0.0},
         'data_start': float(pt[0]) if len(pt) else float('nan'),
         'data_end': float(pt[-1]) if len(pt) else float('nan'),
         'exclude_stats': False,
@@ -744,14 +710,6 @@ def write_20260709_report(all_metrics):
         em, esd = mean_std(es); vm, vsd = mean_std(vs)
         stop = np.mean(np.abs(np.asarray(vs)-3))*100
         lines.append(f'| {system} | {len(es)} | {em:.3f} ± {esd:.3f} m | {vm:.3f} ± {vsd:.3f} m | {stop:.1f} cm |')
-
-    lines += ['', '---', '', '## 6. 時間對齊與資料品質', '',
-              'ROS bag 與 VICON 使用共同 trigger OFF 校正；LiDAR XYZ 完整轉換至 odom frame，且只使用 trigger 有效時間窗。',
-              '',
-              '| 實驗編號 | 時間偏移 (s) |',
-              '|----------|--------------:|']
-    for m in included:
-        lines.append(f'| {m["exp_id"]} | {m.get("time_alignment",{}).get("offset_s",0):+.3f} |')
 
     lines += ['', '---', '', '## 7. Closed-Loop（MPC）vs Open-Loop（Walk）比較', '',
               '本節比較 ESEKF 的 Closed-Loop Obstacle MPC 與 Open-Loop RUGG Walk。姿態數值是 EKF 相對 VICON 的估測 RMSE，不是機體相對水平面的實際震盪量。',

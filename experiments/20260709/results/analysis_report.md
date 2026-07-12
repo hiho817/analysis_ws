@@ -35,25 +35,25 @@ Legacy system: /odometry/legacy/position, /odometry/legacy/velocity
 
 | 實驗編號 | 分組 | 有效資料 (s) | 位置 X | 位置 Y | 位置 Z | 位置 3D | 速度 X | 速度 Y | 速度 Z | 速度 3D |
 |----------|------|--------------|--------|--------|--------|---------|--------|--------|--------|---------|
-| RUGG_Walk_NEW_REAL_1 | NEW_RUGG_WALK | 0.0–32.2 | 2.36 | 5.10 | 3.04 | 6.38 | 0.055 | 0.060 | 0.023 | 0.085 |
-| RUGG_Walk_NEW_REAL_2 | NEW_RUGG_WALK | 0.0–32.2 | 3.67 | 4.81 | 3.56 | 7.02 | 0.069 | 0.060 | 0.029 | 0.096 |
-| RUGG_Walk_NEW_REAL_3 | NEW_RUGG_WALK | 0.0–33.5 | 4.02 | 8.32 | 5.43 | 10.72 | 0.052 | 0.061 | 0.023 | 0.083 |
-| RUGG_Walk_NEW_REAL_5 | NEW_RUGG_WALK | 0.0–34.4 | 2.10 | 6.67 | 2.64 | 7.47 | 0.076 | 0.062 | 0.027 | 0.101 |
-| RUGG_Walk_OLD_REAL_1 | OLD_RUGG_WALK | 0.0–34.3 | 28.57 | 35.84 | 1.38 | 45.86 | 0.079 | 0.069 | 0.067 | 0.124 |
-| RUGG_Walk_OLD_REAL_2 | OLD_RUGG_WALK | 0.0–32.1 | 30.31 | 28.01 | 1.75 | 41.30 | 0.071 | 0.062 | 0.064 | 0.114 |
-| RUGG_Walk_OLD_REAL_3 | OLD_RUGG_WALK | 0.0–32.7 | 34.56 | 33.55 | 1.55 | 48.19 | 0.073 | 0.076 | 0.069 | 0.126 |
-| RUGG_Walk_OLD_REAL_4 | OLD_RUGG_WALK | 0.0–35.4 | 35.39 | 30.48 | 1.58 | 46.73 | 0.074 | 0.075 | 0.068 | 0.126 |
-| RUGG_Walk_OLD_REAL_5 | OLD_RUGG_WALK | 0.0–34.3 | 29.75 | 29.34 | 1.59 | 41.81 | 0.074 | 0.071 | 0.064 | 0.121 |
-| OBS_MPC_NEW_REAL_3 | NEW_OBS_MPC_GMO | 0.0–46.2 | 2.38 | 6.02 | 5.75 | 8.66 | 0.041 | 0.055 | 0.024 | 0.073 |
-| OBS_MPC_NEW_REAL_4 | NEW_OBS_MPC_GMO | 0.0–45.4 | 1.50 | 4.45 | 1.95 | 5.08 | 0.038 | 0.052 | 0.023 | 0.068 |
-| OBS_MPC_NEW_REAL_5 | NEW_OBS_MPC_GMO | 0.0–47.3 | 2.96 | 12.73 | 5.70 | 14.26 | 0.038 | 0.053 | 0.029 | 0.071 |
-| OBS_MPC_NEW_REAL_6 | NEW_OBS_MPC_GMO | 0.0–44.8 | 1.58 | 9.76 | 2.11 | 10.11 | 0.033 | 0.046 | 0.022 | 0.061 |
-| OBS_MPC_NEW_REAL_7 | NEW_OBS_MPC_GMO | 0.0–48.2 | 2.95 | 5.63 | 8.76 | 10.82 | 0.047 | 0.047 | 0.024 | 0.071 |
-| OBS_MPC_OLD_REAL_1 | OLD_OBS_MPC | 0.0–38.8 | 27.89 | 16.43 | 9.40 | 33.70 | 0.056 | 0.055 | 0.045 | 0.090 |
-| OBS_MPC_OLD_REAL_2 | OLD_OBS_MPC | 0.0–38.4 | 19.38 | 6.15 | 3.20 | 20.58 | 0.040 | 0.052 | 0.056 | 0.086 |
-| OBS_MPC_OLD_REAL_3 | OLD_OBS_MPC | 0.0–37.2 | 18.21 | 6.94 | 1.46 | 19.54 | 0.040 | 0.047 | 0.046 | 0.077 |
-| OBS_MPC_OLD_REAL_4 | OLD_OBS_MPC | 0.0–35.9 | 23.07 | 5.70 | 1.20 | 23.79 | 0.038 | 0.045 | 0.045 | 0.074 |
-| OBS_MPC_OLD_REAL_5 | OLD_OBS_MPC | 0.0–40.1 | 21.80 | 6.40 | 1.58 | 22.77 | 0.036 | 0.044 | 0.048 | 0.074 |
+| RUGG_Walk_NEW_REAL_1 | NEW_RUGG_WALK | 0.0–32.2 | 14.77 | 9.84 | 3.08 | 18.01 | 0.099 | 0.088 | 0.113 | 0.174 |
+| RUGG_Walk_NEW_REAL_2 | NEW_RUGG_WALK | 0.0–32.2 | 3.68 | 4.80 | 3.57 | 7.03 | 0.069 | 0.061 | 0.028 | 0.096 |
+| RUGG_Walk_NEW_REAL_3 | NEW_RUGG_WALK | 0.0–33.5 | 13.00 | 12.00 | 5.06 | 18.40 | 0.095 | 0.084 | 0.103 | 0.163 |
+| RUGG_Walk_NEW_REAL_5 | NEW_RUGG_WALK | 0.0–34.4 | 2.08 | 6.68 | 2.64 | 7.48 | 0.074 | 0.058 | 0.034 | 0.100 |
+| RUGG_Walk_OLD_REAL_1 | OLD_RUGG_WALK | 0.0–34.3 | 28.35 | 35.85 | 1.39 | 45.73 | 0.079 | 0.069 | 0.066 | 0.124 |
+| RUGG_Walk_OLD_REAL_2 | OLD_RUGG_WALK | 0.0–32.1 | 17.06 | 28.03 | 1.95 | 32.88 | 0.070 | 0.062 | 0.063 | 0.113 |
+| RUGG_Walk_OLD_REAL_3 | OLD_RUGG_WALK | 0.0–32.7 | 21.94 | 33.55 | 1.76 | 40.13 | 0.072 | 0.076 | 0.069 | 0.125 |
+| RUGG_Walk_OLD_REAL_4 | OLD_RUGG_WALK | 0.0–35.4 | 30.14 | 30.48 | 1.62 | 42.90 | 0.073 | 0.075 | 0.068 | 0.125 |
+| RUGG_Walk_OLD_REAL_5 | OLD_RUGG_WALK | 0.0–34.3 | 28.44 | 29.35 | 1.60 | 40.90 | 0.072 | 0.071 | 0.064 | 0.120 |
+| OBS_MPC_NEW_REAL_3 | NEW_OBS_MPC_GMO | 0.0–46.2 | 2.43 | 6.03 | 5.74 | 8.68 | 0.039 | 0.050 | 0.030 | 0.070 |
+| OBS_MPC_NEW_REAL_4 | NEW_OBS_MPC_GMO | 0.0–45.4 | 2.83 | 4.86 | 1.96 | 5.95 | 0.089 | 0.089 | 0.074 | 0.146 |
+| OBS_MPC_NEW_REAL_5 | NEW_OBS_MPC_GMO | 0.0–47.3 | 2.99 | 12.74 | 5.70 | 14.28 | 0.038 | 0.046 | 0.035 | 0.069 |
+| OBS_MPC_NEW_REAL_6 | NEW_OBS_MPC_GMO | 0.0–44.8 | 1.60 | 9.76 | 2.11 | 10.11 | 0.033 | 0.045 | 0.023 | 0.060 |
+| OBS_MPC_NEW_REAL_7 | NEW_OBS_MPC_GMO | 0.0–48.2 | 21.55 | 11.88 | 8.32 | 25.98 | 0.081 | 0.081 | 0.068 | 0.134 |
+| OBS_MPC_OLD_REAL_1 | OLD_OBS_MPC | 0.0–38.8 | 26.74 | 16.43 | 9.33 | 32.74 | 0.060 | 0.055 | 0.047 | 0.094 |
+| OBS_MPC_OLD_REAL_2 | OLD_OBS_MPC | 0.0–38.4 | 17.90 | 7.95 | 3.15 | 19.84 | 0.070 | 0.087 | 0.079 | 0.137 |
+| OBS_MPC_OLD_REAL_3 | OLD_OBS_MPC | 0.0–37.2 | 13.23 | 7.38 | 1.52 | 15.23 | 0.061 | 0.080 | 0.065 | 0.119 |
+| OBS_MPC_OLD_REAL_4 | OLD_OBS_MPC | 0.0–35.9 | 16.56 | 8.81 | 1.53 | 18.82 | 0.064 | 0.079 | 0.072 | 0.124 |
+| OBS_MPC_OLD_REAL_5 | OLD_OBS_MPC | 0.0–40.1 | 21.76 | 6.40 | 1.59 | 22.73 | 0.038 | 0.043 | 0.052 | 0.078 |
 
 ---
 
@@ -61,10 +61,10 @@ Legacy system: /odometry/legacy/position, /odometry/legacy/velocity
 
 | 模式 | 系統 | n | Pos X (cm) | Pos Y (cm) | Pos Z (cm) | Pos 3D (cm) | Vel X (m/s) | Vel Y (m/s) | Vel Z (m/s) | Vel 3D (m/s) |
 |------|------|---|------------|------------|------------|-------------|-------------|-------------|-------------|--------------|
-| RUGG Walk（崎嶇地面步行） | ESEKF + fusion | 4 | 3.035 ± 0.951 | 6.223 ± 1.620 | 3.669 ± 1.235 | 7.899 ± 1.932 | 0.063 ± 0.011 | 0.061 ± 0.001 | 0.025 ± 0.003 | 0.091 ± 0.009 |
-| RUGG Walk（崎嶇地面步行） | Legacy | 5 | 31.715 ± 3.057 | 31.446 ± 3.199 | 1.570 ± 0.129 | 44.781 ± 3.062 | 0.074 ± 0.003 | 0.071 ± 0.006 | 0.066 ± 0.002 | 0.122 ± 0.005 |
-| Obstacle MPC（障礙地形） | ESEKF + fusion | 5 | 2.277 ± 0.712 | 7.717 ± 3.436 | 4.852 ± 2.861 | 9.787 ± 3.337 | 0.040 ± 0.005 | 0.050 ± 0.004 | 0.024 ± 0.003 | 0.069 ± 0.005 |
-| Obstacle MPC（障礙地形） | Legacy | 5 | 22.066 ± 3.777 | 8.325 ± 4.555 | 3.368 ± 3.460 | 24.077 ± 5.641 | 0.042 ± 0.008 | 0.049 ± 0.005 | 0.048 ± 0.005 | 0.080 ± 0.007 |
+| RUGG Walk（崎嶇地面步行） | ESEKF + fusion | 4 | 8.381 ± 6.428 | 8.330 ± 3.209 | 3.588 ± 1.051 | 12.728 ± 6.329 | 0.084 ± 0.015 | 0.073 ± 0.015 | 0.069 ± 0.045 | 0.133 ± 0.041 |
+| RUGG Walk（崎嶇地面步行） | Legacy | 5 | 25.189 ± 5.517 | 31.453 ± 3.194 | 1.664 ± 0.208 | 40.507 ± 4.783 | 0.073 ± 0.004 | 0.071 ± 0.006 | 0.066 ± 0.003 | 0.121 ± 0.005 |
+| Obstacle MPC（障礙地形） | ESEKF + fusion | 5 | 6.278 ± 8.555 | 9.054 ± 3.495 | 4.768 ± 2.711 | 12.999 ± 7.853 | 0.056 ± 0.027 | 0.062 ± 0.021 | 0.046 ± 0.023 | 0.096 ± 0.041 |
+| Obstacle MPC（障礙地形） | Legacy | 5 | 19.239 ± 5.188 | 9.395 ± 4.031 | 3.423 ± 3.373 | 21.873 ± 6.643 | 0.058 ± 0.012 | 0.069 ± 0.019 | 0.063 ± 0.013 | 0.110 ± 0.024 |
 
 ---
 
@@ -74,15 +74,15 @@ Legacy system: /odometry/legacy/position, /odometry/legacy/velocity
 
 | 模式 | ESEKF (cm) | Legacy (cm) | 改善幅度 |
 |------|------------|-------------|----------|
-| RUGG Walk | 7.90 ± 1.93 | 44.78 ± 3.06 | +82.4% |
-| Obstacle MPC | 9.79 ± 3.34 | 24.08 ± 5.64 | +59.4% |
+| RUGG Walk | 12.73 ± 6.33 | 40.51 ± 4.78 | +68.6% |
+| Obstacle MPC | 13.00 ± 7.85 | 21.87 ± 6.64 | +40.6% |
 
 ### 3.2 速度 3D RMSE
 
 | 模式 | ESEKF (m/s) | Legacy (m/s) | 改善幅度 |
 |------|-------------|--------------|----------|
-| RUGG Walk | 0.091 ± 0.009 | 0.122 ± 0.005 | +25.2% |
-| Obstacle MPC | 0.069 ± 0.005 | 0.080 ± 0.007 | +14.6% |
+| RUGG Walk | 0.133 ± 0.041 | 0.121 ± 0.005 | -9.8% |
+| Obstacle MPC | 0.096 ± 0.041 | 0.110 ± 0.024 | +13.3% |
 
 > 改善幅度為 `(Legacy − ESEKF) / Legacy × 100%`。
 
@@ -94,29 +94,29 @@ Legacy system: /odometry/legacy/position, /odometry/legacy/velocity
 
 | 實驗編號 | Roll (°) | Pitch (°) | Yaw (°) |
 |----------|----------|-----------|---------|
-| RUGG_Walk_NEW_REAL_1 | 0.746 | 0.568 | 0.259 |
-| RUGG_Walk_NEW_REAL_2 | 1.611 | 0.735 | 0.317 |
-| RUGG_Walk_NEW_REAL_3 | 1.053 | 1.329 | 0.620 |
-| RUGG_Walk_NEW_REAL_5 | 0.933 | 0.348 | 0.665 |
-| OBS_MPC_NEW_REAL_3 | 1.679 | 1.226 | 0.490 |
-| OBS_MPC_NEW_REAL_4 | 0.743 | 0.720 | 0.483 |
-| OBS_MPC_NEW_REAL_5 | 3.659 | 1.826 | 2.705 |
-| OBS_MPC_NEW_REAL_6 | 2.959 | 1.051 | 1.433 |
-| OBS_MPC_NEW_REAL_7 | 0.958 | 2.161 | 0.700 |
+| RUGG_Walk_NEW_REAL_1 | 3.406 | 3.094 | 2.922 |
+| RUGG_Walk_NEW_REAL_2 | 1.609 | 0.731 | 0.315 |
+| RUGG_Walk_NEW_REAL_3 | 3.153 | 2.947 | 3.076 |
+| RUGG_Walk_NEW_REAL_5 | 0.945 | 0.379 | 0.670 |
+| OBS_MPC_NEW_REAL_3 | 1.686 | 1.240 | 0.501 |
+| OBS_MPC_NEW_REAL_4 | 1.840 | 2.599 | 1.258 |
+| OBS_MPC_NEW_REAL_5 | 3.663 | 1.834 | 2.708 |
+| OBS_MPC_NEW_REAL_6 | 2.958 | 1.054 | 1.434 |
+| OBS_MPC_NEW_REAL_7 | 3.481 | 3.803 | 4.074 |
 
 ### 4.2 odom_mapping 位置 RMSE
 
 | 實驗編號 | RMSE X (cm) | RMSE Y (cm) | RMSE 2D (cm) |
 |----------|-------------|-------------|--------------|
-| RUGG_Walk_NEW_REAL_1 | 1.75 | 4.78 | 5.09 |
-| RUGG_Walk_NEW_REAL_2 | 1.61 | 5.24 | 5.48 |
-| RUGG_Walk_NEW_REAL_3 | 2.01 | 4.69 | 5.10 |
-| RUGG_Walk_NEW_REAL_5 | 1.34 | 3.69 | 3.93 |
-| OBS_MPC_NEW_REAL_3 | 0.88 | 4.27 | 4.36 |
-| OBS_MPC_NEW_REAL_4 | 1.22 | 4.04 | 4.22 |
-| OBS_MPC_NEW_REAL_5 | 2.45 | 4.03 | 4.72 |
+| RUGG_Walk_NEW_REAL_1 | 15.47 | 9.44 | 18.13 |
+| RUGG_Walk_NEW_REAL_2 | 1.62 | 5.24 | 5.48 |
+| RUGG_Walk_NEW_REAL_3 | 14.69 | 8.97 | 17.21 |
+| RUGG_Walk_NEW_REAL_5 | 1.33 | 3.70 | 3.93 |
+| OBS_MPC_NEW_REAL_3 | 0.93 | 4.28 | 4.38 |
+| OBS_MPC_NEW_REAL_4 | 1.82 | 4.48 | 4.84 |
+| OBS_MPC_NEW_REAL_5 | 2.42 | 4.05 | 4.72 |
 | OBS_MPC_NEW_REAL_6 | 0.73 | 3.14 | 3.22 |
-| OBS_MPC_NEW_REAL_7 | 1.77 | 3.75 | 4.15 |
+| OBS_MPC_NEW_REAL_7 | 21.15 | 10.98 | 23.83 |
 
 ### 4.3 LiDAR 輸入品質
 
@@ -128,7 +128,7 @@ Legacy system: /odometry/legacy/position, /odometry/legacy/velocity
 | RUGG_Walk_NEW_REAL_5 | 10.00 | 0.90 | 4.60 |
 | OBS_MPC_NEW_REAL_3 | 10.02 | 0.79 | 3.18 |
 | OBS_MPC_NEW_REAL_4 | 9.99 | 0.82 | 5.22 |
-| OBS_MPC_NEW_REAL_5 | 10.01 | 1.41 | 7.21 |
+| OBS_MPC_NEW_REAL_5 | 9.98 | 1.41 | 7.21 |
 | OBS_MPC_NEW_REAL_6 | 10.01 | 0.70 | 2.46 |
 | OBS_MPC_NEW_REAL_7 | 10.00 | 0.73 | 3.74 |
 
@@ -141,50 +141,22 @@ MPC 控制器以 X = 3 m 為目標停止。估測器 final X 是控制器的停�
 | 實驗編號 | 估測器 final X (m) | VICON final X (m) | 估測誤差 (cm) | 停止誤差 VICON (cm) |
 |----------|-------------------|-------------------|--------------|--------------------|
 | OBS_MPC_NEW_REAL_3 | 2.998 | 2.997 | -0.2 | -0.3 |
-| OBS_MPC_NEW_REAL_4 | 2.986 | 2.967 | -1.4 | -3.3 |
-| OBS_MPC_NEW_REAL_5 | 3.002 | 2.951 | +0.2 | -4.9 |
+| OBS_MPC_NEW_REAL_4 | 2.985 | 2.967 | -1.5 | -3.3 |
+| OBS_MPC_NEW_REAL_5 | 3.001 | 2.951 | +0.1 | -4.9 |
 | OBS_MPC_NEW_REAL_6 | 2.987 | 2.987 | -1.3 | -1.3 |
-| OBS_MPC_NEW_REAL_7 | 2.977 | 2.926 | -2.3 | -7.4 |
+| OBS_MPC_NEW_REAL_7 | 2.975 | 2.926 | -2.5 | -7.4 |
 | OBS_MPC_OLD_REAL_1 | 3.010 | 2.548 | +1.0 | -45.2 |
 | OBS_MPC_OLD_REAL_2 | 3.003 | 2.682 | +0.3 | -31.8 |
 | OBS_MPC_OLD_REAL_3 | 3.009 | 2.667 | +0.9 | -33.3 |
-| OBS_MPC_OLD_REAL_4 | 3.005 | 2.623 | +0.5 | -37.7 |
+| OBS_MPC_OLD_REAL_4 | 3.002 | 2.623 | +0.2 | -37.7 |
 | OBS_MPC_OLD_REAL_5 | 3.003 | 2.651 | +0.3 | -34.9 |
 
 **統計摘要（目標 X = 3.0 m）**
 
 | 系統 | n | 估測器 final X | 實際 VICON final X | VICON 停止誤差 (abs mean) |
 |------|---|------------------|---------------------|-----------------------------|
-| ESEKF (NEW) | 5 | 2.990 ± 0.010 m | 2.966 ± 0.028 m | 3.4 cm |
-| Legacy (OLD) | 5 | 3.006 ± 0.003 m | 2.634 ± 0.053 m | 36.6 cm |
-
----
-
-## 6. 時間對齊與資料品質
-
-ROS bag 與 VICON 使用共同 trigger OFF 校正；LiDAR XYZ 完整轉換至 odom frame，且只使用 trigger 有效時間窗。
-
-| 實驗編號 | 時間偏移 (s) |
-|----------|--------------:|
-| RUGG_Walk_NEW_REAL_1 | -2.055 |
-| RUGG_Walk_NEW_REAL_2 | +0.002 |
-| RUGG_Walk_NEW_REAL_3 | -2.039 |
-| RUGG_Walk_NEW_REAL_5 | -0.006 |
-| RUGG_Walk_OLD_REAL_1 | -0.031 |
-| RUGG_Walk_OLD_REAL_2 | -2.064 |
-| RUGG_Walk_OLD_REAL_3 | -2.068 |
-| RUGG_Walk_OLD_REAL_4 | -0.849 |
-| RUGG_Walk_OLD_REAL_5 | -0.179 |
-| OBS_MPC_NEW_REAL_3 | -0.009 |
-| OBS_MPC_NEW_REAL_4 | -0.276 |
-| OBS_MPC_NEW_REAL_5 | -0.011 |
-| OBS_MPC_NEW_REAL_6 | -0.003 |
-| OBS_MPC_NEW_REAL_7 | -3.310 |
-| OBS_MPC_OLD_REAL_1 | -0.188 |
-| OBS_MPC_OLD_REAL_2 | -3.160 |
-| OBS_MPC_OLD_REAL_3 | -0.915 |
-| OBS_MPC_OLD_REAL_4 | -3.318 |
-| OBS_MPC_OLD_REAL_5 | -0.007 |
+| ESEKF (NEW) | 5 | 2.989 ± 0.011 m | 2.966 ± 0.028 m | 3.4 cm |
+| Legacy (OLD) | 5 | 3.005 ± 0.003 m | 2.634 ± 0.053 m | 36.6 cm |
 
 ---
 
@@ -195,16 +167,16 @@ ROS bag 與 VICON 使用共同 trigger OFF 校正；LiDAR XYZ 完整轉換至 od
 | 指標 | Closed-Loop（MPC） | Open-Loop（RUGG Walk） |
 |------|-------------------|------------------------|
 | n（試驗數） | 5 | 4 |
-| Position 3D RMSE (cm) | 9.79 ± 3.34 | 7.90 ± 1.93 |
-| Velocity 3D RMSE (m/s) | 0.069 ± 0.005 | 0.091 ± 0.009 |
-| Roll estimation RMSE (°) | 2.00 ± 1.27 | 1.09 ± 0.37 |
-| Pitch estimation RMSE (°) | 1.40 ± 0.59 | 0.74 ± 0.42 |
-| Yaw estimation RMSE (°) | 1.16 ± 0.95 | 0.47 ± 0.21 |
+| Position 3D RMSE (cm) | 13.00 ± 7.85 | 12.73 ± 6.33 |
+| Velocity 3D RMSE (m/s) | 0.096 ± 0.041 | 0.133 ± 0.041 |
+| Roll estimation RMSE (°) | 2.73 ± 0.92 | 2.28 ± 1.19 |
+| Pitch estimation RMSE (°) | 2.11 ± 1.12 | 1.79 ± 1.43 |
+| Yaw estimation RMSE (°) | 1.99 ± 1.41 | 1.75 ± 1.46 |
 | peak vx EKF（35–75% T_END，m/s） | 0.395 ± 0.083 | 0.566 ± 0.036 |
 
 ### 7.1 分析
 
-- Closed-Loop MPC 的位置 3D RMSE 為 9.79 cm；Open-Loop RUGG Walk 為 7.90 cm。
+- Closed-Loop MPC 的位置 3D RMSE 為 13.00 cm；Open-Loop RUGG Walk 為 12.73 cm。
 - 兩組地形與任務條件不同，因此本比較用於描述系統行為，不應解讀為單一控制器因素的因果效果。
 - peak vx 可反映步態中的瞬時速度振盪；姿態 RMSE 則反映估測器追蹤 VICON 的一致性。
 
@@ -214,12 +186,12 @@ ROS bag 與 VICON 使用共同 trigger OFF 校正；LiDAR XYZ 完整轉換至 od
 
 ### 崎嶇地面步行（RUGG Walk）
 
-- ESEKF 位置 3D RMSE 為 7.90 cm；Legacy 為 44.78 cm。
+- ESEKF 位置 3D RMSE 為 12.73 cm；Legacy 為 40.51 cm。
 - 修正後 LiDAR XZ 高度與 VICON 地形起伏一致，先前的大幅 Z 漂移來自未轉換的 LiDAR Z 軸與錯誤時間窗。
 
 ### 障礙地形 MPC
 
-- ESEKF 位置 3D RMSE 為 9.79 cm；Legacy 為 24.08 cm。
+- ESEKF 位置 3D RMSE 為 13.00 cm；Legacy 為 21.87 cm。
 - MPC 終點表直接呈現估測器停止依據與 VICON 實際停止位置，可用來判斷里程計累積誤差是否導致提前停止。
 
 ### 整體結論

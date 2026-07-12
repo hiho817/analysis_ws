@@ -3,10 +3,6 @@
   "group": "NEW_OBS_MPC_GAIT",
   "bag": "mpc_esekf_20260709_173128",
   "T_END": 47.374,
-  "time_alignment": {
-    "method": "trigger_off",
-    "offset_s": 0.0
-  },
   "data_start": 0.0011911392211914062,
   "data_end": 36.739513874053955,
   "position": {
