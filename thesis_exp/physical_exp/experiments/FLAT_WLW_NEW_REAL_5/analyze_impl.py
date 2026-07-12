@@ -346,10 +346,11 @@ def analyze_new(exp_id, group, bag_name, vicon_csv, out_dir,
             c_gmo  = interp_gmo(gmo['t'], gmo[leg], t_win, T_END)
             color  = COLORS_LEG[leg]
             ax.plot(t_win, hf_leg * 1000, lw=0.8, color=color, label=f'{leg} height [mm]')
-            _shade_contact(ax, t_win, cf_leg, color='tab:green',  alpha=0.18)
-            _shade_contact(ax, t_win, c_gmo,  color='tab:orange', alpha=0.12)
+            gmo_valid = (t_win >= gmo['t'].min()) & (t_win <= gmo['t'].max())
+            contact_match = cf_leg == c_gmo
+            _shade_contact(ax, t_win, gmo_valid & contact_match, color='tab:green', alpha=0.18)
+            _shade_contact(ax, t_win, gmo_valid & ~contact_match, color='tab:red', alpha=0.18)
             ax.axhline(CONTACT_THRESHOLD_M * 1000, color='k', ls='--', lw=0.8, alpha=0.5)
-            ax.axvspan(0, T_END, color='gold', alpha=0.06)
             ax.set_ylabel(f'{leg} [mm]'); ax.legend(fontsize=7); ax.grid(True, alpha=0.4)
         axes[-1].set_xlabel('Time [s]')
         fig.suptitle(f'Contact Detection — {exp_id}')
@@ -421,7 +422,7 @@ def analyze_new(exp_id, group, bag_name, vicon_csv, out_dir,
     axes[1].fill_between(et, epy - 3*np.sqrt(np.abs(ecov_py)), epy + 3*np.sqrt(np.abs(ecov_py)), alpha=0.15)
     axes[2].plot(et, err_3d * 100, lw=0.8, color='red', label='3D error [cm]')
     for ax in axes:
-        ax.axvspan(0, T_END, color='gold', alpha=0.06)
+        ax.axvspan(0, T_END, color="gold", alpha=0.06)
         ax.legend(fontsize=8); ax.grid(True, alpha=0.4)
     axes[0].set_ylabel('X [m]'); axes[1].set_ylabel('Y [m]'); axes[2].set_ylabel('Error [cm]')
     axes[-1].set_xlabel('Time [s]')
@@ -433,7 +434,7 @@ def analyze_new(exp_id, group, bag_name, vicon_csv, out_dir,
     for ax, (ev, vv, lbl) in zip(axes, [(evx, vi_vx_e, 'vx'), (evy, vi_vy_e, 'vy'), (evz, vi_vz_e, 'vz')]):
         ax.plot(et, ev, lw=1.0, label=f'EKF {lbl}')
         ax.plot(et[~np.isnan(vv)], vv[~np.isnan(vv)], lw=1.0, label=f'VICON {lbl}')
-        ax.axvspan(0, T_END, color='gold', alpha=0.06)
+        ax.axvspan(0, T_END, color="gold", alpha=0.06)
         ax.set_ylabel(f'{lbl} [m/s]'); ax.legend(fontsize=8); ax.grid(True, alpha=0.4)
     axes[-1].set_xlabel('Time [s]')
     fig.suptitle(f'Inner EKF Velocity — {exp_id}')
@@ -449,7 +450,7 @@ def analyze_new(exp_id, group, bag_name, vicon_csv, out_dir,
         ax.plot(et, ekf_a, lw=1.0, label=f'EKF {lbl}')
         valid_a = ~np.isnan(vi_a)
         ax.plot(et[valid_a], vi_a[valid_a], lw=1.0, label=f'VICON {lbl}')
-        ax.axvspan(0, T_END, color='gold', alpha=0.06)
+        ax.axvspan(0, T_END, color="gold", alpha=0.06)
         ax.set_ylabel(f'{lbl} [°]'); ax.legend(fontsize=8); ax.grid(True, alpha=0.4)
     axes[-1].set_xlabel('Time [s]')
     fig.suptitle(f'Inner EKF Attitude — {exp_id}')
@@ -682,7 +683,7 @@ def analyze_old(exp_id, group, bag_name, vicon_csv, out_dir, flip=None):
     axes[1].plot(vt, vy, lw=1.0, label='Legacy vy')
     axes[1].plot(vt[~np.isnan(vi_vy)], vi_vy[~np.isnan(vi_vy)], lw=1.0, label='VICON vy')
     for ax in axes:
-        ax.axvspan(0, T_END, color='gold', alpha=0.06)
+        ax.axvspan(0, T_END, color="gold", alpha=0.06)
         ax.legend(fontsize=8); ax.grid(True, alpha=0.4)
     axes[0].set_ylabel('vx [m/s]'); axes[1].set_ylabel('vy [m/s]')
     axes[-1].set_xlabel('Time [s]')
