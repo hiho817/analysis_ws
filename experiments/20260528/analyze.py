@@ -120,44 +120,6 @@ def interp_gmo(gmo_t, gmo_leg, t_tgt, T_END):
                     bounds_error=False, fill_value=0.)(t_tgt) > 0.5
 
 
-def match_contact_edges(t, reference, estimate, max_abs_dt_s=0.1):
-    """One-to-one nearest rising-edge matching within a bounded time window.
-
-    Discontinuities in ``t`` are not treated as contact transitions.  Returns
-    signed delays (estimate - reference) in milliseconds.
-    """
-    t = np.asarray(t, dtype=float)
-    reference = np.asarray(reference, dtype=bool)
-    estimate = np.asarray(estimate, dtype=bool)
-    if len(t) < 2:
-        return np.array([], dtype=float)
-
-    dt = np.diff(t)
-    contiguous = dt <= max(0.01, 3.0 * np.nanmedian(dt))
-    ref_idx = np.where((~reference[:-1]) & reference[1:] & contiguous)[0] + 1
-    est_idx = np.where((~estimate[:-1]) & estimate[1:] & contiguous)[0] + 1
-    ref_t = t[ref_idx]
-    est_t = t[est_idx]
-
-    candidates = []
-    for i, tr in enumerate(ref_t):
-        for j, te in enumerate(est_t):
-            delta = te - tr
-            if abs(delta) <= max_abs_dt_s:
-                candidates.append((abs(delta), i, j, delta))
-
-    used_ref = set()
-    used_est = set()
-    delays = []
-    for _, i, j, delta in sorted(candidates):
-        if i in used_ref or j in used_est:
-            continue
-        used_ref.add(i)
-        used_est.add(j)
-        delays.append(delta * 1000.0)
-    return np.asarray(delays, dtype=float)
-
-
 def align_vicon_orientation(rpy_vicon, rpy_ekf_deg):
     """Align VICON initial orientation to EKF frame."""
     valid = ~np.isnan(rpy_vicon).any(1)
@@ -365,25 +327,15 @@ def analyze_new(exp_id, group, bag_name, vicon_csv, out_dir,
             FP = int(np.sum(~cv_v & cg_v)); FN = int(np.sum(cv_v & ~cg_v))
             N  = len(tv)
             acc  = (TP + TN) / N
-            prec = TP / (TP + FP) if (TP + FP) > 0 else float('nan')
-            rec  = TP / (TP + FN) if (TP + FN) > 0 else float('nan')
-            f1   = 2 * prec * rec / (prec + rec) if not np.isnan(prec + rec) and (prec + rec) > 0 else float('nan')
-
-            latencies = match_contact_edges(tv, cv_v, cg_v, max_abs_dt_s=0.1)
-            mean_lat = float(np.mean(latencies)) if len(latencies) else float('nan')
-            mean_abs_lat = float(np.mean(np.abs(latencies))) if len(latencies) else float('nan')
 
             contact_results[leg] = {
                 'N': N, 'TP': TP, 'TN': TN, 'FP': FP, 'FN': FN,
-                'acc': acc, 'prec': prec, 'rec': rec, 'f1': f1,
-                'mean_lat_ms': mean_lat,
-                'mean_abs_lat_ms': mean_abs_lat,
-                'n_latency_matches': int(len(latencies)),
+                'acc': acc,
                 't_start': float(tv[0]), 't_end': float(tv[-1]),
             }
-            print(f'  [{leg}] Acc={acc:.1%} Prec={prec:.3f} Rec={rec:.3f} '
-                  f'F1={f1:.4f} |Lat|={mean_abs_lat:.1f}ms '
-                  f'(n={len(latencies)}, overlap={tv[0]:.2f}–{tv[-1]:.2f}s)')
+            print(f'  [{leg}] accuracy={acc:.1%} '
+                  f'(N={N}, TP={TP}, TN={TN}, FP={FP}, FN={FN}; '
+                  f'overlap={tv[0]:.2f}–{tv[-1]:.2f}s)')
 
         # Contact plot
         fig, axes = plt.subplots(4, 1, figsize=(13, 8), sharex=True)
@@ -932,17 +884,16 @@ Legacy system: /odometry/legacy/position, /odometry/legacy/velocity
 
 ## 5. 接觸偵測指標（ESEKF 系統）
 
-| 實驗編號 | 腳 | Acc | Prec | Rec | F1 | Lat (ms) |
-|----------|-----|-----|------|-----|----|----------|
+| 實驗編號 | 腳 | 有效時間步 | Acc | TP | TN | FP | FN |
+|----------|-----|------------|-----|----|----|----|----|
 """
     for m in all_metrics:
         if 'NEW' in m.get('group', '') and 'contact' in m:
             for leg, c in m['contact'].items():
                 if c is None:
                     continue
-                report += (f'| {m["exp_id"]} | {leg} | {c["acc"]:.1%} '
-                           f'| {f(c.get("prec"), ".3f")} | {f(c.get("rec"), ".3f")} '
-                           f'| {f(c.get("f1"), ".4f")} | {f(c.get("mean_lat_ms"), ".1f")} |\n')
+                report += (f'| {m["exp_id"]} | {leg} | {c["N"]} | {c["acc"]:.1%} '
+                           f'| {c["TP"]} | {c["TN"]} | {c["FP"]} | {c["FN"]} |\n')
 
     report += """
 ---
@@ -1182,12 +1133,12 @@ def write_corrected_summary_report(all_metrics):
                          f'| {fmt(p.get("RMSE_Y_cm"), 2)} '
                          f'| {fmt(p.get("RMSE_2D_cm"), 2)} |\n')
 
-    section5 = """## 5. 接觸偵測指標（四腳平均）
+    section5 = """## 5. 接觸偵測指標（逐有效時間步比對）
 
-每筆實驗先對 LF、RF、RH、LH 四腳取算術平均。僅使用 VICON 腳標記有效且 GMO 實際有資料的重疊區間；落腳事件採一對一最近鄰配對，最大容許時間差為 100 ms。延遲欄為平均絕對延遲；沒有有效事件配對的腳不納入延遲平均。
+僅使用 VICON 腳標記有效、腳標記位於 ground marker 覆蓋區、且 GMO 實際有資料的重疊時間步。在每個有效時間步直接比對 VICON 與 GMO 的二元接觸狀態，Acc = (TP + TN) / N。不進行接觸或離地事件配對，也不計算延遲。四腳平均為各腳 accuracy 的算術平均。
 
-| 實驗編號 | Acc | Prec | Rec | F1 | Mean \|Lat\| (ms) | 配對事件數 |
-|----------|-----|------|-----|----|-------------------|------------|
+| 實驗編號 | 四腳平均 Acc | 總有效時間步 | TP | TN | FP | FN |
+|----------|-------------|--------------|----|----|----|----|
 """
     for m in included:
         if 'NEW' not in m['group'] or not m.get('contact'):
@@ -1198,10 +1149,11 @@ def write_corrected_summary_report(all_metrics):
             return float(np.mean(values)) if values else float('nan')
         section5 += (
             f'| {m["exp_id"]} | {leg_mean("acc"):.1%} '
-            f'| {fmt(leg_mean("prec"), 3)} | {fmt(leg_mean("rec"), 3)} '
-            f'| {fmt(leg_mean("f1"), 4)} '
-            f'| {fmt(leg_mean("mean_abs_lat_ms"), 1)} '
-            f'| {sum(int(c.get("n_latency_matches", 0)) for c in legs)} |\n'
+            f'| {sum(int(c["N"]) for c in legs)} '
+            f'| {sum(int(c["TP"]) for c in legs)} '
+            f'| {sum(int(c["TN"]) for c in legs)} '
+            f'| {sum(int(c["FP"]) for c in legs)} '
+            f'| {sum(int(c["FN"]) for c in legs)} |\n'
         )
 
     report = re.sub(r'\*\*有效實驗數：\*\*.*',
