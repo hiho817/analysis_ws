@@ -1,26 +1,26 @@
 /home/hiho817/.local/lib/python3.10/site-packages/matplotlib/projections/__init__.py:63: UserWarning: Unable to import Axes3D. This may be due to multiple versions of Matplotlib being installed (e.g. as a system package and as a pip package). As a result, the 3D projection is not available.
   warnings.warn("Unable to import Axes3D. This may be due to multiple versions of "
-/home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/FLAT_WLW_NEW_REAL_2/analyze_impl.py:1235: UserWarning: Glyph 23526 (\N{CJK UNIFIED IDEOGRAPH-5BE6}) missing from font(s) DejaVu Sans.
-  fig.tight_layout()
-/home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/FLAT_WLW_NEW_REAL_2/analyze_impl.py:1235: UserWarning: Glyph 39511 (\N{CJK UNIFIED IDEOGRAPH-9A57}) missing from font(s) DejaVu Sans.
-  fig.tight_layout()
-/home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/FLAT_WLW_NEW_REAL_2/analyze_impl.py:1235: UserWarning: Glyph 65306 (\N{FULLWIDTH COLON}) missing from font(s) DejaVu Sans.
-  fig.tight_layout()
-/home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/FLAT_WLW_NEW_REAL_2/analyze_impl.py:1235: UserWarning: Glyph 27604 (\N{CJK UNIFIED IDEOGRAPH-6BD4}) missing from font(s) DejaVu Sans.
-  fig.tight_layout()
-/home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/FLAT_WLW_NEW_REAL_2/analyze_impl.py:1235: UserWarning: Glyph 36611 (\N{CJK UNIFIED IDEOGRAPH-8F03}) missing from font(s) DejaVu Sans.
-  fig.tight_layout()
-/home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/FLAT_WLW_NEW_REAL_2/analyze_impl.py:1235: UserWarning: Tight layout not applied. The bottom and top margins cannot be made large enough to accommodate all Axes decorations.
-  fig.tight_layout()
 /home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/FLAT_WLW_NEW_REAL_2/analyze_impl.py:1236: UserWarning: Glyph 23526 (\N{CJK UNIFIED IDEOGRAPH-5BE6}) missing from font(s) DejaVu Sans.
-  fig.savefig(os.path.join(OUT_DIR, 'fig_comparison.pdf'), dpi=150)
+  fig.tight_layout()
 /home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/FLAT_WLW_NEW_REAL_2/analyze_impl.py:1236: UserWarning: Glyph 39511 (\N{CJK UNIFIED IDEOGRAPH-9A57}) missing from font(s) DejaVu Sans.
-  fig.savefig(os.path.join(OUT_DIR, 'fig_comparison.pdf'), dpi=150)
+  fig.tight_layout()
 /home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/FLAT_WLW_NEW_REAL_2/analyze_impl.py:1236: UserWarning: Glyph 65306 (\N{FULLWIDTH COLON}) missing from font(s) DejaVu Sans.
-  fig.savefig(os.path.join(OUT_DIR, 'fig_comparison.pdf'), dpi=150)
+  fig.tight_layout()
 /home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/FLAT_WLW_NEW_REAL_2/analyze_impl.py:1236: UserWarning: Glyph 27604 (\N{CJK UNIFIED IDEOGRAPH-6BD4}) missing from font(s) DejaVu Sans.
-  fig.savefig(os.path.join(OUT_DIR, 'fig_comparison.pdf'), dpi=150)
+  fig.tight_layout()
 /home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/FLAT_WLW_NEW_REAL_2/analyze_impl.py:1236: UserWarning: Glyph 36611 (\N{CJK UNIFIED IDEOGRAPH-8F03}) missing from font(s) DejaVu Sans.
+  fig.tight_layout()
+/home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/FLAT_WLW_NEW_REAL_2/analyze_impl.py:1236: UserWarning: Tight layout not applied. The bottom and top margins cannot be made large enough to accommodate all Axes decorations.
+  fig.tight_layout()
+/home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/FLAT_WLW_NEW_REAL_2/analyze_impl.py:1237: UserWarning: Glyph 23526 (\N{CJK UNIFIED IDEOGRAPH-5BE6}) missing from font(s) DejaVu Sans.
+  fig.savefig(os.path.join(OUT_DIR, 'fig_comparison.pdf'), dpi=150)
+/home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/FLAT_WLW_NEW_REAL_2/analyze_impl.py:1237: UserWarning: Glyph 39511 (\N{CJK UNIFIED IDEOGRAPH-9A57}) missing from font(s) DejaVu Sans.
+  fig.savefig(os.path.join(OUT_DIR, 'fig_comparison.pdf'), dpi=150)
+/home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/FLAT_WLW_NEW_REAL_2/analyze_impl.py:1237: UserWarning: Glyph 65306 (\N{FULLWIDTH COLON}) missing from font(s) DejaVu Sans.
+  fig.savefig(os.path.join(OUT_DIR, 'fig_comparison.pdf'), dpi=150)
+/home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/FLAT_WLW_NEW_REAL_2/analyze_impl.py:1237: UserWarning: Glyph 27604 (\N{CJK UNIFIED IDEOGRAPH-6BD4}) missing from font(s) DejaVu Sans.
+  fig.savefig(os.path.join(OUT_DIR, 'fig_comparison.pdf'), dpi=150)
+/home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/FLAT_WLW_NEW_REAL_2/analyze_impl.py:1237: UserWarning: Glyph 36611 (\N{CJK UNIFIED IDEOGRAPH-8F03}) missing from font(s) DejaVu Sans.
   fig.savefig(os.path.join(OUT_DIR, 'fig_comparison.pdf'), dpi=150)
 
 ============================================================
@@ -32,7 +32,7 @@
 [bag_loader] EKF: 15551 msgs, odom: 349 msgs, fv: 349 msgs
 [bag_loader] t_ros_trigger = 1779955143.490 s, t_trigger_end = 34.94817280769348
 Analysis window: t ∈ [0, 34.95] s
-  [flip] Negating estimator signals: {'vy', 'pitch', 'roll', 'px', 'py', 'vx'}
+  [flip] Negating estimator signals: {'roll', 'px', 'py', 'vx', 'pitch', 'vy'}
   [LF] accuracy=65.5% (N=12019, TP=7229, TN=649, FP=2917, FN=1224; overlap=6.17–30.21s)
   [RF] accuracy=46.1% (N=11998, TP=4352, TN=1174, FP=5258, FN=1214; overlap=4.77–28.76s)
   [RH] accuracy=70.2% (N=11716, TP=6599, TN=1624, FP=2486, FN=1007; overlap=0.00–23.43s)
@@ -43,10 +43,6 @@ Analysis window: t ∈ [0, 34.95] s
   → Saved metrics.json & figures to /home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/FLAT_WLW_NEW_REAL_2/results/FLAT_WLW_NEW_REAL_2
 
 [Corrected summary] → /home/hiho817/analysis_ws/thesis_exp/physical_exp/experiments/FLAT_WLW_NEW_REAL_2/results/analysis_report.md
-[Summary] → fig_comparison.pdf
-
-Done. 1 experiments processed, 0 failed.
-s/FLAT_WLW_NEW_REAL_2/results/analysis_report.md
 [Summary] → fig_comparison.pdf
 
 Done. 1 experiments processed, 0 failed.

@@ -212,6 +212,7 @@ def analyze_new(exp_id, group, bag_name, vicon_csv, out_dir,
         lidar['px_odom'] = lidar_xyz_odom[:, 0]
         lidar['py_odom'] = lidar_xyz_odom[:, 1]
         lidar['pz_odom'] = lidar_xyz_odom[:, 2]
+        lidar['pz_odom'] = lidar_xyz_odom[:, 2]
         T_CO_rpy = rpy_CO.tolist(); T_CO_t = t_CO.tolist()
         resid_mean = float(resid.mean() * 100); resid_max = float(resid.max() * 100)
     else:
