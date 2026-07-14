@@ -79,8 +79,14 @@ VICON_DIR = os.path.join(BASE, 'vicon')
 OUT_DIR   = os.path.join(BASE, 'results')
 os.makedirs(OUT_DIR, exist_ok=True)
 
-CONTACT_THRESHOLD_M = 0.015
+CONTACT_THRESHOLD_M = 0.020
 GROUND_MARKERS = ['ground1', 'ground2', 'ground3', 'ground4']
+
+# WLW contact replay: evaluated against 20-mm VICON ground truth.
+CONTACT_RM_HIGH = 225.0
+CONTACT_RM_LOW = 205.0
+CONTACT_BETA_HIGH = 0.50
+CONTACT_BETA_LOW = 0.25
 
 # ─── Helpers ──────────────────────────────────────────────────────────────────
 def interp_to(src_t, src_v, tgt_t):
@@ -120,6 +126,25 @@ def interp_gmo(gmo_t, gmo_leg, t_tgt, T_END):
                     bounds_error=False, fill_value=0.)(t_tgt) > 0.5
 
 
+def replay_gmo_contact(gmo_raw):
+    """Replay the production OR-Schmitt trigger from raw F_rm and tau_beta."""
+    result = {'t': gmo_raw['t']}
+    for leg in ('LF', 'RF', 'RH', 'LH'):
+        state = False
+        contact = np.zeros(len(gmo_raw['t']), dtype=bool)
+        rm = np.abs(gmo_raw[f'{leg}_rm_force'])
+        beta = np.abs(gmo_raw[f'{leg}_beta_torque'])
+        for i in range(len(contact)):
+            if not state:
+                if rm[i] > CONTACT_RM_HIGH or beta[i] > CONTACT_BETA_HIGH:
+                    state = True
+            elif rm[i] < CONTACT_RM_LOW and beta[i] < CONTACT_BETA_LOW:
+                state = False
+            contact[i] = state
+        result[leg] = contact
+    return result
+
+
 def align_vicon_orientation(rpy_vicon, rpy_ekf_deg):
     """Align VICON initial orientation to EKF frame."""
     valid = ~np.isnan(rpy_vicon).any(1)
@@ -153,8 +178,6 @@ def analyze_new(exp_id, group, bag_name, vicon_csv, out_dir,
     """
     if flip is None:
         flip = set()
-    from scipy.spatial import Delaunay
-
     print(f'\n{"="*60}\n[NEW] {exp_id}  ({bag_name})\n{"="*60}')
     os.makedirs(out_dir, exist_ok=True)
 
@@ -166,7 +189,8 @@ def analyze_new(exp_id, group, bag_name, vicon_csv, out_dir,
     bag = load_fusion_bag(bag_db, rate=1.0, trigger_pair=trigger_pair)
 
     ekf   = bag['ekf']; ba = bag['ba']; bw = bag['bw']
-    gmo   = bag['gmo']; odom = bag['odom']; fv = bag['fv']; lidar = bag['lidar']
+    gmo   = replay_gmo_contact(bag['gmo_raw'])
+    odom = bag['odom']; fv = bag['fv']; lidar = bag['lidar']
 
     # Time alignment:
     # If the bag only recorded trigger-OFF (enable=False), bag times are relative to
@@ -274,46 +298,17 @@ def analyze_new(exp_id, group, bag_name, vicon_csv, out_dir,
     has_gmo = len(gmo['t']) > 0
 
     if has_gmo:
-        gnd_pts = []
-        for m in GROUND_MARKERS:
-            try:
-                xyz = vi.get_xyz(m)
-                v = ~np.isnan(xyz).any(axis=1)
-                if v.any():
-                    gnd_pts.append(vi.to_robot(xyz[v][0:1])[0, :2])
-            except Exception:
-                pass
-        try:
-            hull_gnd = Delaunay(np.array(gnd_pts)) if len(gnd_pts) >= 3 else None
-        except Exception:
-            hull_gnd = None
-
-        def in_region(xy_mm, hull):
-            if hull is None:
-                return np.ones(len(xy_mm), dtype=bool)
-            return hull.find_simplex(xy_mm) >= 0
-
         for leg, gm in LEG_MAP:
             hf = vi.foot_heights[leg]; cf = vi.contact[leg]
-            try:
-                fxyz = vi.get_xyz(gm)
-                fxy  = np.full((len(vi.t_traj), 2), np.nan)
-                vf   = ~np.isnan(fxyz).any(1)
-                if vf.any():
-                    fxy[vf] = vi.to_robot(fxyz[vf])[:, :2]
-                    rmask = np.zeros(len(vi.t_traj), dtype=bool)
-                    rmask[vf] = in_region(fxy[vf], hull_gnd)
-                else:
-                    rmask = np.zeros(len(vi.t_traj), dtype=bool)
-            except Exception:
-                rmask = np.zeros(len(vi.t_traj), dtype=bool)
 
             # Compare only where both sensors actually contain data.  In
             # particular, OFF-only bags may start several seconds after VICON.
             finite_foot = np.isfinite(hf)
             gmo_overlap = ((vi.t_traj >= gmo['t'][0]) &
                            (vi.t_traj <= gmo['t'][-1]))
-            amask = mask_win_vi & rmask & finite_foot & gmo_overlap
+            # The fitted Ground1–Ground4 plane is treated as infinite: do not
+            # discard samples merely because the foot is outside their hull.
+            amask = mask_win_vi & finite_foot & gmo_overlap
             if amask.sum() < 10:
                 contact_results[leg] = None; continue
 
@@ -347,13 +342,24 @@ def analyze_new(exp_id, group, bag_name, vicon_csv, out_dir,
             color  = COLORS_LEG[leg]
             ax.plot(t_win, hf_leg * 1000, lw=0.8, color=color, label=f'{leg} height [mm]')
             gmo_valid = (t_win >= gmo['t'].min()) & (t_win <= gmo['t'].max())
+            # Same validity mask as metrics: finite VICON foot height plus
+            # temporal overlap with GMO; the ground plane is infinite.
+            compare_valid = np.isfinite(hf_leg) & gmo_valid
             contact_match = cf_leg == c_gmo
-            _shade_contact(ax, t_win, gmo_valid & contact_match, color='tab:green', alpha=0.18)
-            _shade_contact(ax, t_win, gmo_valid & ~contact_match, color='tab:red', alpha=0.18)
+            _shade_contact(ax, t_win, ~compare_valid, color='0.65', alpha=0.12)
+            _shade_contact(ax, t_win, compare_valid & contact_match, color='tab:green', alpha=0.18)
+            _shade_contact(ax, t_win, compare_valid & ~contact_match, color='tab:red', alpha=0.18)
             ax.axhline(CONTACT_THRESHOLD_M * 1000, color='k', ls='--', lw=0.8, alpha=0.5)
             ax.set_ylabel(f'{leg} [mm]'); ax.legend(fontsize=7); ax.grid(True, alpha=0.4)
         axes[-1].set_xlabel('Time [s]')
-        fig.suptitle(f'Contact Detection — {exp_id}')
+        fig.suptitle(
+            f'Contact Detection — {exp_id} '
+            f'(VICON < {CONTACT_THRESHOLD_M * 1000:.0f} mm; '
+            f'F_rm {CONTACT_RM_HIGH:.0f}/{CONTACT_RM_LOW:.0f}, '
+            f'tau_beta {CONTACT_BETA_HIGH:.2f}/{CONTACT_BETA_LOW:.2f})'
+        )
+        fig.text(0.5, 0.01, 'Green: match; red: mismatch; gray: invalid VICON or GMO data',
+                 ha='center', fontsize=8)
         fig.tight_layout()
         fig.savefig(os.path.join(out_dir, 'fig_contact.pdf'), dpi=150)
         plt.close(fig)
@@ -1137,7 +1143,7 @@ def write_corrected_summary_report(all_metrics):
 
     section5 = """## 5. 接觸偵測指標（逐有效時間步比對）
 
-僅使用 VICON 腳標記有效、腳標記位於 ground marker 覆蓋區、且 GMO 實際有資料的重疊時間步。在每個有效時間步直接比對 VICON 與 GMO 的二元接觸狀態，Acc = (TP + TN) / N。不進行接觸或離地事件配對，也不計算延遲。四腳平均為各腳 accuracy 的算術平均。
+僅使用 VICON 腳標記有效、且 GMO 實際有資料的重疊時間步。VICON 接觸真值由 Ground1–Ground4 擬合的無限地面平面計算；不限制腳標記是否位於 ground marker 覆蓋區。在每個有效時間步直接比對 VICON 與 GMO 的二元接觸狀態，Acc = (TP + TN) / N。不進行接觸或離地事件配對，也不計算延遲。四腳平均為各腳 accuracy 的算術平均。
 
 | 實驗編號 | 四腳平均 Acc | 總有效時間步 | TP | TN | FP | FN |
 |----------|-------------|--------------|----|----|----|----|

@@ -79,8 +79,14 @@ VICON_DIR = os.path.join(BASE, 'vicon')
 OUT_DIR   = os.path.join(BASE, 'results')
 os.makedirs(OUT_DIR, exist_ok=True)
 
-CONTACT_THRESHOLD_M = 0.015
+CONTACT_THRESHOLD_M = 0.020
 GROUND_MARKERS = ['ground1', 'ground2', 'ground3', 'ground4']
+
+# Shared WLW calibration against 20-mm VICON truth.
+CONTACT_RM_HIGH = 50.0
+CONTACT_RM_LOW = 25.0
+CONTACT_BETA_HIGH = 3.00
+CONTACT_BETA_LOW = 1.50
 
 # ─── Helpers ──────────────────────────────────────────────────────────────────
 def interp_to(src_t, src_v, tgt_t):
@@ -118,6 +124,24 @@ def interp_gmo(gmo_t, gmo_leg, t_tgt, T_END):
         return np.zeros(len(t_tgt), dtype=bool)
     return interp1d(t_g, c_g, kind='nearest',
                     bounds_error=False, fill_value=0.)(t_tgt) > 0.5
+
+
+def replay_gmo_contact(gmo_raw):
+    """Replay the calibrated OR-Schmitt trigger from raw GMO residuals."""
+    result = {'t': gmo_raw['t']}
+    for leg in ('LF', 'RF', 'RH', 'LH'):
+        state = False
+        contact = np.zeros(len(gmo_raw['t']), dtype=bool)
+        rm = np.abs(gmo_raw[f'{leg}_rm_force'])
+        beta = np.abs(gmo_raw[f'{leg}_beta_torque'])
+        for i in range(len(contact)):
+            if not state:
+                state = rm[i] > CONTACT_RM_HIGH or beta[i] > CONTACT_BETA_HIGH
+            elif rm[i] < CONTACT_RM_LOW and beta[i] < CONTACT_BETA_LOW:
+                state = False
+            contact[i] = state
+        result[leg] = contact
+    return result
 
 
 def align_vicon_orientation(rpy_vicon, rpy_ekf_deg):
@@ -166,7 +190,8 @@ def analyze_new(exp_id, group, bag_name, vicon_csv, out_dir,
     bag = load_fusion_bag(bag_db, rate=1.0, trigger_pair=trigger_pair)
 
     ekf   = bag['ekf']; ba = bag['ba']; bw = bag['bw']
-    gmo   = bag['gmo']; odom = bag['odom']; fv = bag['fv']; lidar = bag['lidar']
+    gmo   = replay_gmo_contact(bag['gmo_raw'])
+    odom  = bag['odom']; fv = bag['fv']; lidar = bag['lidar']
 
     # Time alignment:
     # If the bag only recorded trigger-OFF (enable=False), bag times are relative to
@@ -313,7 +338,7 @@ def analyze_new(exp_id, group, bag_name, vicon_csv, out_dir,
             finite_foot = np.isfinite(hf)
             gmo_overlap = ((vi.t_traj >= gmo['t'][0]) &
                            (vi.t_traj <= gmo['t'][-1]))
-            amask = mask_win_vi & rmask & finite_foot & gmo_overlap
+            amask = mask_win_vi & finite_foot & gmo_overlap
             if amask.sum() < 10:
                 contact_results[leg] = None; continue
 

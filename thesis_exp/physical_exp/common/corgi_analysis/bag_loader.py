@@ -108,6 +108,30 @@ def _parse_gmo(rows, trg_ts0, rate):
     return gmo
 
 
+def _parse_gmo_raw(rows, trg_ts0, rate):
+    """Parse raw GMO residuals used by the contact Schmitt trigger."""
+    gmo = {'t': []}
+    modules = ('module_a', 'module_b', 'module_c', 'module_d')
+    legs = ('LF', 'RF', 'RH', 'LH')
+    for leg in legs:
+        gmo[f'{leg}_rm_force'] = []
+        gmo[f'{leg}_beta_torque'] = []
+    seen = set()
+    for ts, data in rows:
+        if ts in seen:
+            continue
+        seen.add(ts)
+        msg = deserialize_message(data, GMOContactStateStamped)
+        gmo['t'].append((ts - trg_ts0) / 1e9 * rate)
+        for leg, module_name in zip(legs, modules):
+            module = getattr(msg, module_name)
+            gmo[f'{leg}_rm_force'].append(module.rm_force)
+            gmo[f'{leg}_beta_torque'].append(module.beta_torque)
+    for key in gmo:
+        gmo[key] = np.array(gmo[key])
+    return gmo
+
+
 # ──────────────────────────────────────────────────────────────────────────────
 # Public API
 # ──────────────────────────────────────────────────────────────────────────────
@@ -157,6 +181,7 @@ def load_inner_ekf_bag(bag_db: str, rate: float = 2.0) -> dict:
     ba  = _parse_vector3_bias(rows_ba,  trg_ts0, rate)
     bw  = _parse_vector3_bias(rows_bw,  trg_ts0, rate)
     gmo = _parse_gmo(rows_gmo, trg_ts0, rate)
+    gmo_raw = _parse_gmo_raw(rows_gmo, trg_ts0, rate)
 
     t_bag_trigger_end = (
         t_ros_trigger_off - t_ros_trigger if t_ros_trigger_off is not None else None
@@ -167,7 +192,7 @@ def load_inner_ekf_bag(bag_db: str, rate: float = 2.0) -> dict:
           f't_trigger_end = {t_bag_trigger_end}')
 
     return {
-        'ekf': ekf, 'ba': ba, 'bw': bw, 'gmo': gmo,
+        'ekf': ekf, 'ba': ba, 'bw': bw, 'gmo': gmo, 'gmo_raw': gmo_raw,
         't_ros_trigger': t_ros_trigger,
         't_ros_trigger_off': t_ros_trigger_off,
         't_trigger_end': t_bag_trigger_end,
@@ -239,6 +264,7 @@ def load_fusion_bag(bag_db: str, rate: float = 1.0, trigger_pair: int = 0) -> di
     ba   = _parse_vector3_bias(rows_ba,  trg_ts0, rate)
     bw   = _parse_vector3_bias(rows_bw,  trg_ts0, rate)
     gmo  = _parse_gmo(rows_gmo, trg_ts0, rate)
+    gmo_raw = _parse_gmo_raw(rows_gmo, trg_ts0, rate)
     odom = _parse_ekf(rows_odom, t_ros_trigger)  # same Odometry type
     lidar = _parse_ekf(rows_lidar, t_ros_trigger)  # /lidar_odom in camera_init frame
 
@@ -261,7 +287,7 @@ def load_fusion_bag(bag_db: str, rate: float = 1.0, trigger_pair: int = 0) -> di
           f't_trigger_end = {t_bag_trigger_end}')
 
     return {
-        'ekf': ekf, 'ba': ba, 'bw': bw, 'gmo': gmo,
+        'ekf': ekf, 'ba': ba, 'bw': bw, 'gmo': gmo, 'gmo_raw': gmo_raw,
         'odom': odom, 'fv': fv, 'lidar': lidar,
         't_ros_trigger': t_ros_trigger,
         't_ros_trigger_off': t_ros_trigger_off,

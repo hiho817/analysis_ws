@@ -98,11 +98,11 @@ Legacy system: /odometry/legacy/position, /odometry/legacy/velocity
 
 ## 5. 接觸偵測指標（逐有效時間步比對）
 
-僅使用 VICON 腳標記有效、腳標記位於 ground marker 覆蓋區、且 GMO 實際有資料的重疊時間步。在每個有效時間步直接比對 VICON 與 GMO 的二元接觸狀態，Acc = (TP + TN) / N。不進行接觸或離地事件配對，也不計算延遲。四腳平均為各腳 accuracy 的算術平均。
+僅使用 VICON 腳標記有效、且 GMO 實際有資料的重疊時間步。VICON 接觸真值由 Ground1–Ground4 擬合的無限地面平面計算，腳標記高度低於 **20 mm** 視為接觸；不限制腳標記是否位於 ground marker 覆蓋區。在每個有效時間步直接比對 VICON 與 GMO 的二元接觸狀態，Acc = (TP + TN) / N。不進行接觸或離地事件配對，也不計算延遲。四腳平均為各腳 accuracy 的算術平均。
 
 | 實驗編號 | 四腳平均 Acc | 總有效時間步 | TP | TN | FP | FN |
 |----------|-------------|--------------|----|----|----|----|
-| FLAT_WLW_NEW_REAL_1 | 46.2% | 48154 | 19879 | 2386 | 15984 | 9905 |
+| FLAT_WLW_NEW_REAL_1 | 73.1% | 69432 | 48479 | 2248 | 9988 | 8717 |
 
 ---
 

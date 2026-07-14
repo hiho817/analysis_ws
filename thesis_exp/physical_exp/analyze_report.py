@@ -13,6 +13,15 @@ ROOT = Path(__file__).resolve().parent
 METRICS = sorted(ROOT.glob("experiments/*/results/*/metrics.json"))
 OUT = ROOT / "results" / "analysis_report.md"
 
+# Contact calibration is validated only on these WLW NEW trials.  REAL_1 and
+# REAL_3 are intentionally excluded because their F_rm residual is phase-aligned
+# with swing rather than a usable contact cue.
+CONTACT_REPORT_IDS = {
+    "FLAT_WLW_NEW_REAL_2",
+    "FLAT_WLW_NEW_REAL_4",
+    "FLAT_WLW_NEW_REAL_5",
+}
+
 
 def number(value):
     return value if isinstance(value, (int, float)) else None
@@ -74,6 +83,39 @@ def main():
         fig.tight_layout()
         fig.savefig(OUT.parent / "fig_group_position_rmse.pdf", bbox_inches="tight")
         plt.close(fig)
+
+    contact_records = [
+        r for r in records
+        if r.get("exp_id") in CONTACT_REPORT_IDS and r.get("contact")
+    ]
+    lines += [
+        "",
+        "## WLW NEW 接觸狀態（校正後）",
+        "",
+        "VICON 真值採腳標記高度 < 20 mm；GMO OR-Schmitt 門檻採 `F_rm` 進／離地 50/25、`tau_beta` 進／離地 3.00/1.50。",
+        "",
+        "排除 `FLAT_WLW_NEW_REAL_1` 與 `FLAT_WLW_NEW_REAL_3`：兩筆的 `F_rm` 與 VICON swing 同相，不能作為此門檻校正的驗證樣本。",
+        "",
+        "| 實驗 | 四腳平均 Acc | 總有效時間步 | TP | TN | FP | FN |",
+        "|---|---:|---:|---:|---:|---:|---:|",
+    ]
+    total = {key: 0 for key in ("N", "TP", "TN", "FP", "FN")}
+    for r in sorted(contact_records, key=lambda x: x.get("exp_id", "")):
+        legs = list(r["contact"].values())
+        acc = mean(float(c["acc"]) for c in legs)
+        values = {key: sum(int(c[key]) for c in legs) for key in total}
+        for key in total:
+            total[key] += values[key]
+        lines.append(
+            f"| {r['exp_id']} | {acc:.1%} | {values['N']} | {values['TP']} | "
+            f"{values['TN']} | {values['FP']} | {values['FN']} |"
+        )
+    if contact_records:
+        weighted_acc = (total["TP"] + total["TN"]) / total["N"]
+        lines += [
+            "",
+            f"納入三筆試驗的加權整體 Acc：**{weighted_acc:.1%}**（N = {total['N']}）。",
+        ]
 
     lines += [
         "",
