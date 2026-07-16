@@ -185,7 +185,12 @@ def load_vicon(csv_path: str,
     print(f'[vicon_loader] Markers: {list(marker_col_map.keys())}')
 
     def get_xyz(name):
-        return traj_df[marker_col_map[name]].values.astype(float)
+        # Nexus capitalization differs across captures (ground1 vs Ground1).
+        key = marker_col_map.get(name)
+        if key is None:
+            canonical = {k.lower(): k for k in marker_col_map}
+            key = marker_col_map[canonical[name.lower()]]
+        return traj_df[key].values.astype(float)
 
     # ── Ground plane ──────────────────────────────────────────────────────────
     gpts = []

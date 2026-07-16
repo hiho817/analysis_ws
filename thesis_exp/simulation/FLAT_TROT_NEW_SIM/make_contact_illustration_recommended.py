@@ -13,9 +13,9 @@ from rclpy.serialization import deserialize_message
 from corgi_msgs.msg import GMOContactStateStamped, SimLegContactStamped, TriggerStamped
 
 
-ROOT = Path(__file__).resolve().parent
-DB = ROOT / "walk_openloop.db3"
-OUT = ROOT / "results" / "FLAT_WALK_NEW_SIM.pdf"
+ROOT = Path("/home/hiho817/analysis_ws/thesis_exp/simulation/FLAT_TROT_NEW_SIM")
+DB = ROOT / "FLAT_TROT_NEW_SIM_0.db3"
+OUT = ROOT / "results" / "FLAT_TROT_NEW_SIM.pdf"
 LEG = "LF"
 MODULE = "module_a"
 
@@ -76,13 +76,13 @@ def main():
 
     t = np.asarray(t); rm = np.asarray(rm); beta = np.asarray(beta)
     gt_t = np.asarray(gt_t); gt_c = np.asarray(gt_c, dtype=bool)
-    keep = (t >= 0) & (t <= t[-1])
+    keep = (t >= 0) & (t <= 7.0)
     t, rm, beta = t[keep], rm[keep], beta[keep]
 
     # Active simulator settings in config_online.yaml; the recorded Boolean
     # state is intentionally not reused, so this evaluates the new thresholds.
-    rm_high, rm_low = 25.0, 15.0
-    beta_high, beta_low = 2.0, 1.0
+    rm_high, rm_low = 40.0, 30.0
+    beta_high, beta_low = 3.0, 2.0
     gmo = schmitt_contact(rm, beta, rm_high, rm_low, beta_high, beta_low)
     gt = truth_at(t, gt_t, gt_c)
     correct = gt == gmo

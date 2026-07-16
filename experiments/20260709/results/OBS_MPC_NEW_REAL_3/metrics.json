@@ -30,6 +30,22 @@
     "RMSE_pitch_deg": 1.2396937599733855,
     "RMSE_yaw_deg": 0.5007570651122843
   },
+  "closed_loop": {
+    "roll_rms_deg": 1.999200008631542,
+    "pitch_rms_deg": 2.6313874350791413,
+    "roll_std_deg": 1.9984810730868472,
+    "pitch_std_deg": 2.5907746281346413,
+    "vicon_vx_steady_mean": 0.07535735864705446,
+    "vicon_vx_steady_std": 0.04873441566327957,
+    "vicon_vx_cruise_mean": 0.08433372970148044,
+    "vicon_vx_cruise_std": 0.04647404869378831,
+    "vicon_vx_rmse_from_0p1_steady": 0.054610466422575187,
+    "vicon_vx_rmse_from_0p1_cruise": 0.04904354419349077,
+    "peak_vx_ekf": 0.49233806133270264,
+    "steady_start_s": 16.1805,
+    "steady_end_s": 34.6725,
+    "cruise_end_s": 20.840000000000003
+  },
   "ba": {
     "x": [
       NaN,

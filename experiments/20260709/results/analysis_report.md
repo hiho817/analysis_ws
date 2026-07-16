@@ -162,23 +162,46 @@ MPC 控制器以 X = 3 m 為目標停止。估測器 final X 是控制器的停�
 
 ## 7. Closed-Loop（MPC）vs Open-Loop（Walk）比較
 
-本節比較 ESEKF 的 Closed-Loop Obstacle MPC 與 Open-Loop RUGG Walk。姿態數值是 EKF 相對 VICON 的估測 RMSE，不是機體相對水平面的實際震盪量。
+本節採用與 20260528 第 7 節相同的 VICON-based 比較：Closed-Loop 為 Obstacle MPC，Open-Loop 為 RUGG Walk；兩者皆為 ESEKF + fusion。
+
+> 姿態指標使用 VICON 相對水平面 0° 的 Roll/Pitch RMS，以及 VICON Roll/Pitch standard deviation（震盪量），不是 EKF 相對 VICON 的估測 RMSE。
+> 速度統計使用 trigger 有效段的 35–75% `T_END` 穩態窗。巡航段從穩態窗起點開始，至 VICON vx 的 1 秒移動平均首次連續 1 秒低於穩態均值 80% 的減速起點；未偵測到減速則沿用穩態窗終點。
+
+### 7.1 每次試驗詳細指標
+
+| 實驗編號 | Roll RMS (°) | Pitch RMS (°) | Roll std (°) | Pitch std (°) | VICON vx mean ± std（穩態窗） | peak |vx| EKF（穩態窗） |
+|----------|--------------|---------------|--------------|---------------|-------------------------------|--------------------------|
+| OBS_MPC_NEW_REAL_3 | 1.999 | 2.631 | 1.998 | 2.591 | 0.075 ± 0.049 | 0.492 |
+| OBS_MPC_NEW_REAL_4 | 1.844 | 2.612 | 1.833 | 2.602 | 0.080 ± 0.054 | 0.359 |
+| OBS_MPC_NEW_REAL_5 | 2.297 | 2.279 | 2.162 | 2.252 | 0.073 ± 0.052 | 0.366 |
+| OBS_MPC_NEW_REAL_6 | 2.069 | 2.067 | 1.855 | 2.037 | 0.078 ± 0.047 | 0.291 |
+| OBS_MPC_NEW_REAL_7 | 2.435 | 2.341 | 2.430 | 2.307 | 0.073 ± 0.053 | 0.466 |
+| RUGG_Walk_NEW_REAL_1 | 3.152 | 3.155 | 2.972 | 3.143 | 0.085 ± 0.074 | 0.551 |
+| RUGG_Walk_NEW_REAL_2 | 2.925 | 3.260 | 2.832 | 3.229 | 0.085 ± 0.075 | 0.538 |
+| RUGG_Walk_NEW_REAL_3 | 3.128 | 3.145 | 2.923 | 3.129 | 0.089 ± 0.072 | 0.557 |
+| RUGG_Walk_NEW_REAL_5 | 3.199 | 3.005 | 2.852 | 2.994 | 0.084 ± 0.077 | 0.619 |
+
+### 7.2 分組統計摘要
 
 | 指標 | Closed-Loop（MPC） | Open-Loop（RUGG Walk） |
 |------|-------------------|------------------------|
 | n（試驗數） | 5 | 4 |
-| Position 3D RMSE (cm) | 13.00 ± 7.85 | 12.73 ± 6.33 |
-| Velocity 3D RMSE (m/s) | 0.096 ± 0.041 | 0.133 ± 0.041 |
-| Roll estimation RMSE (°) | 2.73 ± 0.92 | 2.28 ± 1.19 |
-| Pitch estimation RMSE (°) | 2.11 ± 1.12 | 1.79 ± 1.43 |
-| Yaw estimation RMSE (°) | 1.99 ± 1.41 | 1.75 ± 1.46 |
-| peak vx EKF（35–75% T_END，m/s） | 0.395 ± 0.083 | 0.566 ± 0.036 |
+| Roll RMS vs 0° (°) | 2.129 ± 0.236 | 3.101 ± 0.121 |
+| Pitch RMS vs 0° (°) | 2.386 ± 0.238 | 3.141 ± 0.104 |
+| Roll std（姿態震盪, °） | 2.056 ± 0.247 | 2.895 ± 0.065 |
+| Pitch std（姿態震盪, °） | 2.358 ± 0.240 | 3.124 ± 0.097 |
+| VICON vx 穩態均值（35–75% T_END，m/s） | 0.076 ± 0.003 | 0.086 ± 0.002 |
+| VICON vx std（35–75% T_END，m/s） | 0.051 ± 0.003 | 0.074 ± 0.002 |
+| VICON vx 巡航均值（減速前，m/s） | 0.082 ± 0.004 | 0.089 ± 0.008 |
+| VICON vx std（巡航，m/s） | 0.047 ± 0.011 | 0.049 ± 0.035 |
+| VICON vx RMSE from 0.1（穩態窗，cm/s） | 5.6 | 7.6 |
+| VICON vx RMSE from 0.1（巡航，cm/s） | 5.1 | 5.3 |
+| peak |vx| EKF（35–75% T_END，m/s） | 0.395 ± 0.083 | 0.566 ± 0.036 |
 
-### 7.1 分析
+### 7.3 分析
 
-- Closed-Loop MPC 的位置 3D RMSE 為 13.00 cm；Open-Loop RUGG Walk 為 12.73 cm。
-- 兩組地形與任務條件不同，因此本比較用於描述系統行為，不應解讀為單一控制器因素的因果效果。
-- peak vx 可反映步態中的瞬時速度振盪；姿態 RMSE 則反映估測器追蹤 VICON 的一致性。
+- 本節量測的是 VICON 觀測到的機體姿態與前進速度，不使用 EKF 姿態估測誤差作為穩定性指標。
+- MPC 與 Walk 的地形與任務條件不同，結果用於描述兩種系統行為，不應解讀為單一控制器因素的因果效果。
 
 ---
 

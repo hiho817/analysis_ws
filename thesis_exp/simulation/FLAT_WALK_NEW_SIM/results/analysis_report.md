@@ -33,7 +33,7 @@
 |---:|---:|---:|---:|---:|---:|---:|
 | 99.21% | 99.41% | 91.19% | 90.82% | 95.16% | 0.21% | 4.63% |
 
-[LF 接觸狀態示意圖（PDF）](fig_sim_contact_illustration.pdf)
+[LF 接觸狀態示意圖（PDF）](FLAT_WALK_NEW_SIM.pdf)
 
 ## Bias
 

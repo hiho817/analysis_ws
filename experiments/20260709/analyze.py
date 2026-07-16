@@ -85,6 +85,58 @@ def rmse(d):
     return float(np.sqrt(np.mean(v ** 2))) if len(v) > 0 else float('nan')
 
 
+def closed_loop_metrics(t, rpy_rad, vx, ekf_t, ekf_vx, t_end):
+    """VICON-based stability and velocity metrics for MPC-vs-Walk analysis.
+
+    The VICON attitude is intentionally used before any EKF-frame alignment:
+    RMS is therefore relative to the horizontal VICON frame, while standard
+    deviation measures attitude oscillation after removing its DC offset.
+    """
+    roll_deg = np.degrees(rpy_rad[:, 0])
+    pitch_deg = np.degrees(rpy_rad[:, 1])
+    steady_start, steady_end = 0.35 * t_end, 0.75 * t_end
+    steady = (t >= steady_start) & (t <= steady_end) & np.isfinite(vx)
+
+    # Cruise begins at the steady-window start.  Its end is the first point
+    # where a 1-s moving-average speed remains below 80% of the steady mean
+    # for 1 s; otherwise the end of the steady window is retained.
+    cruise_end = steady_end
+    steady_mean = float(np.mean(vx[steady])) if steady.any() else float('nan')
+    cruise_candidates = np.flatnonzero((t >= steady_start) & (t <= t_end) & np.isfinite(vx))
+    if len(cruise_candidates) >= 2 and np.isfinite(steady_mean) and steady_mean > 0:
+        dt = float(np.median(np.diff(t[cruise_candidates])))
+        span = max(1, int(round(1.0 / dt))) if dt > 0 else 1
+        local_vx = vx[cruise_candidates]
+        kernel = np.ones(span) / span
+        avg = np.convolve(local_vx, kernel, mode='same')
+        below = avg < 0.8 * steady_mean
+        for j in range(0, len(below) - span + 1):
+            if below[j:j + span].all():
+                cruise_end = float(t[cruise_candidates[j]])
+                break
+    cruise = (t >= steady_start) & (t <= cruise_end) & np.isfinite(vx)
+    ekf_steady = (ekf_t >= steady_start) & (ekf_t <= steady_end) & np.isfinite(ekf_vx)
+
+    def stats(values):
+        values = np.asarray(values, dtype=float)
+        values = values[np.isfinite(values)]
+        return (float(np.mean(values)), float(np.std(values))) if len(values) else (float('nan'), float('nan'))
+
+    vx_steady_mean, vx_steady_std = stats(vx[steady])
+    vx_cruise_mean, vx_cruise_std = stats(vx[cruise])
+    return {
+        'roll_rms_deg': rmse(roll_deg), 'pitch_rms_deg': rmse(pitch_deg),
+        'roll_std_deg': float(np.nanstd(roll_deg)), 'pitch_std_deg': float(np.nanstd(pitch_deg)),
+        'vicon_vx_steady_mean': vx_steady_mean, 'vicon_vx_steady_std': vx_steady_std,
+        'vicon_vx_cruise_mean': vx_cruise_mean, 'vicon_vx_cruise_std': vx_cruise_std,
+        'vicon_vx_rmse_from_0p1_steady': rmse(vx[steady] - 0.1),
+        'vicon_vx_rmse_from_0p1_cruise': rmse(vx[cruise] - 0.1),
+        'peak_vx_ekf': float(np.nanmax(np.abs(ekf_vx[ekf_steady]))) if ekf_steady.any() else float('nan'),
+        'steady_start_s': float(steady_start), 'steady_end_s': float(steady_end),
+        'cruise_end_s': float(cruise_end),
+    }
+
+
 def align_vicon_orientation(rpy_vicon, rpy_ekf_deg):
     """Align VICON initial orientation to EKF frame."""
     valid = ~np.isnan(rpy_vicon).any(1)
@@ -174,6 +226,9 @@ def analyze_new(exp_id, group, bag_name, vicon_csv, out_dir,
     ecov_py = ekf['cov_py'][ekf_mask]
     rpy_ekf_deg = quat_to_rpy_deg(eqw, eqx, eqy, eqz)
 
+    # Keep the VICON-horizontal attitude for the closed-loop stability study;
+    # a separate aligned copy remains necessary for EKF attitude-error metrics.
+    rpy_vicon_horizontal = rpy_vicon.copy()
     rpy_vicon = align_vicon_orientation(rpy_vicon, rpy_ekf_deg)
 
     vi_valid = ~np.isnan(pos_vicon).any(1)
@@ -264,6 +319,8 @@ def analyze_new(exp_id, group, bag_name, vicon_csv, out_dir,
         'RMSE_pitch_deg': rmse((rpy_ekf_deg[:, 1] - vi_pitch_e)[valid_pitch]),
         'RMSE_yaw_deg':   rmse((rpy_ekf_deg[:, 2] - vi_yaw_e)[valid_yaw]),
     }
+    metrics_closed_loop = closed_loop_metrics(
+        t_win, rpy_vicon_horizontal, v_body_vi[:, 0], et, evx, T_END)
 
     # Bias metrics (may be empty for mpc_esekf)
     def _bias_stats(b):
@@ -403,6 +460,7 @@ def analyze_new(exp_id, group, bag_name, vicon_csv, out_dir,
         'position': metrics_pos,
         'velocity': metrics_vel,
         'attitude': metrics_rpy,
+        'closed_loop': metrics_closed_loop,
         'ba': metrics_ba, 'bw': metrics_bw,
         'odom_pos': metrics_odom,
         'fusion_bv': metrics_fv,
@@ -712,31 +770,48 @@ def write_20260709_report(all_metrics):
         lines.append(f'| {system} | {len(es)} | {em:.3f} ± {esd:.3f} m | {vm:.3f} ± {vsd:.3f} m | {stop:.1f} cm |')
 
     lines += ['', '---', '', '## 7. Closed-Loop（MPC）vs Open-Loop（Walk）比較', '',
-              '本節比較 ESEKF 的 Closed-Loop Obstacle MPC 與 Open-Loop RUGG Walk。姿態數值是 EKF 相對 VICON 的估測 RMSE，不是機體相對水平面的實際震盪量。',
+              '本節採用與 20260528 第 7 節相同的 VICON-based 比較：Closed-Loop 為 Obstacle MPC，Open-Loop 為 RUGG Walk；兩者皆為 ESEKF + fusion。',
               '',
-              '| 指標 | Closed-Loop（MPC） | Open-Loop（RUGG Walk） |',
-              '|------|-------------------|------------------------|']
+              '> 姿態指標使用 VICON 相對水平面 0° 的 Roll/Pitch RMS，以及 VICON Roll/Pitch standard deviation（震盪量），不是 EKF 相對 VICON 的估測 RMSE。',
+              '> 速度統計使用 trigger 有效段的 35–75% `T_END` 穩態窗。巡航段從穩態窗起點開始，至 VICON vx 的 1 秒移動平均首次連續 1 秒低於穩態均值 80% 的減速起點；未偵測到減速則沿用穩態窗終點。',
+              '', '### 7.1 每次試驗詳細指標', '',
+              '| 實驗編號 | Roll RMS (°) | Pitch RMS (°) | Roll std (°) | Pitch std (°) | VICON vx mean ± std（穩態窗） | peak |vx| EKF（穩態窗） |',
+              '|----------|--------------|---------------|--------------|---------------|-------------------------------|--------------------------|']
     closed, opened = 'NEW_OBS_MPC_GMO', 'NEW_RUGG_WALK'
-    comparisons = [
-        ('n（試驗數）', str(len(rows(closed))), str(len(rows(opened)))),
-        ('Position 3D RMSE (cm)', *[f'{ms(g,"position","RMSE_3D_cm")[0]:.2f} ± {ms(g,"position","RMSE_3D_cm")[1]:.2f}' for g in (closed,opened)]),
-        ('Velocity 3D RMSE (m/s)', *[f'{ms(g,"velocity","RMSE_3D")[0]:.3f} ± {ms(g,"velocity","RMSE_3D")[1]:.3f}' for g in (closed,opened)]),
-        ('Roll estimation RMSE (°)', *[f'{ms(g,"attitude","RMSE_roll_deg")[0]:.2f} ± {ms(g,"attitude","RMSE_roll_deg")[1]:.2f}' for g in (closed,opened)]),
-        ('Pitch estimation RMSE (°)', *[f'{ms(g,"attitude","RMSE_pitch_deg")[0]:.2f} ± {ms(g,"attitude","RMSE_pitch_deg")[1]:.2f}' for g in (closed,opened)]),
-        ('Yaw estimation RMSE (°)', *[f'{ms(g,"attitude","RMSE_yaw_deg")[0]:.2f} ± {ms(g,"attitude","RMSE_yaw_deg")[1]:.2f}' for g in (closed,opened)]),
-        ('peak vx EKF（35–75% T_END，m/s）', *[f'{ms(g,"velocity","peak_vx")[0]:.3f} ± {ms(g,"velocity","peak_vx")[1]:.3f}' for g in (closed,opened)]),
-    ]
-    for label, cv, ov in comparisons:
-        lines.append(f'| {label} | {cv} | {ov} |')
+    rugg_new = ms('NEW_RUGG_WALK', 'position', 'RMSE_3D_cm')[0]
+    rugg_old = ms('OLD_RUGG_WALK', 'position', 'RMSE_3D_cm')[0]
+    mpc_new = ms('NEW_OBS_MPC_GMO', 'position', 'RMSE_3D_cm')[0]
+    mpc_old = ms('OLD_OBS_MPC', 'position', 'RMSE_3D_cm')[0]
+    for m in rows(closed) + rows(opened):
+        c = m['closed_loop']
+        lines.append(f'| {m["exp_id"]} | {c["roll_rms_deg"]:.3f} | {c["pitch_rms_deg"]:.3f} | {c["roll_std_deg"]:.3f} | {c["pitch_std_deg"]:.3f} | {c["vicon_vx_steady_mean"]:.3f} ± {c["vicon_vx_steady_std"]:.3f} | {c["peak_vx_ekf"]:.3f} |')
 
-    rugg_new = ms('NEW_RUGG_WALK','position','RMSE_3D_cm')[0]
-    rugg_old = ms('OLD_RUGG_WALK','position','RMSE_3D_cm')[0]
-    mpc_new = ms('NEW_OBS_MPC_GMO','position','RMSE_3D_cm')[0]
-    mpc_old = ms('OLD_OBS_MPC','position','RMSE_3D_cm')[0]
-    lines += ['', '### 7.1 分析', '',
-              f'- Closed-Loop MPC 的位置 3D RMSE 為 {mpc_new:.2f} cm；Open-Loop RUGG Walk 為 {rugg_new:.2f} cm。',
-              '- 兩組地形與任務條件不同，因此本比較用於描述系統行為，不應解讀為單一控制器因素的因果效果。',
-              '- peak vx 可反映步態中的瞬時速度振盪；姿態 RMSE 則反映估測器追蹤 VICON 的一致性。', '',
+    def cms(group, key):
+        return mean_std([float(m.get('closed_loop', {}).get(key, np.nan)) for m in rows(group)])
+
+    def cfmt(group, key, digits=3):
+        mean, std = cms(group, key)
+        return f'{mean:.{digits}f} ± {std:.{digits}f}'
+
+    lines += ['', '### 7.2 分組統計摘要', '',
+              '| 指標 | Closed-Loop（MPC） | Open-Loop（RUGG Walk） |',
+              '|------|-------------------|------------------------|',
+              f'| n（試驗數） | {len(rows(closed))} | {len(rows(opened))} |',
+              f'| Roll RMS vs 0° (°) | {cfmt(closed, "roll_rms_deg")} | {cfmt(opened, "roll_rms_deg")} |',
+              f'| Pitch RMS vs 0° (°) | {cfmt(closed, "pitch_rms_deg")} | {cfmt(opened, "pitch_rms_deg")} |',
+              f'| Roll std（姿態震盪, °） | {cfmt(closed, "roll_std_deg")} | {cfmt(opened, "roll_std_deg")} |',
+              f'| Pitch std（姿態震盪, °） | {cfmt(closed, "pitch_std_deg")} | {cfmt(opened, "pitch_std_deg")} |',
+              f'| VICON vx 穩態均值（35–75% T_END，m/s） | {cfmt(closed, "vicon_vx_steady_mean")} | {cfmt(opened, "vicon_vx_steady_mean")} |',
+              f'| VICON vx std（35–75% T_END，m/s） | {cfmt(closed, "vicon_vx_steady_std")} | {cfmt(opened, "vicon_vx_steady_std")} |',
+              f'| VICON vx 巡航均值（減速前，m/s） | {cfmt(closed, "vicon_vx_cruise_mean")} | {cfmt(opened, "vicon_vx_cruise_mean")} |',
+              f'| VICON vx std（巡航，m/s） | {cfmt(closed, "vicon_vx_cruise_std")} | {cfmt(opened, "vicon_vx_cruise_std")} |',
+              f'| VICON vx RMSE from 0.1（穩態窗，cm/s） | {cms(closed, "vicon_vx_rmse_from_0p1_steady")[0] * 100:.1f} | {cms(opened, "vicon_vx_rmse_from_0p1_steady")[0] * 100:.1f} |',
+              f'| VICON vx RMSE from 0.1（巡航，cm/s） | {cms(closed, "vicon_vx_rmse_from_0p1_cruise")[0] * 100:.1f} | {cms(opened, "vicon_vx_rmse_from_0p1_cruise")[0] * 100:.1f} |',
+              f'| peak |vx| EKF（35–75% T_END，m/s） | {cfmt(closed, "peak_vx_ekf")} | {cfmt(opened, "peak_vx_ekf")} |']
+
+    lines += ['', '### 7.3 分析', '',
+              '- 本節量測的是 VICON 觀測到的機體姿態與前進速度，不使用 EKF 姿態估測誤差作為穩定性指標。',
+              '- MPC 與 Walk 的地形與任務條件不同，結果用於描述兩種系統行為，不應解讀為單一控制器因素的因果效果。', '',
               '---', '', '## 8. 觀察與結論', '',
               '### 崎嶇地面步行（RUGG Walk）', '',
               f'- ESEKF 位置 3D RMSE 為 {rugg_new:.2f} cm；Legacy 為 {rugg_old:.2f} cm。',

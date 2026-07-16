@@ -15,9 +15,12 @@ from corgi_msgs.msg import GMOContactStateStamped, SimLegContactStamped, Trigger
 
 ROOT = Path("/home/hiho817/analysis_ws/thesis_exp/simulation/FLAT_WLW_NEW_SIM")
 DB = ROOT / "FLAT_WLW_NEW_SIM_0.db3"
-OUT = ROOT / "results" / "fig_sim_contact_illustration.pdf"
+OUT = ROOT / "results" / "FLAT_WLW_NEW_SIM.pdf"
 LEG = "LF"
 MODULE = "module_a"
+
+plt.rcParams.update({"font.size": 10, "axes.labelsize": 10,
+                     "xtick.labelsize": 9, "ytick.labelsize": 9})
 
 
 def sec(stamp):
@@ -97,13 +100,13 @@ def main():
     axes[0].plot(t, np.abs(rm), color="#1f77b4", lw=.75, zorder=2)
     axes[0].axhline(rm_high, color="#333333", ls="--", lw=1.0)
     axes[0].axhline(rm_low, color="#333333", ls=":", lw=1.3)
-    axes[0].set_ylabel(r"$|F_{Rm}|$")
+    axes[0].set_ylabel(r"$\sigma_{R_m}\;[\mathrm{N}]$")
     axes[0].set_ylim(0, max(40, np.percentile(np.abs(rm), 99.8) * 1.05))
 
     axes[1].plot(t, np.abs(beta), color="#222222", lw=.75, zorder=2)
     axes[1].axhline(beta_high, color="#333333", ls="--", lw=1.0)
     axes[1].axhline(beta_low, color="#333333", ls=":", lw=1.3)
-    axes[1].set_ylabel(r"$|\tau_\beta|$")
+    axes[1].set_ylabel(r"$\sigma_\beta\;[\mathrm{N,m}]$")
     axes[1].set_ylim(0, 6.0)
 
     axes[2].set_yticks([])
@@ -126,12 +129,13 @@ def main():
     handles = [
         Line2D([], [], color="#333", ls="--", label="high threshold"),
         Line2D([], [], color="#333", ls=":", label="low threshold"),
-        Line2D([], [], color="#1f77b4", label=r"$|F_{Rm}|$"),
-        Line2D([], [], color="#222", label=r"$|\tau_\beta|$"),
+        Line2D([], [], color="#1f77b4", label=r"$\sigma_{R_m}\;[\mathrm{N}]$"),
+        Line2D([], [], color="#222", label=r"$\sigma_\beta\;[\mathrm{N,m}]$"),
         Patch(facecolor=contact_color, label="GT contact"), Patch(facecolor=swing_color, label="GT swing"),
         Patch(facecolor=good_color, label="correct"), Patch(facecolor=bad_color, label="incorrect"),
     ]
-    fig.legend(handles=handles, loc="upper center", ncol=4, frameon=False, bbox_to_anchor=(.5, 1.01))
+    fig.legend(handles=handles, loc="upper center", ncol=4, frameon=False,
+               fontsize=9, bbox_to_anchor=(.5, 1.01))
     fig.subplots_adjust(top=.86, hspace=.16, left=.09, right=.99, bottom=.08)
     fig.savefig(OUT, bbox_inches="tight")
     print(OUT)
