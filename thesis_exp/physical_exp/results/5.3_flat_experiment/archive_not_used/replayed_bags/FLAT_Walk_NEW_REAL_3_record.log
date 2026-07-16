@@ -1,0 +1,18 @@
+stdin is not a terminal device. Keyboard handling disabled.[INFO] [1784196996.647027180] [rosbag2_recorder]: Press SPACE for pausing/resuming
+[INFO] [1784196996.648315831] [rosbag2_storage]: Opened database '/home/hiho817/corgi_ws/corgi_ros2_ws/analysis_reports/5.3_flat_experiment/replayed_bags/FLAT_Walk_NEW_REAL_3/FLAT_Walk_NEW_REAL_3_0.db3' for READ_WRITE.
+[INFO] [1784196996.648857752] [rosbag2_recorder]: Listening for topics...
+[INFO] [1784196996.648868985] [rosbag2_recorder]: Event publisher thread: Starting
+[INFO] [1784196996.651644483] [rosbag2_recorder]: Subscribed to topic '/trigger'
+[INFO] [1784196996.652158258] [rosbag2_recorder]: Subscribed to topic '/gmo/contact_state'
+[INFO] [1784196996.652833796] [rosbag2_recorder]: Subscribed to topic '/fusion/bv'
+[INFO] [1784196996.653325096] [rosbag2_recorder]: Subscribed to topic '/ekf/orientation'
+[INFO] [1784196996.653774082] [rosbag2_recorder]: Subscribed to topic '/ekf/bw'
+[INFO] [1784196996.654723497] [rosbag2_recorder]: Subscribed to topic '/odom_mapping'
+[INFO] [1784196996.655158024] [rosbag2_recorder]: Subscribed to topic '/ekf/ba'
+[INFO] [1784196996.655602921] [rosbag2_recorder]: Subscribed to topic '/ekf'
+[INFO] [1784196996.655662160] [rosbag2_recorder]: Recording...
+[INFO] [1784196999.003299597] [rosbag2_recorder]: Subscribed to topic '/lidar_odom'
+[INFO] [1784196999.003340098] [rosbag2_recorder]: All requested topics are subscribed. Stopping discovery...
+[INFO] [1784197041.213131957] [rosbag2_cpp]: Writing remaining messages from cache to the bag. It may take a while
+[INFO] [1784197041.214822064] [rosbag2_recorder]: Event publisher thread: Exiting
+[INFO] [1784197041.214888997] [rosbag2_recorder]: Recording stopped

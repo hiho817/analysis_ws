@@ -1,0 +1,48 @@
+{
+  "WALK": {
+    "experiment_id": "FLAT_Walk_NEW_REAL_3",
+    "selection_rule": "minimum Proposed Method 3D position RMSE among selected WALK trials",
+    "common_time_start_s": 0.001425027847290039,
+    "common_time_end_s": 30.0,
+    "imu_integration_position_rmse_3d_m": 22.013617281226328,
+    "proposed_method_position_rmse_3d_m": 0.05915881613895106,
+    "imu_integration_velocity_rmse_3d_m_s": 1.471693257996078,
+    "proposed_method_velocity_rmse_3d_m_s": 0.07263848112154453,
+    "alignment": "each estimate translated to Ground Truth at its first common valid sample",
+    "position_axis_scale": {
+      "x_to_yz_span_ratio": 4,
+      "x_limits_m": [
+        -0.6369454264100016,
+        3.3630545735899986
+      ],
+      "yz_limits_m": [
+        -0.5,
+        0.5
+      ]
+    },
+    "presentation": "three-panel position, velocity, and attitude time histories with fixed method colors; angles in deg; position and velocity limits use Ground Truth plus Proposed Method only; py and pz share zero-centred limits; px span is an integer multiple of the common Y/Z span"
+  },
+  "WLW": {
+    "experiment_id": "FLAT_WLW_NEW_REAL_2",
+    "selection_rule": "minimum Proposed Method 3D position RMSE among selected WLW trials",
+    "common_time_start_s": 0.0014073848724365234,
+    "common_time_end_s": 34.94661545753479,
+    "imu_integration_position_rmse_3d_m": 12.901233769338914,
+    "proposed_method_position_rmse_3d_m": 0.0504764420621459,
+    "imu_integration_velocity_rmse_3d_m_s": 1.013965097420425,
+    "proposed_method_velocity_rmse_3d_m_s": 0.034419289347204285,
+    "alignment": "each estimate translated to Ground Truth at its first common valid sample",
+    "position_axis_scale": {
+      "x_to_yz_span_ratio": 4,
+      "x_limits_m": [
+        -3.4349714018243214,
+        0.5650285981756784
+      ],
+      "yz_limits_m": [
+        -0.5,
+        0.5
+      ]
+    },
+    "presentation": "three-panel position, velocity, and attitude time histories with fixed method colors; angles in deg; position and velocity limits use Ground Truth plus Proposed Method only; py and pz share zero-centred limits; px span is an integer multiple of the common Y/Z span"
+  }
+}

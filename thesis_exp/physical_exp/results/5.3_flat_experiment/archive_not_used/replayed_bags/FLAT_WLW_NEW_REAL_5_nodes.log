@@ -1,0 +1,39 @@
+[INFO] [launch]: All log files can be found below /tmp/codex_ros_logs/2026-07-16-18-30-14-800759-HIHO817-TUF-JAMMY-2126899
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [corgi_leg_odom-1]: process started with pid [2126921]
+[INFO] [corgi_fusion_node-2]: process started with pid [2126923]
+[corgi_fusion_node-2] [INFO] [1784197815.195336125] [corgi_fusion_node]: FusionNode: loaded config/fusion/config_fusion.yaml
+[corgi_leg_odom-1] [WARN] [1784197815.197738856] [leg_odometry]: config has use_esekf_state=false but it is ignored in the online node — always running with ESEKF state
+[corgi_fusion_node-2] [INFO] [1784197815.199152948] [corgi_fusion_node]: FusionNode started. map_frame=map, odom_frame=odom
+[corgi_leg_odom-1] [INFO] [1784197815.202557182] [corgi_leg_odom]: Leg Odometry Node Started (event-driven, driven by motor_state, mode=LEG_ESEKF)
+[corgi_leg_odom-1] [INFO] [1784197815.202604602] [corgi_leg_odom]: Waiting for simulation clock...
+[corgi_leg_odom-1] ============================================================
+[corgi_leg_odom-1] Discrete-Time Disturbance Observer
+[corgi_leg_odom-1] ============================================================
+[corgi_leg_odom-1] Sampling Time: 1 ms
+[corgi_leg_odom-1] Cutoff frequency: 15 Hz
+[corgi_leg_odom-1] γ (Z-domain Pole): 0.910057
+[corgi_leg_odom-1] β: 98.83
+[corgi_leg_odom-1] ============================================================
+[corgi_leg_odom-1] [INFO] [1784197820.214166352] [corgi_leg_odom]: Clock synced! Sim Time: 1783500129.01
+[corgi_leg_odom-1] [INFO] [1784197821.419293102] [corgi_leg_odom]: Waiting for trigger...
+[corgi_leg_odom-1] [INFO] [1784197821.985094870] [corgi_leg_odom]: Waiting for trigger...
+[corgi_fusion_node-2] [INFO] [1784197822.146662075] [corgi_fusion_node]: FusionNode: trigger enabled — starting fusion
+[corgi_leg_odom-1] [INFO] [1784197822.148012975] [corgi_leg_odom]: ES-EKF static init: N=200 samples (200 ms), ba=[-0.0001, -0.0001, -0.0142] m/s², bw=[0.00005, 0.00036, 0.00036] rad/s
+[corgi_leg_odom-1] [INFO] [1784197822.148063642] [corgi_leg_odom]: ES-EKF initialized (500 Hz, nominal dt=0.0020 s, initial_z=0.200 m)
+[corgi_fusion_node-2] [INFO] [1784197822.186793185] [corgi_fusion_node]: FusionNode: T_{odom←camera_init} set: t=[0.115 -0.020 0.369] q=[0.6956 0.1235 0.1184 0.6978]
+[corgi_fusion_node-2] [INFO] [1784197822.186833061] [corgi_fusion_node]: OuterEKF initialised: map frame aligned with odom frame (p_mo=0, q_mo=I)
+[corgi_fusion_node-2] [INFO] [1784197840.598955670] [corgi_fusion_node]: FusionNode: trigger disabled — pausing fusion
+[corgi_leg_odom-1] [INFO] [1784197840.869566518] [corgi_leg_odom]: Waiting for trigger...
+[corgi_leg_odom-1] [INFO] [1784197841.438378360] [corgi_leg_odom]: Waiting for trigger...
+[corgi_leg_odom-1] [INFO] [1784197841.988880484] [corgi_leg_odom]: Waiting for trigger...
+[corgi_leg_odom-1] [INFO] [1784197842.511637689] [corgi_leg_odom]: Waiting for trigger...
+[corgi_leg_odom-1] [INFO] [1784197843.055682680] [corgi_leg_odom]: Waiting for trigger...
+[corgi_leg_odom-1] [INFO] [1784197843.619750593] [corgi_leg_odom]: Waiting for trigger...
+[WARNING] [launch]: user interrupted with ctrl-c (SIGINT)
+[INFO] [corgi_fusion_node-2]: sending signal 'SIGINT' to process[corgi_fusion_node-2]
+[INFO] [corgi_leg_odom-1]: sending signal 'SIGINT' to process[corgi_leg_odom-1]
+[corgi_leg_odom-1] [INFO] [1784197847.051161574] [corgi_leg_odom]: Interrupt received, shutting down...
+[corgi_fusion_node-2] [INFO] [1784197847.051216308] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[ERROR] [corgi_fusion_node-2]: process has died [pid 2126923, exit code -2, cmd '/home/hiho817/corgi_ws/corgi_ros2_ws/install/corgi_odometry/lib/corgi_odometry/corgi_fusion_node --ros-args -r __node:=corgi_fusion_node --params-file /tmp/launch_params_szp7s7zt'].
+[ERROR] [corgi_leg_odom-1]: process has died [pid 2126921, exit code -2, cmd '/home/hiho817/corgi_ws/corgi_ros2_ws/install/corgi_odometry/lib/corgi_odometry/corgi_leg_odom --ros-args -r __node:=corgi_leg_odom --params-file /tmp/launch_params_436uwkhh -r /imu:=/imu_raw'].

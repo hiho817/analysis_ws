@@ -1,0 +1,43 @@
+[INFO] [launch]: All log files can be found below /tmp/codex_ros_logs/2026-07-16-18-25-06-080107-HIHO817-TUF-JAMMY-2124516
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [corgi_leg_odom-1]: process started with pid [2124544]
+[INFO] [corgi_fusion_node-2]: process started with pid [2124546]
+[corgi_fusion_node-2] [INFO] [1784197506.139687344] [corgi_fusion_node]: FusionNode: loaded config/fusion/config_fusion.yaml
+[corgi_leg_odom-1] [WARN] [1784197506.140910623] [leg_odometry]: config has use_esekf_state=false but it is ignored in the online node — always running with ESEKF state
+[corgi_fusion_node-2] [INFO] [1784197506.143349656] [corgi_fusion_node]: FusionNode started. map_frame=map, odom_frame=odom
+[corgi_leg_odom-1] [INFO] [1784197506.146086844] [corgi_leg_odom]: Leg Odometry Node Started (event-driven, driven by motor_state, mode=LEG_ESEKF)
+[corgi_leg_odom-1] [INFO] [1784197506.146144305] [corgi_leg_odom]: Waiting for simulation clock...
+[corgi_leg_odom-1] ============================================================
+[corgi_leg_odom-1] Discrete-Time Disturbance Observer
+[corgi_leg_odom-1] ============================================================
+[corgi_leg_odom-1] Sampling Time: 1 ms
+[corgi_leg_odom-1] Cutoff frequency: 15 Hz
+[corgi_leg_odom-1] γ (Z-domain Pole): 0.910057
+[corgi_leg_odom-1] β: 98.83
+[corgi_leg_odom-1] ============================================================
+[corgi_leg_odom-1] [INFO] [1784197511.163456388] [corgi_leg_odom]: Clock synced! Sim Time: 1783499946.08
+[corgi_leg_odom-1] [WARN] [1784197511.191328474] [corgi_leg_odom]: Waiting for data... Motor: 1, IMU: 0
+[corgi_leg_odom-1] [INFO] [1784197516.852994025] [corgi_leg_odom]: Waiting for trigger...
+[corgi_leg_odom-1] [INFO] [1784197522.491875206] [corgi_leg_odom]: Waiting for trigger...
+[corgi_leg_odom-1] [INFO] [1784197528.310283094] [corgi_leg_odom]: Waiting for trigger...
+[corgi_leg_odom-1] [INFO] [1784197533.789750404] [corgi_leg_odom]: Waiting for trigger...
+[corgi_fusion_node-2] [INFO] [1784197537.141228137] [corgi_fusion_node]: FusionNode: trigger enabled — starting fusion
+[corgi_leg_odom-1] [INFO] [1784197537.148816312] [corgi_leg_odom]: ES-EKF static init: N=200 samples (200 ms), ba=[-0.0001, -0.0001, -0.0109] m/s², bw=[0.00006, 0.00043, 0.00024] rad/s
+[corgi_leg_odom-1] [INFO] [1784197537.148895144] [corgi_leg_odom]: ES-EKF initialized (500 Hz, nominal dt=0.0020 s, initial_z=0.200 m)
+[corgi_fusion_node-2] [INFO] [1784197537.289540419] [corgi_fusion_node]: FusionNode: T_{odom←camera_init} set: t=[0.102 -0.032 0.375] q=[0.6971 0.1230 0.1172 0.6965]
+[corgi_fusion_node-2] [INFO] [1784197537.289659819] [corgi_fusion_node]: OuterEKF initialised: map frame aligned with odom frame (p_mo=0, q_mo=I)
+[corgi_fusion_node-2] [INFO] [1784197652.512519152] [corgi_fusion_node]: FusionNode: trigger disabled — pausing fusion
+[corgi_leg_odom-1] [INFO] [1784197653.948852737] [corgi_leg_odom]: Waiting for trigger...
+[corgi_leg_odom-1] [INFO] [1784197665.538844978] [corgi_leg_odom]: Waiting for trigger...
+[corgi_leg_odom-1] [INFO] [1784197678.721853443] [corgi_leg_odom]: Waiting for trigger...
+[corgi_leg_odom-1] [INFO] [1784197691.754674204] [corgi_leg_odom]: Waiting for trigger...
+[corgi_leg_odom-1] [INFO] [1784197703.779654252] [corgi_leg_odom]: Waiting for trigger...
+[corgi_leg_odom-1] [INFO] [1784197716.723982796] [corgi_leg_odom]: Waiting for trigger...
+[corgi_leg_odom-1] [INFO] [1784197727.806857633] [corgi_leg_odom]: Waiting for trigger...
+[WARNING] [launch]: user interrupted with ctrl-c (SIGINT)
+[corgi_leg_odom-1] [INFO] [1784197729.490169859] [corgi_leg_odom]: Interrupt received, shutting down...
+[INFO] [corgi_fusion_node-2]: sending signal 'SIGINT' to process[corgi_fusion_node-2]
+[INFO] [corgi_leg_odom-1]: sending signal 'SIGINT' to process[corgi_leg_odom-1]
+[corgi_fusion_node-2] [INFO] [1784197729.490191380] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[ERROR] [corgi_fusion_node-2]: process has died [pid 2124546, exit code -2, cmd '/home/hiho817/corgi_ws/corgi_ros2_ws/install/corgi_odometry/lib/corgi_odometry/corgi_fusion_node --ros-args -r __node:=corgi_fusion_node --params-file /tmp/launch_params_cpsmjv2d'].
+[ERROR] [corgi_leg_odom-1]: process has died [pid 2124544, exit code -2, cmd '/home/hiho817/corgi_ws/corgi_ros2_ws/install/corgi_odometry/lib/corgi_odometry/corgi_leg_odom --ros-args -r __node:=corgi_leg_odom --params-file /tmp/launch_params_iaf1jfnx -r /imu:=/imu_raw'].

@@ -1,0 +1,299 @@
+{
+  "Walk": {
+    "source_bag": "/home/hiho817/analysis_ws/thesis_exp/simulation/FLAT_WALK_NEW_SIM/walk_openloop.db3",
+    "imu_replay_bag": "/home/hiho817/analysis_ws/thesis_exp/simulation/FLAT_WALK_NEW_SIM/results/imu_only_bag/flat_walk_imu_only_0.db3",
+    "analysis_window_s": [
+      0.0009999989999975867,
+      32.705
+    ],
+    "duration_s": 32.704000001,
+    "proposed_method": {
+      "position_rmse_xyz_m": [
+        0.02267676239044653,
+        0.016637151714180457,
+        0.00821056954390833
+      ],
+      "position_rmse_3d_m": 0.029299211967368385,
+      "position_max_3d_m": 0.04470290807287965,
+      "velocity_rmse_xyz_mps": [
+        0.007219134343699357,
+        0.005969686349655734,
+        0.00856396916529607
+      ],
+      "velocity_rmse_3d_mps": 0.012692305686902888,
+      "rpy_rmse_deg": [
+        0.05206345023447725,
+        0.24562751586449744,
+        0.3213607837786593
+      ],
+      "position_offset_m": [
+        0.020138181705142606,
+        0.00028202789083012534,
+        0.002947384693994201
+      ],
+      "attitude_offset_deg": [
+        0.02945802737499264,
+        0.07901745618050435,
+        0.0485522331823079
+      ],
+      "final_position_error_xyz_m": [
+        -0.020175646252771795,
+        0.032944132755498595,
+        -0.020260967552089726
+      ],
+      "final_horizontal_error_m": 0.038631238457094534,
+      "final_velocity_error_xyz_mps": [
+        0.005487995862273815,
+        0.0010119854514975238,
+        -0.0014634889052531073
+      ]
+    },
+    "imu_integration": {
+      "position_rmse_xyz_m": [
+        8.68779142109019,
+        1.2387077297620432,
+        0.2831723012657491
+      ],
+      "position_rmse_3d_m": 8.78022227328811,
+      "position_max_3d_m": 23.394370572088945,
+      "velocity_rmse_xyz_mps": [
+        0.9632092372177993,
+        0.10707403568363011,
+        0.030882864493751723
+      ],
+      "velocity_rmse_3d_mps": 0.9696342790447403,
+      "rpy_rmse_deg": [
+        0.03195500477899865,
+        0.43121602246444585,
+        0.32076498736829084
+      ],
+      "position_offset_m": [
+        0.02033574664541383,
+        2.8376486484580437e-06,
+        0.002966333234053939
+      ],
+      "attitude_offset_deg": [
+        0.029643297741740696,
+        0.0805752246582048,
+        0.04841892963556284
+      ],
+      "final_position_error_xyz_m": [
+        23.227460229997025,
+        -2.726540584023691,
+        0.589611882342607
+      ],
+      "final_horizontal_error_m": 23.386939352818736,
+      "final_velocity_error_xyz_mps": [
+        2.1503214064640472,
+        -0.16518495421152812,
+        0.04858341058566476
+      ]
+    },
+    "imu_diagnostics": {
+      "messages": 16327,
+      "duplicate_timestamps": 0,
+      "median_positive_dt_s": 0.0020000000000024443,
+      "effective_median_rate_hz": 499.99999999938893,
+      "dt_outside_1_to_4_ms": 3,
+      "velocity_error_slope_xyz_mps2": [
+        0.07742035622240805,
+        -0.005901088016454772,
+        0.001329409745963573
+      ],
+      "horizontal_effective_acceleration_mps2": 0.07764492512316888,
+      "equivalent_gravity_tilt_deg": 0.45349367584837896,
+      "horizontal_error_5s_m": 0.05991303460342807,
+      "horizontal_error_10s_m": 0.5591766718397643,
+      "horizontal_error_15s_m": 2.0668907354972523,
+      "horizontal_error_20s_m": 5.142709927636297,
+      "horizontal_error_25s_m": 10.296518760778882,
+      "horizontal_error_30s_m": 18.01230976717884
+    },
+    "plot_axis_policy": {
+      "reference_methods": [
+        "Ground Truth",
+        "Proposed Method"
+      ],
+      "imu_changes_visible_limits": false,
+      "py_pz_zero_centered_common_scale": true,
+      "px_to_yz_span_ratio": 4
+    },
+    "outer_fusion_existing": {
+      "position_rmse_xyz_m": [
+        0.004116894188782388,
+        0.00976139283615686,
+        0.00636104572606184
+      ],
+      "position_rmse_3d_m": 0.012357042955029906,
+      "position_max_3d_m": 0.0347237418095869,
+      "rpy_rmse_deg": [
+        0.23673307396530524,
+        0.26799905312997985,
+        0.034637944264082544
+      ],
+      "body_velocity_rmse_xyz_mps": [
+        0.10686047522060563,
+        0.026555944881663157,
+        0.0210900481988035
+      ]
+    },
+    "lidar_existing": {
+      "header_frame": "odom",
+      "messages": 1936,
+      "mean_interval_ms": 16.895607234625327,
+      "gaps_over_200ms": 0,
+      "jumps_over_5cm": 749,
+      "position_rmse_3d_m": 0.03516965684676959,
+      "position_max_3d_m": 0.08696542831299743
+    },
+    "excluded_empty_file": "/home/hiho817/analysis_ws/thesis_exp/simulation/FLAT_WALK_NEW_SIM/FLAT_WALK_NEW_SIM_0.db3"
+  },
+  "WLW": {
+    "source_bag": "/home/hiho817/analysis_ws/thesis_exp/simulation/FLAT_WLW_NEW_SIM/FLAT_WLW_NEW_SIM_0.db3",
+    "imu_replay_bag": "/home/hiho817/analysis_ws/thesis_exp/simulation/FLAT_WLW_NEW_SIM/results/imu_only_bag/flat_wlw_imu_only_0.db3",
+    "analysis_window_s": [
+      0.000999998999999363,
+      31.687
+    ],
+    "duration_s": 31.686000001000004,
+    "proposed_method": {
+      "position_rmse_xyz_m": [
+        0.008845115384721904,
+        0.021924966770331122,
+        0.01188102529552203
+      ],
+      "position_rmse_3d_m": 0.026459383895359363,
+      "position_max_3d_m": 0.04119433199201046,
+      "velocity_rmse_xyz_mps": [
+        0.008714490380844406,
+        0.00414126018512353,
+        0.005914018767572263
+      ],
+      "velocity_rmse_3d_mps": 0.01131671314922827,
+      "rpy_rmse_deg": [
+        0.034136640711220856,
+        0.1561158380110194,
+        0.19330127256952526
+      ],
+      "position_offset_m": [
+        0.019263962333752743,
+        0.004065591692420355,
+        0.04408401156782031
+      ],
+      "attitude_offset_deg": [
+        -0.120236535380235,
+        0.017030096886552472,
+        -0.11870162899001342
+      ],
+      "final_position_error_xyz_m": [
+        0.008523855543268066,
+        -0.035193571461957965,
+        0.019639994977024122
+      ],
+      "final_horizontal_error_m": 0.036211097547167,
+      "final_velocity_error_xyz_mps": [
+        0.007316934574664319,
+        -0.001242903242956645,
+        0.0005518513053156326
+      ]
+    },
+    "imu_integration": {
+      "position_rmse_xyz_m": [
+        2.917291474931063,
+        0.28559840072992915,
+        0.1911344460256469
+      ],
+      "position_rmse_3d_m": 2.9374629142616393,
+      "position_max_3d_m": 8.412630566191496,
+      "velocity_rmse_xyz_mps": [
+        0.384369785112451,
+        0.018180540335342218,
+        0.020378631061254877
+      ],
+      "velocity_rmse_3d_mps": 0.38533875013837815,
+      "rpy_rmse_deg": [
+        0.025509318366026556,
+        0.22401657959241758,
+        0.1908742460117773
+      ],
+      "position_offset_m": [
+        0.02005302219694441,
+        0.004381470409258146,
+        0.04320870876970006
+      ],
+      "attitude_offset_deg": [
+        -0.11997439900693904,
+        0.018172009295055674,
+        -0.11881487629761667
+      ],
+      "final_position_error_xyz_m": [
+        -8.391505722521229,
+        0.38248825375188966,
+        0.456823256692073
+      ],
+      "final_horizontal_error_m": 8.400218184985716,
+      "final_velocity_error_xyz_mps": [
+        -0.9692548625789996,
+        -0.013709270024128863,
+        0.030549964283273324
+      ]
+    },
+    "imu_diagnostics": {
+      "messages": 15828,
+      "duplicate_timestamps": 0,
+      "median_positive_dt_s": 0.0019999999999988916,
+      "effective_median_rate_hz": 500.0000000002771,
+      "dt_outside_1_to_4_ms": 3,
+      "velocity_error_slope_xyz_mps2": [
+        -0.03451201312834338,
+        -0.0014365560040695217,
+        0.0013256161814670872
+      ],
+      "horizontal_effective_acceleration_mps2": 0.03454189837463734,
+      "equivalent_gravity_tilt_deg": 0.20174404513515973,
+      "horizontal_error_5s_m": 0.03193854214637959,
+      "horizontal_error_10s_m": 0.19744482291956936,
+      "horizontal_error_15s_m": 0.6175415562975681,
+      "horizontal_error_20s_m": 1.6102380163215264,
+      "horizontal_error_25s_m": 3.570882582025376,
+      "horizontal_error_30s_m": 6.8847094675336535
+    },
+    "plot_axis_policy": {
+      "reference_methods": [
+        "Ground Truth",
+        "Proposed Method"
+      ],
+      "imu_changes_visible_limits": false,
+      "py_pz_zero_centered_common_scale": true,
+      "px_to_yz_span_ratio": 4
+    },
+    "outer_fusion_existing": {
+      "position_rmse_xyz_m": [
+        0.0045849854803378465,
+        0.005841492171895219,
+        0.004752928782025424
+      ],
+      "position_rmse_3d_m": 0.008816771214919193,
+      "position_max_3d_m": 0.04629617435384893,
+      "rpy_rmse_deg": [
+        0.1526439826410311,
+        0.19933970519953303,
+        0.03677629375655831
+      ],
+      "body_velocity_rmse_xyz_mps": [
+        0.10551289324724576,
+        0.01533415248501177,
+        0.01764475634393382
+      ]
+    },
+    "lidar_existing": {
+      "header_frame": "odom",
+      "messages": 1996,
+      "mean_interval_ms": 15.868170426065163,
+      "gaps_over_200ms": 0,
+      "jumps_over_5cm": 738,
+      "position_rmse_3d_m": 0.03480438101746448,
+      "position_max_3d_m": 0.09029463868746261
+    }
+  }
+}
