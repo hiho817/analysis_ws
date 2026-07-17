@@ -1,0 +1,8 @@
+$ ros2 bag reindex /tmp/legacy_replay_5gvha7w2
+[INFO] [1784311530.091752515] [rosbag2_cpp]: Beginning reindexing bag in directory: /tmp/legacy_replay_5gvha7w2
+[INFO] [1784311530.093088618] [rosbag2_storage]: Opened database '/tmp/legacy_replay_5gvha7w2/input_0.db3' for READ_ONLY.
+[INFO] [1784311530.493812916] [rosbag2_cpp]: Reindexing complete.
+
+closing.
+
+closing.

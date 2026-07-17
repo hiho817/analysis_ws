@@ -1,0 +1,17 @@
+$ ros2 bag record -o /home/hiho817/analysis_ws/thesis_exp/simulation/RUGG_WLW_SIM_legacy /trigger /odometry/legacy/position /odometry/legacy/velocity /odometry/legacy/contact /validation/legacy/position_stamped /validation/legacy/velocity_stamped /imu/gravity_compensated
+stdin is not a terminal device. Keyboard handling disabled.[INFO] [1784311531.526486946] [rosbag2_recorder]: Press SPACE for pausing/resuming
+[INFO] [1784311531.527816467] [rosbag2_storage]: Opened database '/home/hiho817/analysis_ws/thesis_exp/simulation/RUGG_WLW_SIM_legacy/RUGG_WLW_SIM_legacy_0.db3' for READ_WRITE.
+[INFO] [1784311531.528343853] [rosbag2_recorder]: Listening for topics...
+[INFO] [1784311531.528366967] [rosbag2_recorder]: Event publisher thread: Starting
+[INFO] [1784311531.530311209] [rosbag2_recorder]: Subscribed to topic '/imu/gravity_compensated'
+[INFO] [1784311531.530367034] [rosbag2_recorder]: Recording...
+[INFO] [1784311533.949687799] [rosbag2_recorder]: Subscribed to topic '/odometry/legacy/contact'
+[INFO] [1784311533.950362263] [rosbag2_recorder]: Subscribed to topic '/odometry/legacy/position'
+[INFO] [1784311533.950901732] [rosbag2_recorder]: Subscribed to topic '/trigger'
+[INFO] [1784311533.951367041] [rosbag2_recorder]: Subscribed to topic '/odometry/legacy/velocity'
+[INFO] [1784311533.951927259] [rosbag2_recorder]: Subscribed to topic '/validation/legacy/position_stamped'
+[INFO] [1784311533.952390754] [rosbag2_recorder]: Subscribed to topic '/validation/legacy/velocity_stamped'
+[INFO] [1784311533.952417565] [rosbag2_recorder]: All requested topics are subscribed. Stopping discovery...
+[INFO] [1784311856.421165525] [rosbag2_cpp]: Writing remaining messages from cache to the bag. It may take a while
+[INFO] [1784311856.423116149] [rosbag2_recorder]: Event publisher thread: Exiting
+[INFO] [1784311856.423212070] [rosbag2_recorder]: Recording stopped

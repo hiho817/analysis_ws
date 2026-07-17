@@ -1,0 +1,230 @@
+{
+  "method": "prediction-only IMU integration; no leg update, ZUPT, GMO, or fusion feedback",
+  "selected_imu_only_experiments": {
+    "NEW_WALK": [
+      "RUGG_Walk_NEW_REAL_1",
+      "RUGG_Walk_NEW_REAL_2",
+      "RUGG_Walk_NEW_REAL_5"
+    ]
+  },
+  "no_value_experiments": [],
+  "records": [
+    {
+      "exp_id": "RUGG_Walk_NEW_REAL_1",
+      "group": "NEW_WALK",
+      "baseline": {
+        "position_rmse_3d_m": 0.1801024014505545,
+        "velocity_rmse_3d": 0.17361675712080438,
+        "attitude": {
+          "RMSE_roll_deg": 3.4063175567924717,
+          "RMSE_pitch_deg": 3.093694194932555,
+          "RMSE_yaw_deg": 2.922051157311052
+        }
+      },
+      "valid_imu_only": true,
+      "invalid_reason": null,
+      "imu_only": {
+        "analysis_end_s": 32.195162296295166,
+        "position_rmse_x_m": 11.814987900542665,
+        "position_rmse_y_m": 32.78666906677634,
+        "position_rmse_z_m": 1.0549921319079028,
+        "position_rmse_3d_m": 34.86649704204117,
+        "velocity_rmse_vx": 1.7948605656631476,
+        "velocity_rmse_vy": 2.56787870436193,
+        "velocity_rmse_vz": 0.18572532935078803,
+        "velocity_rmse_3d": 3.1384740541305414,
+        "attitude_rmse_roll_deg": 3.290426242583229,
+        "attitude_rmse_pitch_deg": 3.159879690586571,
+        "attitude_rmse_yaw_deg": 2.6832833302717662,
+        "final_horizontal_drift_m": 81.95370490621033,
+        "5s_horizontal_drift_m": 0.3857769747822764,
+        "10s_horizontal_drift_m": 3.242086662937013,
+        "15s_horizontal_drift_m": 12.344733255218861
+      }
+    },
+    {
+      "exp_id": "RUGG_Walk_NEW_REAL_2",
+      "group": "NEW_WALK",
+      "baseline": {
+        "position_rmse_3d_m": 0.07025809627255918,
+        "velocity_rmse_3d": 0.09623686876605124,
+        "attitude": {
+          "RMSE_roll_deg": 1.6093444150247773,
+          "RMSE_pitch_deg": 0.7314993017922748,
+          "RMSE_yaw_deg": 0.3146276754319161
+        }
+      },
+      "valid_imu_only": true,
+      "invalid_reason": null,
+      "imu_only": {
+        "analysis_end_s": 32.2154803276062,
+        "position_rmse_x_m": 16.94925544193813,
+        "position_rmse_y_m": 20.34612749276493,
+        "position_rmse_z_m": 0.8812883394004722,
+        "position_rmse_3d_m": 26.49563800184999,
+        "velocity_rmse_vx": 2.00540052522217,
+        "velocity_rmse_vy": 1.4634999550107808,
+        "velocity_rmse_vz": 0.16246253473357733,
+        "velocity_rmse_3d": 2.487942414942511,
+        "attitude_rmse_roll_deg": 1.0040509877383244,
+        "attitude_rmse_pitch_deg": 1.0840055392069958,
+        "attitude_rmse_yaw_deg": 0.4895536851535953,
+        "final_horizontal_drift_m": 67.0133105068062,
+        "5s_horizontal_drift_m": 0.1875845672721462,
+        "10s_horizontal_drift_m": 2.0759212114792955,
+        "15s_horizontal_drift_m": 6.875615071426744
+      }
+    },
+    {
+      "exp_id": "RUGG_Walk_NEW_REAL_5",
+      "group": "NEW_WALK",
+      "baseline": {
+        "position_rmse_3d_m": 0.07476963632342978,
+        "velocity_rmse_3d": 0.10035000399052443,
+        "attitude": {
+          "RMSE_roll_deg": 0.9454404127280074,
+          "RMSE_pitch_deg": 0.37852810186832003,
+          "RMSE_yaw_deg": 0.6702108420877385
+        }
+      },
+      "valid_imu_only": true,
+      "invalid_reason": null,
+      "imu_only": {
+        "analysis_end_s": 34.38480257987976,
+        "position_rmse_x_m": 53.77425227470689,
+        "position_rmse_y_m": 10.64250994053565,
+        "position_rmse_z_m": 2.02615728930561,
+        "position_rmse_3d_m": 54.85470389036136,
+        "velocity_rmse_vx": 4.757584252937674,
+        "velocity_rmse_vy": 0.3080228378167634,
+        "velocity_rmse_vz": 0.269188682890245,
+        "velocity_rmse_3d": 4.775138588503312,
+        "attitude_rmse_roll_deg": 0.7347602533941757,
+        "attitude_rmse_pitch_deg": 1.647896293902767,
+        "attitude_rmse_yaw_deg": 1.0924434752580154,
+        "final_horizontal_drift_m": 132.24624040443146,
+        "5s_horizontal_drift_m": 0.2521114492777393,
+        "10s_horizontal_drift_m": 2.994520635346157,
+        "15s_horizontal_drift_m": 13.880107327911357
+      }
+    }
+  ],
+  "group_statistics": {
+    "WALK": {
+      "n": 3,
+      "experiment_ids": [
+        "RUGG_Walk_NEW_REAL_1",
+        "RUGG_Walk_NEW_REAL_2",
+        "RUGG_Walk_NEW_REAL_5"
+      ],
+      "position_rmse_x_m": {
+        "values": [
+          11.814987900542665,
+          16.94925544193813,
+          53.77425227470689
+        ],
+        "mean": 27.512831872395896,
+        "sample_std": 22.887481883266318
+      },
+      "position_rmse_y_m": {
+        "values": [
+          32.78666906677634,
+          20.34612749276493,
+          10.64250994053565
+        ],
+        "mean": 21.25843550002564,
+        "sample_std": 11.100233118144466
+      },
+      "position_rmse_z_m": {
+        "values": [
+          1.0549921319079028,
+          0.8812883394004722,
+          2.02615728930561
+        ],
+        "mean": 1.3208125868713283,
+        "sample_std": 0.6169899624969155
+      },
+      "position_rmse_3d_m": {
+        "values": [
+          34.86649704204117,
+          26.49563800184999,
+          54.85470389036136
+        ],
+        "mean": 38.73894631141751,
+        "sample_std": 14.570725857868311
+      },
+      "velocity_rmse_vx": {
+        "values": [
+          1.7948605656631476,
+          2.00540052522217,
+          4.757584252937674
+        ],
+        "mean": 2.852615114607664,
+        "sample_std": 1.653106872569077
+      },
+      "velocity_rmse_vy": {
+        "values": [
+          2.56787870436193,
+          1.4634999550107808,
+          0.3080228378167634
+        ],
+        "mean": 1.4464671657298247,
+        "sample_std": 1.130024212715227
+      },
+      "velocity_rmse_vz": {
+        "values": [
+          0.18572532935078803,
+          0.16246253473357733,
+          0.269188682890245
+        ],
+        "mean": 0.20579218232487012,
+        "sample_std": 0.056121534336672545
+      },
+      "velocity_rmse_3d": {
+        "values": [
+          3.1384740541305414,
+          2.487942414942511,
+          4.775138588503312
+        ],
+        "mean": 3.4671850191921214,
+        "sample_std": 1.1784968213794975
+      },
+      "attitude_rmse_roll_deg": {
+        "values": [
+          3.290426242583229,
+          1.0040509877383244,
+          0.7347602533941757
+        ],
+        "mean": 1.6764124945719097,
+        "sample_std": 1.4042470078223641
+      },
+      "attitude_rmse_pitch_deg": {
+        "values": [
+          3.159879690586571,
+          1.0840055392069958,
+          1.647896293902767
+        ],
+        "mean": 1.9639271745654447,
+        "sample_std": 1.073415115992312
+      },
+      "attitude_rmse_yaw_deg": {
+        "values": [
+          2.6832833302717662,
+          0.4895536851535953,
+          1.0924434752580154
+        ],
+        "mean": 1.4217601635611257,
+        "sample_std": 1.133335585721974
+      },
+      "final_horizontal_drift_m": {
+        "values": [
+          81.95370490621033,
+          67.0133105068062,
+          132.24624040443146
+        ],
+        "mean": 93.73775193914933,
+        "sample_std": 34.17574591889709
+      }
+    }
+  }
+}

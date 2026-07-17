@@ -44,6 +44,8 @@ def main():
     parser.add_argument("input_bag", type=Path)
     parser.add_argument("output_bag", type=Path)
     parser.add_argument("--rate", type=float, default=1.0)
+    parser.add_argument("--minimal-recording", action="store_true",
+                        help="Record only the Odometry stream and trigger.")
     args = parser.parse_args()
     if args.output_bag.exists():
         parser.error(f"output exists: {args.output_bag}")
@@ -76,10 +78,13 @@ def main():
         if node.poll() is not None:
             raise RuntimeError("IMU-only node exited early")
 
+        recorded_topics = "/imu_only/ekf /trigger"
+        if not args.minimal_recording:
+            recorded_topics = (
+                "/imu_only/ekf /imu_only/orientation /imu_only/ba "
+                "/imu_only/bw /trigger")
         recorder, handle = start(
-            "ros2 bag record "
-            f"-o {args.output_bag} /imu_only/ekf /imu_only/orientation "
-            "/imu_only/ba /imu_only/bw /trigger",
+            f"ros2 bag record -o {args.output_bag} {recorded_topics}",
             Path(f"/tmp/{tag}_recorder.log"))
         handles.append(handle)
         time.sleep(3)

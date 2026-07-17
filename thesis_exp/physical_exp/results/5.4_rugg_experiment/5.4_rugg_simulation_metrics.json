@@ -1,0 +1,82 @@
+{
+  "source_bag": "/home/hiho817/analysis_ws/thesis_exp/simulation/RUGG_WALK_SIM/RUGG_WALK_SIM_0.db3",
+  "legacy_bag": "/home/hiho817/analysis_ws/thesis_exp/simulation/RUGG_WALK_SIM_legacy_fixed42/RUGG_WALK_SIM_legacy_fixed42_0.db3",
+  "analysis_window_s": [
+    0.0,
+    33.036000001000005
+  ],
+  "methods": {
+    "proposed": {
+      "name": "Proposed Method",
+      "position_rmse_xyz_m": [
+        0.09881090405127534,
+        0.013016546255278772,
+        0.08894721101107957
+      ],
+      "position_rmse_3d_m": 0.1335837998504896,
+      "velocity_rmse_xyz_mps": [
+        0.035399619291098146,
+        0.015026149461223222,
+        0.02024813921100275
+      ],
+      "velocity_rmse_3d_mps": 0.04346153880264542,
+      "attitude_rmse_deg": [
+        0.28820460974039125,
+        0.07485742863209795,
+        0.13934251296402395
+      ],
+      "final_horizontal_error_m": 0.13888660300379574,
+      "final_velocity_error_mps": [
+        0.0004235137003796288,
+        -0.0018530387911754565,
+        -0.0010155837107619884
+      ],
+      "samples": 15985,
+      "dt_median_s": 0.0019999999999988916
+    },
+    "legacy": {
+      "name": "IF+KLD (Legacy)",
+      "position_rmse_xyz_m": [
+        0.2509451894630372,
+        0.3442616886417747,
+        0.08673318728781097
+      ],
+      "position_rmse_3d_m": 0.43475538427744437,
+      "velocity_rmse_xyz_mps": [
+        0.08827004799717572,
+        0.12594764970914918,
+        0.023108330520419402
+      ],
+      "velocity_rmse_3d_mps": 0.15552622537734015,
+      "samples": 6607
+    },
+    "imu_integration": {
+      "name": "IMU Integration",
+      "position_rmse_xyz_m": [
+        11.080785557704795,
+        32.55763378343243,
+        0.9120549266241136
+      ],
+      "position_rmse_3d_m": 34.40370867132088,
+      "velocity_rmse_xyz_mps": [
+        0.4620256681715238,
+        3.4328297674047814,
+        0.1828855130953511
+      ],
+      "velocity_rmse_3d_mps": 3.46860707502736,
+      "attitude_rmse_deg": [
+        1.4478205304251677,
+        0.42790995312145436,
+        0.1268727162606885
+      ],
+      "final_horizontal_error_m": 88.18114721097831,
+      "final_velocity_error_mps": [
+        0.5486168462589956,
+        -7.430992121261806,
+        -0.16081603715578519
+      ],
+      "samples": 4903,
+      "dt_median_s": 0.006000000000000227
+    }
+  }
+}
