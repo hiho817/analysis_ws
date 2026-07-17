@@ -11,7 +11,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
-from geometry_msgs.msg import Vector3
+from geometry_msgs.msg import Vector3, Vector3Stamped
 from nav_msgs.msg import Odometry
 from rclpy.serialization import deserialize_message
 from scipy.interpolate import interp1d
@@ -26,6 +26,7 @@ REPORT_DIR = ROOT / "physical_exp/results/5.3_flat_experiment"
 FIG = REPORT_DIR / "figures"
 REPORT = REPORT_DIR / "5.3_平地實驗_模擬.md"
 SUMMARY_JSON = REPORT_DIR / "5.3_flat_simulation_metrics.json"
+LEGACY_ROOT = Path("/home/hiho817/corgi_ws/corgi_ros2_ws/bag/thesis_if_kld_sim")
 
 CASES = {
     "Walk": {
@@ -33,17 +34,22 @@ CASES = {
         "imu": SIM / "FLAT_WALK_NEW_SIM/results/imu_only_bag/flat_walk_imu_only_0.db3",
         "existing": SIM / "FLAT_WALK_NEW_SIM/results/metrics.json",
         "empty": SIM / "FLAT_WALK_NEW_SIM/FLAT_WALK_NEW_SIM_0.db3",
+        "legacy": LEGACY_ROOT / "walk_det1/walk_det1_0.db3",
+        "legacy_metrics": LEGACY_ROOT / "walk_metrics.json",
         "slug": "walk",
     },
     "WLW": {
         "source": SIM / "FLAT_WLW_NEW_SIM/FLAT_WLW_NEW_SIM_0.db3",
         "imu": SIM / "FLAT_WLW_NEW_SIM/results/imu_only_bag/flat_wlw_imu_only_0.db3",
         "existing": SIM / "FLAT_WLW_NEW_SIM/results/metrics.json",
+        "legacy": LEGACY_ROOT / "wlw_det1/wlw_det1_0.db3",
+        "legacy_metrics": LEGACY_ROOT / "wlw_metrics.json",
         "slug": "wlw",
     },
 }
 
-COLORS = {"gt": "#222222", "imu": "#D55E00", "proposed": "#0072B2"}
+COLORS = {"gt": "#222222", "imu": "#D55E00", "proposed": "#0072B2",
+          "legacy": "#009E73"}
 
 
 def stamp(s):
@@ -74,6 +80,15 @@ def load_vec(db: Path, topic: str, t0: float):
         msg = deserialize_message(raw, Vector3)
         t.append(storage * 1e-9 - t0)
         xyz.append([msg.x, msg.y, msg.z])
+    return {"t": np.asarray(t), "x": np.asarray(xyz)}
+
+
+def load_stamped_vec(db: Path, topic: str, t0: float):
+    t, xyz = [], []
+    for _, raw in rows(db, topic):
+        msg = deserialize_message(raw, Vector3Stamped)
+        t.append(stamp(msg.header.stamp) - t0)
+        xyz.append([msg.vector.x, msg.vector.y, msg.vector.z])
     return {"t": np.asarray(t), "x": np.asarray(xyz)}
 
 
@@ -252,13 +267,15 @@ def position_reference_limits(truth, proposed):
             (-yz_half_span, yz_half_span), ratio)
 
 
-def plot_case(label, slug, start, end, gt_pos, gt_bv, gt_tf, proposed, imu, pm, im):
+def plot_case(label, slug, start, end, gt_pos, gt_bv, gt_tf, proposed, imu,
+              legacy_p, legacy_v, pm, im, lm):
     gt_t = np.linspace(start, end, int((end - start) * 200) + 1)
     gt_p = interp(gt_pos["t"], gt_pos["x"], gt_t) + np.asarray(pm["position_offset_m"])
     gt_v = interp(gt_bv["t"], gt_bv["x"], gt_t)
     gt_rpy = rpy_deg(interp(gt_tf["t"], gt_tf["q"], gt_t)) + np.asarray(pm["attitude_offset_deg"])
 
-    def make(kind, title, ylabel, truth, pvalue, ivalue, filename):
+    def make(kind, title, ylabel, truth, pvalue, ivalue, filename,
+             legacy=None, legacy_t=None):
         fig, axes = plt.subplots(3, 1, figsize=(11, 8), sharex=True)
         axes[0].set_title(title)
         labels = ("x", "y", "z") if kind != "attitude" else ("roll", "pitch", "yaw")
@@ -269,6 +286,9 @@ def plot_case(label, slug, start, end, gt_pos, gt_bv, gt_tf, proposed, imu, pm, 
         for axis, name, i in zip(axes, labels, range(3)):
             axis.plot(gt_t, truth[:, i], color=COLORS["gt"], lw=1.8, label="Ground Truth")
             axis.plot(proposed["t"], pvalue[:, i], color=COLORS["proposed"], lw=1.2, label="Proposed Method")
+            if legacy is not None:
+                axis.plot(legacy_t, legacy[:, i], color=COLORS["legacy"], lw=1.1,
+                          label="IF+KLD")
             axis.plot(imu["t"], ivalue[:, i], color=COLORS["imu"], lw=1.0, label="IMU Integration")
             if kind == "position":
                 axis.set_ylim(x_limits if i == 0 else yz_limits)
@@ -277,21 +297,33 @@ def plot_case(label, slug, start, end, gt_pos, gt_bv, gt_tf, proposed, imu, pm, 
             axis.set_ylabel(ylabel.format(name=name))
             axis.grid(alpha=.25)
             axis.set_xlim(start, end)
-        axes[0].legend(ncol=3, loc="best")
+        axes[0].legend(ncol=4 if legacy is not None else 3, loc="best")
         axes[-1].set_xlabel("Time [s]")
         fig.tight_layout()
-        fig.savefig(FIG / filename, dpi=220)
+        fig.savefig(FIG / filename, dpi=300)
         fig.savefig(FIG / filename.replace(".png", ".pdf"))
         plt.close(fig)
         return scale_ratio
 
+    # Plot-only height-origin adjustment.  Apply the same translation to all
+    # three methods so their relative errors and all quantitative metrics stay
+    # unchanged.
+    position_plot_offset = np.asarray([0.0, 0.0, -0.2])
+    gt_p_for_plot = gt_p + position_plot_offset
+    proposed_p_for_plot = proposed["p"] + position_plot_offset
+    imu_p_for_plot = (imu["p"] - np.asarray(im["position_offset_m"])
+                      + np.asarray(pm["position_offset_m"])
+                      + position_plot_offset)
+    legacy_p_for_plot = (legacy_p["x"] - np.asarray(lm["position_offset_m"])
+                         + np.asarray(pm["position_offset_m"])
+                         + position_plot_offset)
     scale_ratio = make(
-        "position", "PositionComparison", "p{name} [m]", gt_p,
-        proposed["p"],
-        imu["p"] - np.asarray(im["position_offset_m"]) + np.asarray(pm["position_offset_m"]),
-        f"fig_sim_{slug}_position.png")
+        "position", "PositionComparison", "p{name} [m]", gt_p_for_plot,
+        proposed_p_for_plot, imu_p_for_plot,
+        f"fig_sim_{slug}_position.png", legacy_p_for_plot, legacy_p["t"])
     make("velocity", "Velocity Comparison", "v{name} [m/s]", gt_v,
-         proposed["v"], imu["v"], f"fig_sim_{slug}_velocity.png")
+         proposed["v"], imu["v"], f"fig_sim_{slug}_velocity.png",
+         legacy_v["x"], legacy_v["t"])
     proposed_rpy_for_plot = rpy_deg(proposed["q"])
     imu_rpy_for_plot = (rpy_deg(imu["q"]) - np.asarray(im["attitude_offset_deg"])
                         + np.asarray(pm["attitude_offset_deg"]))
@@ -302,6 +334,7 @@ def plot_case(label, slug, start, end, gt_pos, gt_bv, gt_tf, proposed, imu, pm, 
         "imu_changes_visible_limits": False,
         "py_pz_zero_centered_common_scale": True,
         "px_to_yz_span_ratio": scale_ratio,
+        "position_plot_offset_m": [0.0, 0.0, -0.2],
     }
 
 
@@ -314,21 +347,38 @@ def analyze_case(label, cfg):
     proposed = load_odom(source, "/ekf", t0)
     gt_tf = load_tf(source, t0, proposed)
     imu = load_odom(imu_db, "/imu_only/ekf", imu_t0)
+    legacy_p = load_stamped_vec(
+        cfg["legacy"], "/validation/legacy/position_stamped", t0)
+    legacy_v = load_stamped_vec(
+        cfg["legacy"], "/validation/legacy/velocity_stamped", t0)
     start = max(0.0, proposed["t"].min(), imu["t"].min(), gt_pos["t"].min(), gt_tf["t"].min())
     end = min(proposed["t"].max(), imu["t"].max(), gt_pos["t"].max(), gt_tf["t"].max())
     proposed, imu = crop(proposed, start, end), crop(imu, start, end)
+    legacy_p, legacy_v = crop(legacy_p, start, end), crop(legacy_v, start, end)
     pm = estimator_metrics(proposed, gt_pos, gt_bv, gt_tf)
     im = estimator_metrics(imu, gt_pos, gt_bv, gt_tf)
     diag = imu_diagnostics(imu, im)
     existing = json.loads(cfg["existing"].read_text())
+    legacy_audit = json.loads(cfg["legacy_metrics"].read_text())
+    if not legacy_audit["cross_check"]["passed"]:
+        raise RuntimeError(f"legacy dual-time-base check failed for {label}")
+    expected_y_flip = [1, -1, 1]
+    if (legacy_audit.get("coordinate_transform", {}).get("position") != expected_y_flip or
+            legacy_audit.get("coordinate_transform", {}).get("velocity") != expected_y_flip):
+        raise RuntimeError(f"legacy Y-axis transform missing for {label}")
+    legacy_p["x"][:, 1] *= -1.0
+    legacy_v["x"][:, 1] *= -1.0
+    lm = legacy_audit["native_stamps"]
     plot_axis_policy = plot_case(
         label, cfg["slug"], start, end, gt_pos, gt_bv, gt_tf,
-        proposed, imu, pm, im)
+        proposed, imu, legacy_p, legacy_v, pm, im, lm)
     result = {
         "source_bag": str(source), "imu_replay_bag": str(imu_db),
         "analysis_window_s": [float(start), float(end)], "duration_s": float(end - start),
         "proposed_method": {k: v for k, v in pm.items() if k != "series"},
         "imu_integration": {k: v for k, v in im.items() if k != "series"},
+        "if_kld_legacy": lm,
+        "if_kld_cross_check": legacy_audit["cross_check"],
         "imu_diagnostics": diag,
         "plot_axis_policy": plot_axis_policy,
         "outer_fusion_existing": existing["outer_fusion"],
@@ -352,23 +402,26 @@ def write_report(results):
         "| 步態 | 原始資料 | 分析區間 [s] | 重複次數 |", "|---|---|---:|---:|",
         f"| Walk | `FLAT_WALK_NEW_SIM/walk_openloop.db3` | {w['analysis_window_s'][0]:.3f}–{w['analysis_window_s'][1]:.3f} | 1 |",
         f"| WLW | `FLAT_WLW_NEW_SIM/FLAT_WLW_NEW_SIM_0.db3` | {l['analysis_window_s'][0]:.3f}–{l['analysis_window_s'][1]:.3f} | 1 |", "",
-        "Walk 目錄中的 `FLAT_WALK_NEW_SIM_0.db3` 為 0-byte 空檔，故排除；有效資料為同目錄的 `walk_openloop.db3`。Ground truth 使用 `/sim/position`、`/sim/body_velocity` 與 `/tf` 的 `odom → base_link`。位置以共同區間起始 500 筆的固定 offset 對齊，姿態同樣移除起始固定角度 offset；速度不做 offset 對齊。", "",
+        "Walk 目錄中的 `FLAT_WALK_NEW_SIM_0.db3` 為 0-byte 空檔，故排除；有效資料為同目錄的 `walk_openloop.db3`。Ground truth 使用 `/sim/position`、`/sim/body_velocity` 與 `/tf` 的 `odom → base_link`。位置以共同區間起始 1.0 s 的固定 offset 對齊，姿態同樣移除起始固定角度 offset；速度不做 offset 對齊。", "",
         "Proposed Method 使用原 bag 的 `/ekf`。IMU Integration 將既有 `/imu_noisy` 與 `/motor/state` 重播至同一個 `corgi_leg_odom` prediction-only 模式，只執行 IMU propagation，不使用腿部速度更新、ZUPT、GMO/contact、LiDAR、`/fusion/bv` 或 ground truth 校正。輸入 IMU 為 1 kHz CX5 規格雜訊模型；節點名義 propagation 頻率為 500 Hz。", "",
+        "IF+KLD 使用 `corgi_odometry_legacy` 重播同一份原始 bag，輸入限定為 `/imu_noisy`、`/motor/state` 與 `/trigger`。其中加速度與角速度直接取自 bag 內已加入 CX5 雜訊的 `/imu_noisy`，僅依原驅動程式的座標定義移除重力；未重新產生雜訊，也未讀取 `/ekf`、`/odom_mapping`、`/fusion/bv` 或 ground truth。Legacy 輸出的 Y 軸與模擬座標定義相反，故在比較前對 IF+KLD 的位置與速度 Y 分量各乘以 −1；此為座標表示轉換，不改變估測器輸出或其 IF/KLD 計算。為排除 ROS callback 排程造成的 latest-sample 競態，重播時依 header sequence 與 timestamp 精確配對 IMU/馬達資料，並固定每 5 筆 1 kHz 輸入更新一次，使 IF+KLD 輸出為 200 Hz。位置採共同區間起始 1.0 s 固定平移對齊，速度不做 offset 校正。", "",
         "## 5.3.2 位置與速度估測結果", "",
         "| 步態 | 方法 | 位置 RMSE X / Y / Z [m] | 位置 RMSE 3D [m] | 速度 RMSE vx / vy / vz [m/s] | 速度 RMSE 3D [m/s] |", "|---|---|---:|---:|---:|---:|",
     ]
     for gait in ("Walk", "WLW"):
         r = results[gait]
-        for method, key in (("Proposed Method（ES-EKF）", "proposed_method"), ("IMU Integration", "imu_integration")):
+        for method, key in (("Proposed Method（ES-EKF）", "proposed_method"),
+                            ("IF+KLD（Legacy）", "if_kld_legacy"),
+                            ("IMU Integration", "imu_integration")):
             m = r[key]
             lines.append(f"| {gait} | {method} | {vec(m['position_rmse_xyz_m'])} | {m['position_rmse_3d_m']:.3f} | {vec(m['velocity_rmse_xyz_mps'])} | {m['velocity_rmse_3d_mps']:.3f} |")
     lines += ["", "### 現有外部融合與 LiDAR 估測結果", "",
-              "下表沿用各模擬資料既有 `metrics.json` 的單次結果，作為完整估測鏈的補充；主比較仍為 Proposed Method 與 IMU Integration。", "",
+              "下表沿用各模擬資料既有 `metrics.json` 的單次結果，作為完整估測鏈的補充；主比較為 Proposed Method、IF+KLD 與 IMU Integration。", "",
               "| 步態 | `/odom_mapping` 位置 RMSE 3D [m] | `/fusion/bv` RMSE vx / vy / vz [m/s] | LiDAR 位置 RMSE 3D [m] |", "|---|---:|---:|---:|"]
     for gait in ("Walk", "WLW"):
         r = results[gait]
         lines.append(f"| {gait} | {r['outer_fusion_existing']['position_rmse_3d_m']:.3f} | {vec(r['outer_fusion_existing']['body_velocity_rmse_xyz_mps'])} | {r['lidar_existing']['position_rmse_3d_m']:.3f} |")
-    lines += ["", "位置與速度圖的顯示範圍僅由 Ground Truth 與 Proposed Method 決定；IMU Integration 僅疊加顯示，其超出範圍的漂移不會擴張座標軸。位置圖的 $p_y$ 與 $p_z$ 使用以 0 為中心的相同尺度，$p_x$ 顯示跨度則設定為 Y/Z 跨度的整數倍。Walk 與 WLW 的 X/YZ 跨度比分別為 **{} 倍**與 **{} 倍**。".format(w["plot_axis_policy"]["px_to_yz_span_ratio"], l["plot_axis_policy"]["px_to_yz_span_ratio"]), "",
+    lines += ["", "位置與速度圖的顯示範圍僅由 Ground Truth 與 Proposed Method 決定；IF+KLD 與 IMU Integration 僅疊加顯示，其超出範圍的漂移不會擴張座標軸。位置圖繪製時將四組曲線的 $p_z$ 一致減去 0.2 m，以調整高度顯示原點；此為共同視覺平移，不影響相對誤差與量化指標。$p_y$ 與平移後的 $p_z$ 使用以 0 為中心的相同尺度，$p_x$ 顯示跨度則設定為 Y/Z 跨度的整數倍。Walk 與 WLW 的 X/YZ 跨度比分別為 **{} 倍**與 **{} 倍**。".format(w["plot_axis_policy"]["px_to_yz_span_ratio"], l["plot_axis_policy"]["px_to_yz_span_ratio"]), "",
               "### Walk 位置與速度時序", "",
               "![Walk position comparison](figures/fig_sim_walk_position.png)", "",
               "![Walk velocity comparison](figures/fig_sim_walk_velocity.png)", "",
@@ -396,10 +449,12 @@ def write_report(results):
               "### WLW 姿態時序", "", "![WLW attitude comparison](figures/fig_sim_wlw_attitude.png)", "",
               "## 5.3.4 小結", ""]
     for gait in ("Walk", "WLW"):
-        p, i = results[gait]["proposed_method"], results[gait]["imu_integration"]
-        lines.append(f"{gait} 單次模擬中，Proposed Method 的位置與速度 3D RMSE 分別為 **{p['position_rmse_3d_m']:.3f} m** 與 **{p['velocity_rmse_3d_mps']:.3f} m/s**；純 IMU 積分則為 **{i['position_rmse_3d_m']:.3f} m** 與 **{i['velocity_rmse_3d_mps']:.3f} m/s**。")
+        p = results[gait]["proposed_method"]
+        k = results[gait]["if_kld_legacy"]
+        i = results[gait]["imu_integration"]
+        lines.append(f"{gait} 單次模擬中，Proposed Method 的位置與速度 3D RMSE 分別為 **{p['position_rmse_3d_m']:.3f} m** 與 **{p['velocity_rmse_3d_mps']:.3f} m/s**，IF+KLD 為 **{k['position_rmse_3d_m']:.3f} m** 與 **{k['velocity_rmse_3d_mps']:.3f} m/s**；純 IMU 積分則為 **{i['position_rmse_3d_m']:.3f} m** 與 **{i['velocity_rmse_3d_mps']:.3f} m/s**。")
         lines.append("")
-    lines += ["模擬結果顯示，當 IMU 使用相同雜訊模型與初始化流程時，純慣性 propagation 仍會快速累積速度與位置漂移；Proposed Method 透過腿部運動學速度觀測持續約束慣性狀態，因此能將位置與速度誤差維持在穩定範圍。由於每種步態僅一組固定資料，本節僅報告案例結果，不將其解讀為跨隨機種子的統計分布。"]
+    lines += ["模擬結果顯示，在相同 noisy IMU 與馬達輸入下，IF+KLD 能大幅抑制純慣性 propagation 的漂移，但兩種步態的位置與速度 RMSE 仍高於 Proposed Method；Proposed Method 透過腿部運動學速度觀測持續約束慣性狀態，因此能將位置與速度誤差維持在較低範圍。由於每種步態僅一組固定資料，本節僅報告案例結果，不將其解讀為跨隨機種子的統計分布。"]
     REPORT.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
@@ -409,6 +464,8 @@ def main():
     SUMMARY_JSON.write_text(json.dumps(results, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     write_report(results)
     print(json.dumps({g: {"proposed_p3d": r["proposed_method"]["position_rmse_3d_m"],
+                               "if_kld_p3d": r["if_kld_legacy"]["position_rmse_3d_m"],
+                               "if_kld_v3d": r["if_kld_legacy"]["velocity_rmse_3d_mps"],
                                "imu_p3d": r["imu_integration"]["position_rmse_3d_m"],
                                "imu_v3d": r["imu_integration"]["velocity_rmse_3d_mps"]}
                       for g, r in results.items()}, indent=2))

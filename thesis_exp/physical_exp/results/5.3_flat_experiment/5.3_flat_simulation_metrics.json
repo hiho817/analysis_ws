@@ -89,6 +89,35 @@
         0.04858341058566476
       ]
     },
+    "if_kld_legacy": {
+      "samples": 6541,
+      "window_s": [
+        0.004999999999999005,
+        32.705
+      ],
+      "position_offset_m": [
+        0.019984191073437147,
+        -0.00037494998909848705,
+        0.0027175546902113365
+      ],
+      "position_rmse_xyz_m": [
+        0.06592202230920409,
+        0.009298199931662154,
+        0.02253306727746025
+      ],
+      "position_rmse_3d_m": 0.07028448383700996,
+      "velocity_rmse_xyz_mps": [
+        0.04050057916404675,
+        0.05803542669684454,
+        0.010470974610525438
+      ],
+      "velocity_rmse_3d_mps": 0.07154054077096637
+    },
+    "if_kld_cross_check": {
+      "position_3d_abs_difference": 1.1523874238528187e-05,
+      "velocity_3d_abs_difference": 5.888826783762013e-06,
+      "passed": true
+    },
     "imu_diagnostics": {
       "messages": 16327,
       "duplicate_timestamps": 0,
@@ -116,7 +145,12 @@
       ],
       "imu_changes_visible_limits": false,
       "py_pz_zero_centered_common_scale": true,
-      "px_to_yz_span_ratio": 4
+      "px_to_yz_span_ratio": 35,
+      "position_plot_offset_m": [
+        0.0,
+        0.0,
+        -0.2
+      ]
     },
     "outer_fusion_existing": {
       "position_rmse_xyz_m": [
@@ -238,6 +272,35 @@
         0.030549964283273324
       ]
     },
+    "if_kld_legacy": {
+      "samples": 6337,
+      "window_s": [
+        0.0049999989999989225,
+        31.684999999000002
+      ],
+      "position_offset_m": [
+        0.018463027857797243,
+        0.004535935671906121,
+        0.04262199963796354
+      ],
+      "position_rmse_xyz_m": [
+        0.07668338529532331,
+        0.008399973981893263,
+        0.0177879142977339
+      ],
+      "position_rmse_3d_m": 0.07916635041677125,
+      "velocity_rmse_xyz_mps": [
+        0.020521137146289527,
+        0.03649461690595633,
+        0.005422528857740167
+      ],
+      "velocity_rmse_3d_mps": 0.04221821824878878
+    },
+    "if_kld_cross_check": {
+      "position_3d_abs_difference": 9.257470624635111e-06,
+      "velocity_3d_abs_difference": 4.034851813779217e-06,
+      "passed": true
+    },
     "imu_diagnostics": {
       "messages": 15828,
       "duplicate_timestamps": 0,
@@ -265,7 +328,12 @@
       ],
       "imu_changes_visible_limits": false,
       "py_pz_zero_centered_common_scale": true,
-      "px_to_yz_span_ratio": 4
+      "px_to_yz_span_ratio": 33,
+      "position_plot_offset_m": [
+        0.0,
+        0.0,
+        -0.2
+      ]
     },
     "outer_fusion_existing": {
       "position_rmse_xyz_m": [

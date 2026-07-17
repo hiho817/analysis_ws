@@ -101,11 +101,10 @@ def save_position_plot(gt_t, gt, imu_t, imu, proposed_t, proposed,
         "Proposed Method": "#0072B2",
     }
     fig, axes = plt.subplots(
-        3, 1, figsize=(13, 7), sharex=True, constrained_layout=True)
+        3, 1, figsize=(11, 8), sharex=True, constrained_layout=True)
     fig.suptitle("PositionComparison")
     x_limits, yz_limits, scale_ratio = position_reference_limits(gt, proposed)
     for axis, (ax, component) in enumerate(zip(axes, ("x", "y", "z"))):
-        ax.set_facecolor("#fffdf5")
         ax.plot(gt_t, gt[:, axis], color=colors["Ground Truth"],
                 linewidth=1.2, label="Ground Truth", zorder=3)
         ax.plot(proposed_t, proposed[:, axis],
@@ -141,10 +140,9 @@ def save_velocity_plot(gt_t, gt_velocity, imu_t, imu_velocity,
         "Proposed Method": "#0072B2",
     }
     fig, axes = plt.subplots(
-        3, 1, figsize=(13, 7), sharex=True, constrained_layout=True)
+        3, 1, figsize=(11, 8), sharex=True, constrained_layout=True)
     fig.suptitle("Velocity Comparison")
     for axis, (ax, component) in enumerate(zip(axes, ("x", "y", "z"))):
-        ax.set_facecolor("#fffdf5")
         ax.plot(gt_t, gt_velocity[:, axis], color=colors["Ground Truth"],
                 linewidth=1.2, label="Ground Truth", zorder=3)
         ax.plot(imu_t, imu_velocity[:, axis], color=colors["IMU Integration"],
@@ -173,11 +171,10 @@ def save_attitude_plot(gt_t, gt_rpy, imu_t, imu_rpy,
         "Proposed Method": "#0072B2",
     }
     fig, axes = plt.subplots(
-        3, 1, figsize=(13, 7), sharex=True, constrained_layout=True)
+        3, 1, figsize=(11, 8), sharex=True, constrained_layout=True)
     fig.suptitle("Attitude Comparison")
     for axis, (ax, component) in enumerate(
             zip(axes, ("roll", "pitch", "yaw"))):
-        ax.set_facecolor("#fffdf5")
         ax.plot(gt_t, gt_rpy[:, axis], color=colors["Ground Truth"],
                 linewidth=1.2, label="Ground Truth", zorder=3)
         ax.plot(imu_t, imu_rpy[:, axis], color=colors["IMU Integration"],
