@@ -1,0 +1,30 @@
+{
+  "exp_id": "RUGG_WLW_OLD_REAL_5",
+  "group": "OLD_RUGG_WLW",
+  "bag": "legacy_odom20260719_220929",
+  "T_END": 35.15,
+  "data_start": 0.007844084,
+  "data_end": 35.149525859,
+  "exclude_stats": false,
+  "position": {
+    "RMSE_X_cm": 3.5533836311740172,
+    "RMSE_Y_cm": 18.268340746386635,
+    "RMSE_Z_cm": 1.152518409475634,
+    "RMSE_2D_cm": 18.61071758037249,
+    "RMSE_3D_cm": 18.64636982204756,
+    "MAX_2D_cm": 35.02052937200015,
+    "MAX_3D_cm": 35.02113520751679,
+    "final_leg_x": 2.9396660327911377,
+    "final_leg_y": 0.0,
+    "final_VICON_x": 3.013604101296339,
+    "final_VICON_y": -0.342102552364343
+  },
+  "velocity": {
+    "RMSE_vx": 0.05141574817653634,
+    "RMSE_vy": 0.03765730831457974,
+    "RMSE_vz": 0.04045144685810437,
+    "RMSE_3D": 0.07548490963739943,
+    "window_start": 12.302499999999998,
+    "window_end": 26.362499999999997
+  }
+}

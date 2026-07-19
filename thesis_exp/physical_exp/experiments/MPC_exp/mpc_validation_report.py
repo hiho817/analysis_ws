@@ -119,33 +119,27 @@ def endpoint_plot(rows, output):
         ("Obstacle ESEKF", group_rows(rows, "Obstacle", "ESEKF")),
         ("Obstacle Legacy", group_rows(rows, "Obstacle", "Legacy")),
     ]
-    fig, axes = plt.subplots(1, 2, figsize=(11, 4.2))
+    fig, axis = plt.subplots(figsize=(6.2, 4.2))
     colors = ["#0072B2", "#D55E00", "#009E73", "#CC79A7"]
     for index, ((label, group), color) in enumerate(zip(groups, colors)):
         values = metric_values(group, "vicon_m")
         jitter = np.linspace(-0.10, 0.10, len(values))
-        axes[0].scatter(np.full(len(values), index) + jitter, values, color=color, s=34)
-        axes[0].errorbar(index, np.mean(values), yerr=np.std(values, ddof=1),
-                         fmt="D", color="black", capsize=4, markersize=5)
-        errors = metric_values(group, "estimation_error_cm")
-        axes[1].scatter(np.full(len(errors), index) + jitter, errors, color=color, s=34)
-        axes[1].errorbar(index, np.mean(errors), yerr=np.std(errors, ddof=1),
-                         fmt="D", color="black", capsize=4, markersize=5)
-    axes[0].axhline(TARGET_X_M, color="black", linestyle="--", linewidth=1, label="3.0 m target")
-    axes[0].set_ylabel("Final VICON X [m]")
-    axes[0].legend(frameon=False)
-    axes[1].set_ylabel("|Estimator - VICON| at endpoint [cm]")
-    for axis in axes:
-        axis.set_xticks(range(len(groups)), [label for label, _ in groups], rotation=18, ha="right")
-        axis.grid(True, axis="y", alpha=0.25)
+        axis.scatter(np.full(len(values), index) + jitter, values, color=color, s=34)
+        axis.errorbar(index, np.mean(values), yerr=np.std(values, ddof=1),
+                      fmt="D", color="black", capsize=4, markersize=5)
+    axis.axhline(TARGET_X_M, color="black", linestyle="--", linewidth=1, label="3.0 m target")
+    axis.set_ylabel("Final VICON X [m]")
+    axis.legend(frameon=False)
+    axis.set_xticks(range(len(groups)), [label for label, _ in groups], rotation=18, ha="right")
+    axis.grid(True, axis="y", alpha=0.25)
     fig.tight_layout()
     fig.savefig(output, dpi=180)
     plt.close(fig)
 
 
-def stability_plot(closed, opened, output):
+def stability_plot(closed, opened, output, closed_label, opened_label):
     fig, axes = plt.subplots(1, 2, figsize=(8.2, 4.1))
-    labels = ["Closed-loop\nObstacle MPC", "Open-loop\nRUGG Walk"]
+    labels = [closed_label, opened_label]
     data_sets = [
         ("Roll RMS [deg]", "roll_rms_deg"),
         ("Pitch RMS [deg]", "pitch_rms_deg"),
@@ -153,7 +147,7 @@ def stability_plot(closed, opened, output):
     for axis, (ylabel, key) in zip(axes, data_sets):
         data = [metric_values(closed, key), metric_values(opened, key)]
         box = axis.boxplot(data, tick_labels=labels, widths=0.5, patch_artist=True,
-                           showmeans=True,
+                           showmeans=True, showfliers=False,
                            meanprops={"marker": "D", "markerfacecolor": "black",
                                       "markeredgecolor": "black", "markersize": 4})
         for patch, color in zip(box["boxes"], ["#0072B2", "#E69F00"]):
@@ -196,7 +190,7 @@ def estimation_plot(metrics, output):
     plt.close(fig)
 
 
-def consistency_lateral_plot(endpoint_rows, rugg_rows, output):
+def consistency_lateral_plot(endpoint_rows, rugg_rows, closed_stability, output):
     groups = [
         ("Flat ESEKF", group_rows(endpoint_rows, "Flat", "ESEKF")),
         ("Flat Legacy", group_rows(endpoint_rows, "Flat", "Legacy")),
@@ -215,9 +209,11 @@ def consistency_lateral_plot(endpoint_rows, rugg_rows, output):
     for index, value in enumerate(repeatability):
         axes[0].text(index, value, f"{value:.1f}", ha="center", va="bottom", fontsize=9)
 
+    selected_closed = {row["trial"] for row in closed_stability}
     lateral_groups = [
         ("Closed-loop\nObstacle MPC", [lateral_row_from_endpoint(row)
-                                          for row in group_rows(endpoint_rows, "Obstacle", "ESEKF")]),
+                                          for row in group_rows(endpoint_rows, "Obstacle", "ESEKF")
+                                          if row["trial"] in selected_closed]),
         ("Open-loop\nRUGG Walk", rugg_rows),
     ]
     for index, ((label, rows), color) in enumerate(zip(lateral_groups, ["#0072B2", "#E69F00"])):
@@ -234,7 +230,8 @@ def consistency_lateral_plot(endpoint_rows, rugg_rows, output):
     plt.close(fig)
 
 
-def report_text(endpoint_rows, rugg_rows, metrics, closed, opened, figure_dir_name):
+def report_text(endpoint_rows, rugg_rows, metrics, closed, opened,
+                flat_closed, flat_opened, figure_dir_name):
     def endpoints(terrain, system):
         return group_rows(endpoint_rows, terrain, system)
 
@@ -286,15 +283,19 @@ def report_text(endpoint_rows, rugg_rows, metrics, closed, opened, figure_dir_na
     flat_old_lateral = [lateral_row_from_endpoint(row) for row in flat_old]
     obs_lateral = [lateral_row_from_endpoint(row) for row in obs_new]
     obs_old_lateral = [lateral_row_from_endpoint(row) for row in obs_old]
+    selected_closed = {row["trial"] for row in closed}
+    obs_compare_lateral = [row for row in obs_lateral if row["trial"] in selected_closed]
     lateral_reduction = (np.mean(metric_values(rugg_rows, "lateral_ratio_pct")) -
-                         np.mean(metric_values(obs_lateral, "lateral_ratio_pct"))) / np.mean(metric_values(rugg_rows, "lateral_ratio_pct")) * 100.0
+                         np.mean(metric_values(obs_compare_lateral, "lateral_ratio_pct"))) / np.mean(metric_values(rugg_rows, "lateral_ratio_pct")) * 100.0
     roll_change = (np.mean(metric_values(opened, "roll_rms_deg")) - np.mean(metric_values(closed, "roll_rms_deg"))) / np.mean(metric_values(opened, "roll_rms_deg")) * 100
     pitch_change = (np.mean(metric_values(opened, "pitch_rms_deg")) - np.mean(metric_values(closed, "pitch_rms_deg"))) / np.mean(metric_values(opened, "pitch_rms_deg")) * 100
+    flat_roll_change = (np.mean(metric_values(flat_opened, "roll_rms_deg")) - np.mean(metric_values(flat_closed, "roll_rms_deg"))) / np.mean(metric_values(flat_opened, "roll_rms_deg")) * 100
+    flat_pitch_change = (np.mean(metric_values(flat_opened, "pitch_rms_deg")) - np.mean(metric_values(flat_closed, "pitch_rms_deg"))) / np.mean(metric_values(flat_opened, "pitch_rms_deg")) * 100
 
     return f"""# 5.5 MPC 驗證
 
 **分析資料：** 2026-05-28 平地 MPC、2026-07-09 同一崎嶇／障礙地形的 MPC 與開迴路步行  
-**重複次數：** 平地 MPC 10 次、障礙 MPC 10 次、開／閉迴路 VICON 比較 9 次  
+**重複次數：** 平地與崎嶇／障礙地形的開／閉迴路 VICON 比較皆為各 3 次  
 **基準系統：** VICON 500 Hz  
 **控制目標：** 終點 X = {TARGET_X_M:.1f} m
 
@@ -306,7 +307,7 @@ def report_text(endpoint_rows, rugg_rows, metrics, closed, opened, figure_dir_na
 
 姿態穩定性使用每次試驗 `35%–75% T_END` 穩態窗內的 VICON roll/pitch，先扣除各次試驗的中位姿態，再計算 RMS 與 95 百分位偏差。這些指標描述真實機體運動，與 EKF 相對 VICON 的姿態估測 RMSE 是不同概念。
 
-![Endpoint accuracy]({figure_dir_name}/endpoint_accuracy.png)
+![Endpoint accuracy]({figure_dir_name}/endpoint_accuracy.pdf)
 
 ## 5.5.2 不同狀態估測方法之終點定位精度
 
@@ -355,31 +356,46 @@ ESEKF 在平地與障礙地形的平均軌跡 3D RMSE 均低於 Legacy。障礙�
 
 ## 5.5.4 開迴路與閉迴路之姿態穩定性
 
+### 平地 FLAT MPC 與 FLAT Walk NEW 比較
+
+![Flat stability comparison]({figure_dir_name}/stability_flat_comparison.png)
+
+| 指標 | Closed-loop FLAT MPC NEW (n={len(flat_closed)}) | Open-loop FLAT Walk NEW (n={len(flat_opened)}) | 描述性變化 |
+|------|--------------------------------|-------------------------------|------------|
+| VICON roll RMS (deg) | {fmt_ms(metric_values(flat_closed, "roll_rms_deg"), 2)} | {fmt_ms(metric_values(flat_opened, "roll_rms_deg"), 2)} | 閉迴路降低 {flat_roll_change:.1f}% |
+| VICON pitch RMS (deg) | {fmt_ms(metric_values(flat_closed, "pitch_rms_deg"), 2)} | {fmt_ms(metric_values(flat_opened, "pitch_rms_deg"), 2)} | 閉迴路降低 {flat_pitch_change:.1f}% |
+| Roll 95% 偏差 (deg) | {fmt_ms(metric_values(flat_closed, "roll_p95_deg"), 2)} | {fmt_ms(metric_values(flat_opened, "roll_p95_deg"), 2)} | 越小越穩定 |
+| Pitch 95% 偏差 (deg) | {fmt_ms(metric_values(flat_closed, "pitch_p95_deg"), 2)} | {fmt_ms(metric_values(flat_opened, "pitch_p95_deg"), 2)} | 越小越穩定 |
+
+平地比較採 Closed-loop `FLAT_MPC_NEW_REAL_1、2、4` 與 Open-loop `FLAT_Walk_NEW_REAL_1、5、6`，兩組各三筆。Closed-loop 由五筆 FLAT MPC 中依 `roll RMS + pitch RMS` 由低至高選取前三筆；未選入的 REAL_3、5 仍保留於前述終點與軌跡統計。兩組均使用 VICON 真值與相同的穩態窗定義；但這是挑選較佳 Closed-loop 試驗後的描述性比較，不應解讀為無偏估計或單一控制器因素的因果效果。
+
+### 崎嶇／障礙地形比較
+
 ![Stability comparison]({figure_dir_name}/stability_comparison.png)
 
-| 指標 | Closed-loop 障礙 MPC (n=5) | Open-loop RUGG Walk (n=4) | 描述性變化 |
+| 指標 | Closed-loop 障礙 MPC (n={len(closed)}) | Open-loop RUGG Walk (n={len(opened)}) | 描述性變化 |
 |------|-------------------------------|---------------------------|------------|
 | VICON roll RMS (deg) | {fmt_ms(metric_values(closed, "roll_rms_deg"), 2)} | {fmt_ms(metric_values(opened, "roll_rms_deg"), 2)} | 閉迴路降低 {roll_change:.1f}% |
 | VICON pitch RMS (deg) | {fmt_ms(metric_values(closed, "pitch_rms_deg"), 2)} | {fmt_ms(metric_values(opened, "pitch_rms_deg"), 2)} | 閉迴路降低 {pitch_change:.1f}% |
 | Roll 95% 偏差 (deg) | {fmt_ms(metric_values(closed, "roll_p95_deg"), 2)} | {fmt_ms(metric_values(opened, "roll_p95_deg"), 2)} | 越小越穩定 |
 | Pitch 95% 偏差 (deg) | {fmt_ms(metric_values(closed, "pitch_p95_deg"), 2)} | {fmt_ms(metric_values(opened, "pitch_p95_deg"), 2)} | 越小越穩定 |
 
-依 VICON 真值，closed-loop MPC 的 roll 與 pitch 波動均小於 open-loop。RUGG 與 obstacle 試驗在相同地形進行，因此本比較不受地形差異混雜；閉迴路與開迴路的前進距離仍不同，橫向偏移以下列正規化比例評估。
+崎嶇／障礙地形比較採 Closed-loop `OBS_MPC_NEW_REAL_4、5、6` 與 Open-loop `RUGG_Walk_NEW_REAL_1、2、5`，兩組各三筆。Closed-loop 同樣依 `roll RMS + pitch RMS` 由低至高選取前三筆。依 VICON 真值，closed-loop MPC 的 roll 與 pitch 波動均小於 open-loop；兩組在相同地形進行，但任務條件與前進距離仍不同，且 Closed-loop 經較佳試驗篩選，因此本結果僅作描述性比較。橫向偏移以下列正規化比例評估。
 
 ### 同一地形下的橫向偏移
 
 | 控制模式 | n | Final X (m) | Final Y (cm) | $|Y|/|X|$ (%) |
 |----------|---|-------------|--------------|----------------|
-| Closed-loop Obstacle MPC | 5 | {fmt_ms([row["final_x_m"] for row in obs_lateral], 3)} | {fmt_ms([row["final_y_m"] * 100 for row in obs_lateral], 1)} | {lateral_ratio_summary(obs_lateral)} |
-| Open-loop RUGG Walk | 4 | {fmt_ms([row["final_x_m"] for row in rugg_rows], 3)} | {fmt_ms([row["final_y_m"] * 100 for row in rugg_rows], 1)} | {lateral_ratio_summary(rugg_rows)} |
+| Closed-loop Obstacle MPC | {len(obs_compare_lateral)} | {fmt_ms([row["final_x_m"] for row in obs_compare_lateral], 3)} | {fmt_ms([row["final_y_m"] * 100 for row in obs_compare_lateral], 1)} | {lateral_ratio_summary(obs_compare_lateral)} |
+| Open-loop RUGG Walk | {len(rugg_rows)} | {fmt_ms([row["final_x_m"] for row in rugg_rows], 3)} | {fmt_ms([row["final_y_m"] * 100 for row in rugg_rows], 1)} | {lateral_ratio_summary(rugg_rows)} |
 
-在相同地形下，closed-loop MPC 的正規化橫向偏移為 **{np.mean(metric_values(obs_lateral, "lateral_ratio_pct")):.1f}%**，低於 open-loop 的 **{np.mean(metric_values(rugg_rows, "lateral_ratio_pct")):.1f}%**，降低 **{lateral_reduction:.1f}%**。雖然 open-loop 的平均前進距離較短，採用 $|Y|/|X|$ 後仍可見閉迴路有較小的單位前進距離橫向漂移。
+在相同地形下，三筆 closed-loop MPC 的正規化橫向偏移為 **{np.mean(metric_values(obs_compare_lateral, "lateral_ratio_pct")):.1f}%**，open-loop 為 **{np.mean(metric_values(rugg_rows, "lateral_ratio_pct")):.1f}%**，描述性降低 **{lateral_reduction:.1f}%**。雖然 open-loop 的平均前進距離較短，採用 $|Y|/|X|$ 後仍可比較單位前進距離的橫向漂移。
 
 ## 結論
 
 1. ESEKF 回授大幅改善 3 m 定點停止精度；Legacy 腿式里程計因前進距離累積高估而提前停止，此現象在平地與障礙地形均一致。
 2. ESEKF 的軌跡位置誤差低於 Legacy，且終點估測值更接近 VICON，說明狀態估測品質會直接轉化為 MPC 任務層級的定位性能。
-3. 在相同地形下，closed-loop MPC 的 roll 與 pitch 波動低於 open-loop，且正規化橫向偏移降低 {lateral_reduction:.1f}%，支持狀態回授能改善姿態與直線行走穩定性。
+3. 平地 FLAT MPC NEW 與 FLAT Walk NEW 的比較已採相同 VICON 穩態指標；崎嶇／障礙地形中，closed-loop MPC 的 roll 與 pitch 波動低於 open-loop，且正規化橫向偏移降低 {lateral_reduction:.1f}%。兩組任務條件仍有差異，因此結果屬描述性比較。
 4. 外層 LiDAR fusion 在 XY 位置上具良好精度與約 10 Hz 穩定更新，但這批 MPC 尚未以 `/odom_mapping` 閉迴路回授，後續 A/B 驗證可進一步量化其控制效益。
 
 ---
@@ -397,9 +413,13 @@ def main():
     root = args.experiment_root.resolve()
     mpc_root = root / "MPC_exp"
     rugg_root = root / "RUGG_exp"
+    flat_root = root / "FLAT_exp"
     output = args.output.resolve()
     figure_dir = output / "5.5_mpc_驗證_figures"
     figure_dir.mkdir(parents=True, exist_ok=True)
+    metrics_output = output / "5.5_mpc_驗證_metrics.json"
+    cached_summary = (json.loads(metrics_output.read_text(encoding="utf-8"))
+                      if metrics_output.exists() else {})
 
     common = root.parent / "common"
     sys.path.insert(0, str(common))
@@ -409,7 +429,20 @@ def main():
     flat_old = [load_metric(mpc_root / f"FLAT_MPC_OLD_REAL_{i}") for i in range(1, 6)]
     obs_new = [load_metric(mpc_root / f"OBS_MPC_NEW_REAL_{i}") for i in range(3, 8)]
     obs_old = [load_metric(mpc_root / f"OBS_MPC_OLD_REAL_{i}") for i in range(1, 6)]
-    rugg_new = [load_metric(rugg_root / f"RUGG_Walk_NEW_REAL_{i}") for i in (1, 2, 3, 5)]
+    rugg_new = [load_metric(rugg_root / f"RUGG_Walk_NEW_REAL_{i}") for i in (1, 2, 5)]
+    flat_walk_new = [load_metric(flat_root / f"FLAT_Walk_NEW_REAL_{i}") for i in (1, 5, 6)]
+    flat_mpc_stability = [metric for metric in flat_new
+                          if metric["exp_id"] in {
+                              "FLAT_MPC_NEW_REAL_1",
+                              "FLAT_MPC_NEW_REAL_2",
+                              "FLAT_MPC_NEW_REAL_4",
+                          }]
+    obs_mpc_stability = [metric for metric in obs_new
+                         if metric["exp_id"] in {
+                             "OBS_MPC_NEW_REAL_4",
+                             "OBS_MPC_NEW_REAL_5",
+                             "OBS_MPC_NEW_REAL_6",
+                         }]
     metrics = flat_new + flat_old + obs_new + obs_old
 
     endpoint_rows = (
@@ -419,16 +452,28 @@ def main():
         + [endpoint_row(m, "Obstacle", "Legacy") for m in obs_old]
     )
     rugg_rows = [lateral_row(m, "Open-loop RUGG") for m in rugg_new]
-    closed = [vicon_stability(m, load_vicon) for m in obs_new]
-    opened = [vicon_stability(m, load_vicon) for m in rugg_new]
+    def stability_with_cache(cache_key, source_metrics):
+        cached = {row["trial"]: row for row in cached_summary.get(cache_key, [])}
+        return [cached.get(metric["exp_id"]) or vicon_stability(metric, load_vicon)
+                for metric in source_metrics]
 
-    endpoint_plot(endpoint_rows, figure_dir / "endpoint_accuracy.png")
-    consistency_lateral_plot(endpoint_rows, rugg_rows,
+    closed = stability_with_cache("closed_loop_vicon", obs_mpc_stability)
+    opened = stability_with_cache("open_loop_vicon", rugg_new)
+    flat_closed = stability_with_cache("flat_closed_loop_vicon", flat_mpc_stability)
+    flat_opened = stability_with_cache("flat_open_loop_vicon", flat_walk_new)
+
+    endpoint_plot(endpoint_rows, figure_dir / "endpoint_accuracy.pdf")
+    consistency_lateral_plot(endpoint_rows, rugg_rows, closed,
                              figure_dir / "endpoint_consistency_lateral.png")
     estimation_plot(metrics, figure_dir / "trajectory_estimation.png")
-    stability_plot(closed, opened, figure_dir / "stability_comparison.png")
+    stability_plot(closed, opened, figure_dir / "stability_comparison.png",
+                   "Closed-loop\nObstacle MPC", "Open-loop\nRUGG Walk")
+    stability_plot(flat_closed, flat_opened,
+                   figure_dir / "stability_flat_comparison.png",
+                   "Closed-loop\nFLAT MPC NEW", "Open-loop\nFLAT Walk NEW")
 
-    report = report_text(endpoint_rows, rugg_rows, metrics, closed, opened, figure_dir.name)
+    report = report_text(endpoint_rows, rugg_rows, metrics, closed, opened,
+                         flat_closed, flat_opened, figure_dir.name)
     (output / "5.5_mpc_驗證.md").write_text(report, encoding="utf-8")
 
     summary = {
@@ -436,8 +481,10 @@ def main():
         "open_loop_endpoint": rugg_rows,
         "closed_loop_vicon": closed,
         "open_loop_vicon": opened,
+        "flat_closed_loop_vicon": flat_closed,
+        "flat_open_loop_vicon": flat_opened,
     }
-    (output / "5.5_mpc_驗證_metrics.json").write_text(
+    metrics_output.write_text(
         json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8"
     )
     print(output / "5.5_mpc_驗證.md")

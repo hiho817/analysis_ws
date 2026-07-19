@@ -31,6 +31,9 @@ IMU_SELECTED = {
     "NEW_WALK": [
         "RUGG_Walk_NEW_REAL_1", "RUGG_Walk_NEW_REAL_2",
         "RUGG_Walk_NEW_REAL_5"],
+    "NEW_WLW": [
+        "RUGG_WLW_NEW_REAL_2", "RUGG_WLW_NEW_REAL_3",
+        "RUGG_WLW_NEW_REAL_5"],
 }
 FLIP = set()
 INVALID = {}
@@ -486,13 +489,13 @@ def update_report(records, stats):
 
 def main():
     records = []
-    for group in ("NEW_WALK",):
+    for group in ("NEW_WALK", "NEW_WLW"):
         for exp_id in IMU_SELECTED[group]:
             item, vi, baseline, imu = analyze(exp_id)
             records.append(item)
             print(exp_id, "valid" if item["valid_imu_only"] else "invalid",
                   item.get("imu_only", {}).get("position_rmse_3d_m"))
-    stats = {"WALK": summarize(records, "WALK")}
+    stats = {"WALK": summarize(records, "WALK"), "WLW": summarize(records, "WLW")}
     payload = {
         "method": "prediction-only IMU integration; no leg update, ZUPT, GMO, or fusion feedback",
         "selected_imu_only_experiments": IMU_SELECTED,
