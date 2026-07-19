@@ -1,1 +1,0 @@
-$ ros2 run corgi_odometry_legacy corgi_odometry_legacy --ros-args -p use_sim_time:=true -p deterministic_replay:=true --log-level warn

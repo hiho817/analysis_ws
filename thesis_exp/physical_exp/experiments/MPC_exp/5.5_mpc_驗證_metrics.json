@@ -1,0 +1,345 @@
+{
+  "endpoint": [
+    {
+      "trial": "FLAT_MPC_NEW_REAL_1",
+      "terrain": "Flat",
+      "system": "ESEKF",
+      "estimate_m": 2.996962070465088,
+      "vicon_m": 2.984846319515537,
+      "estimation_error_cm": 1.2115750949551085,
+      "stop_error_cm": 1.5153680484463194,
+      "signed_stop_error_cm": -1.5153680484463194,
+      "final_y_m": -0.5003594910833417,
+      "position_3d_rmse_cm": 6.161458715856084
+    },
+    {
+      "trial": "FLAT_MPC_NEW_REAL_2",
+      "terrain": "Flat",
+      "system": "ESEKF",
+      "estimate_m": 2.9907565116882324,
+      "vicon_m": 2.9830595930562027,
+      "estimation_error_cm": 0.7696918632029703,
+      "stop_error_cm": 1.6940406943797282,
+      "signed_stop_error_cm": -1.6940406943797282,
+      "final_y_m": -0.39961312446333236,
+      "position_3d_rmse_cm": 4.892108979215463
+    },
+    {
+      "trial": "FLAT_MPC_NEW_REAL_3",
+      "terrain": "Flat",
+      "system": "ESEKF",
+      "estimate_m": 3.0168960094451904,
+      "vicon_m": 2.9833715383975696,
+      "estimation_error_cm": 3.3524471047620796,
+      "stop_error_cm": 1.6628461602430367,
+      "signed_stop_error_cm": -1.6628461602430367,
+      "final_y_m": -0.48920111945022127,
+      "position_3d_rmse_cm": 5.301628663329702
+    },
+    {
+      "trial": "FLAT_MPC_NEW_REAL_4",
+      "terrain": "Flat",
+      "system": "ESEKF",
+      "estimate_m": 3.018446683883667,
+      "vicon_m": 2.9982774787518522,
+      "estimation_error_cm": 2.016920513181475,
+      "stop_error_cm": 0.1722521248147757,
+      "signed_stop_error_cm": -0.1722521248147757,
+      "final_y_m": -0.49042014161626923,
+      "position_3d_rmse_cm": 8.40205995207575
+    },
+    {
+      "trial": "FLAT_MPC_NEW_REAL_5",
+      "terrain": "Flat",
+      "system": "ESEKF",
+      "estimate_m": 2.9986324310302734,
+      "vicon_m": 2.9917421310751084,
+      "estimation_error_cm": 0.6890299955164991,
+      "stop_error_cm": 0.8257868924891554,
+      "signed_stop_error_cm": -0.8257868924891554,
+      "final_y_m": -0.3400114697922574,
+      "position_3d_rmse_cm": 5.359293183608539
+    },
+    {
+      "trial": "FLAT_MPC_OLD_REAL_1",
+      "terrain": "Flat",
+      "system": "Legacy",
+      "estimate_m": 3.003037452697754,
+      "vicon_m": 2.7466537108500226,
+      "estimation_error_cm": 25.638374184773127,
+      "stop_error_cm": 25.334628914997737,
+      "signed_stop_error_cm": -25.334628914997737,
+      "final_y_m": -0.2788488550343352,
+      "position_3d_rmse_cm": 17.865288006816478
+    },
+    {
+      "trial": "FLAT_MPC_OLD_REAL_2",
+      "terrain": "Flat",
+      "system": "Legacy",
+      "estimate_m": 3.009744882583618,
+      "vicon_m": 2.799162152394786,
+      "estimation_error_cm": 21.058273018883213,
+      "stop_error_cm": 20.083784760521397,
+      "signed_stop_error_cm": -20.083784760521397,
+      "final_y_m": -0.29623502106921173,
+      "position_3d_rmse_cm": 12.5989810710298
+    },
+    {
+      "trial": "FLAT_MPC_OLD_REAL_3",
+      "terrain": "Flat",
+      "system": "Legacy",
+      "estimate_m": 3.008493185043335,
+      "vicon_m": 2.761387646731373,
+      "estimation_error_cm": 24.7105538311962,
+      "stop_error_cm": 23.861235326862705,
+      "signed_stop_error_cm": -23.861235326862705,
+      "final_y_m": -0.286005414425639,
+      "position_3d_rmse_cm": 15.031362582769939
+    },
+    {
+      "trial": "FLAT_MPC_OLD_REAL_4",
+      "terrain": "Flat",
+      "system": "Legacy",
+      "estimate_m": 3.0004689693450928,
+      "vicon_m": 2.7469796637466053,
+      "estimation_error_cm": 25.348930559848746,
+      "stop_error_cm": 25.30203362533947,
+      "signed_stop_error_cm": -25.30203362533947,
+      "final_y_m": -0.33762384036514637,
+      "position_3d_rmse_cm": 15.387788598605143
+    },
+    {
+      "trial": "FLAT_MPC_OLD_REAL_5",
+      "terrain": "Flat",
+      "system": "Legacy",
+      "estimate_m": 3.001662254333496,
+      "vicon_m": 2.736253489799742,
+      "estimation_error_cm": 26.540876453375397,
+      "stop_error_cm": 26.374651020025787,
+      "signed_stop_error_cm": -26.374651020025787,
+      "final_y_m": -0.36724590796662054,
+      "position_3d_rmse_cm": 15.968710462438882
+    },
+    {
+      "trial": "OBS_MPC_NEW_REAL_3",
+      "terrain": "Obstacle",
+      "system": "ESEKF",
+      "estimate_m": 2.9980931282043457,
+      "vicon_m": 2.997015109635757,
+      "estimation_error_cm": 0.1078018568588579,
+      "stop_error_cm": 0.2984890364242876,
+      "signed_stop_error_cm": -0.2984890364242876,
+      "final_y_m": -0.49254808481601076,
+      "position_3d_rmse_cm": 8.675065269371773
+    },
+    {
+      "trial": "OBS_MPC_NEW_REAL_4",
+      "terrain": "Obstacle",
+      "system": "ESEKF",
+      "estimate_m": 2.984886407852173,
+      "vicon_m": 2.966511025799082,
+      "estimation_error_cm": 1.837538205309075,
+      "stop_error_cm": 3.34889742009179,
+      "signed_stop_error_cm": -3.34889742009179,
+      "final_y_m": -0.6614189012289807,
+      "position_3d_rmse_cm": 5.953295382777704
+    },
+    {
+      "trial": "OBS_MPC_NEW_REAL_5",
+      "terrain": "Obstacle",
+      "system": "ESEKF",
+      "estimate_m": 3.001455545425415,
+      "vicon_m": 2.9511724473532492,
+      "estimation_error_cm": 5.02830980721658,
+      "stop_error_cm": 4.882755264675076,
+      "signed_stop_error_cm": -4.882755264675076,
+      "final_y_m": -0.7879174813914704,
+      "position_3d_rmse_cm": 14.278588165766825
+    },
+    {
+      "trial": "OBS_MPC_NEW_REAL_6",
+      "terrain": "Obstacle",
+      "system": "ESEKF",
+      "estimate_m": 2.986743927001953,
+      "vicon_m": 2.9870195517865943,
+      "estimation_error_cm": 0.02756247846411597,
+      "stop_error_cm": 1.2980448213405715,
+      "signed_stop_error_cm": -1.2980448213405715,
+      "final_y_m": -0.09086334276293606,
+      "position_3d_rmse_cm": 10.114010690412515
+    },
+    {
+      "trial": "OBS_MPC_NEW_REAL_7",
+      "terrain": "Obstacle",
+      "system": "ESEKF",
+      "estimate_m": 2.9747724533081055,
+      "vicon_m": 2.9259514796250796,
+      "estimation_error_cm": 4.882097368302585,
+      "stop_error_cm": 7.404852037492038,
+      "signed_stop_error_cm": -7.404852037492038,
+      "final_y_m": -0.8715097640019249,
+      "position_3d_rmse_cm": 25.9751426434834
+    },
+    {
+      "trial": "OBS_MPC_OLD_REAL_1",
+      "terrain": "Obstacle",
+      "system": "Legacy",
+      "estimate_m": 3.009619951248169,
+      "vicon_m": 2.547881139221996,
+      "estimation_error_cm": 46.173881202617295,
+      "stop_error_cm": 45.2118860778004,
+      "signed_stop_error_cm": -45.2118860778004,
+      "final_y_m": -0.28832704366788825,
+      "position_3d_rmse_cm": 32.74480984882761
+    },
+    {
+      "trial": "OBS_MPC_OLD_REAL_2",
+      "terrain": "Obstacle",
+      "system": "Legacy",
+      "estimate_m": 3.0033047199249268,
+      "vicon_m": 2.6818860153593134,
+      "estimation_error_cm": 32.141870456561335,
+      "stop_error_cm": 31.811398464068663,
+      "signed_stop_error_cm": -31.811398464068663,
+      "final_y_m": -0.29093025190893557,
+      "position_3d_rmse_cm": 19.84138529646869
+    },
+    {
+      "trial": "OBS_MPC_OLD_REAL_3",
+      "terrain": "Obstacle",
+      "system": "Legacy",
+      "estimate_m": 3.008650779724121,
+      "vicon_m": 2.6666670684604474,
+      "estimation_error_cm": 34.19837112636736,
+      "stop_error_cm": 33.33329315395525,
+      "signed_stop_error_cm": -33.33329315395525,
+      "final_y_m": -0.2774522552549319,
+      "position_3d_rmse_cm": 15.23035914103997
+    },
+    {
+      "trial": "OBS_MPC_OLD_REAL_4",
+      "terrain": "Obstacle",
+      "system": "Legacy",
+      "estimate_m": 3.0020225048065186,
+      "vicon_m": 2.6231801227343388,
+      "estimation_error_cm": 37.884238207217976,
+      "stop_error_cm": 37.68198772656612,
+      "signed_stop_error_cm": -37.68198772656612,
+      "final_y_m": -0.3678466636606096,
+      "position_3d_rmse_cm": 18.81571087542356
+    },
+    {
+      "trial": "OBS_MPC_OLD_REAL_5",
+      "terrain": "Obstacle",
+      "system": "Legacy",
+      "estimate_m": 3.003249168395996,
+      "vicon_m": 2.6513089354273554,
+      "estimation_error_cm": 35.194023296864074,
+      "stop_error_cm": 34.869106457264465,
+      "signed_stop_error_cm": -34.869106457264465,
+      "final_y_m": -0.325029722922283,
+      "position_3d_rmse_cm": 22.73423848356588
+    }
+  ],
+  "open_loop_endpoint": [
+    {
+      "trial": "RUGG_Walk_NEW_REAL_1",
+      "label": "Open-loop RUGG",
+      "final_x_m": 2.452957516331639,
+      "final_y_m": -0.7022746440279604,
+      "abs_final_y_cm": 70.22746440279603,
+      "lateral_ratio_pct": 28.62971084302355
+    },
+    {
+      "trial": "RUGG_Walk_NEW_REAL_2",
+      "label": "Open-loop RUGG",
+      "final_x_m": 2.477812173253756,
+      "final_y_m": -0.7725834622808204,
+      "abs_final_y_cm": 77.25834622808205,
+      "lateral_ratio_pct": 31.180065649055926
+    },
+    {
+      "trial": "RUGG_Walk_NEW_REAL_3",
+      "label": "Open-loop RUGG",
+      "final_x_m": 2.443439381238694,
+      "final_y_m": -0.6675999953280809,
+      "abs_final_y_cm": 66.7599995328081,
+      "lateral_ratio_pct": 27.322142732660843
+    },
+    {
+      "trial": "RUGG_Walk_NEW_REAL_5",
+      "label": "Open-loop RUGG",
+      "final_x_m": 2.4889153202427474,
+      "final_y_m": -0.602078395995801,
+      "abs_final_y_cm": 60.207839599580105,
+      "lateral_ratio_pct": 24.190392943424026
+    }
+  ],
+  "closed_loop_vicon": [
+    {
+      "trial": "OBS_MPC_NEW_REAL_3",
+      "roll_rms_deg": 2.142015208658269,
+      "pitch_rms_deg": 2.7957517113153636,
+      "roll_p95_deg": 4.571734454258345,
+      "pitch_p95_deg": 5.480126625910749
+    },
+    {
+      "trial": "OBS_MPC_NEW_REAL_4",
+      "roll_rms_deg": 1.8484692296687593,
+      "pitch_rms_deg": 2.6229838085180925,
+      "roll_p95_deg": 4.337084522514535,
+      "pitch_p95_deg": 5.2548625815261065
+    },
+    {
+      "trial": "OBS_MPC_NEW_REAL_5",
+      "roll_rms_deg": 2.3407267957866478,
+      "pitch_rms_deg": 2.468769714257143,
+      "roll_p95_deg": 4.723274936657585,
+      "pitch_p95_deg": 5.125283056216284
+    },
+    {
+      "trial": "OBS_MPC_NEW_REAL_6",
+      "roll_rms_deg": 1.8602555356368273,
+      "pitch_rms_deg": 2.1053164276447967,
+      "roll_p95_deg": 3.5773589515741318,
+      "pitch_p95_deg": 4.340752583618377
+    },
+    {
+      "trial": "OBS_MPC_NEW_REAL_7",
+      "roll_rms_deg": 2.3457317817630843,
+      "pitch_rms_deg": 2.4681787251484897,
+      "roll_p95_deg": 4.804387496890585,
+      "pitch_p95_deg": 4.518260960490706
+    }
+  ],
+  "open_loop_vicon": [
+    {
+      "trial": "RUGG_Walk_NEW_REAL_1",
+      "roll_rms_deg": 2.825925071271237,
+      "pitch_rms_deg": 2.932018299572756,
+      "roll_p95_deg": 5.387620390260697,
+      "pitch_p95_deg": 5.55523387293697
+    },
+    {
+      "trial": "RUGG_Walk_NEW_REAL_2",
+      "roll_rms_deg": 2.9789313258167858,
+      "pitch_rms_deg": 3.6931952999197675,
+      "roll_p95_deg": 6.363592800795058,
+      "pitch_p95_deg": 6.93550124185593
+    },
+    {
+      "trial": "RUGG_Walk_NEW_REAL_3",
+      "roll_rms_deg": 2.8088218716148496,
+      "pitch_rms_deg": 2.8746855961524416,
+      "roll_p95_deg": 5.444560639426216,
+      "pitch_p95_deg": 5.501227982443406
+    },
+    {
+      "trial": "RUGG_Walk_NEW_REAL_5",
+      "roll_rms_deg": 2.9277030063161056,
+      "pitch_rms_deg": 3.300408781163483,
+      "roll_p95_deg": 5.367002149000218,
+      "pitch_p95_deg": 6.3610463540068976
+    }
+  ]
+}

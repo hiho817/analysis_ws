@@ -1,1 +1,0 @@
-$ ros2 run corgi_odometry_legacy legacy_sim_bridge --ros-args -p use_sim_time:=true --log-level warn
