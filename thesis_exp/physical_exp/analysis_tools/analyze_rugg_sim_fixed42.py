@@ -6,6 +6,7 @@ import json
 import sqlite3
 import argparse
 from pathlib import Path
+import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -24,8 +25,12 @@ SOURCE = ROOT / 'simulation/RUGG_WALK_SIM/RUGG_WALK_SIM_0.db3'
 LEGACY = ROOT / 'simulation/RUGG_WALK_SIM_legacy_fixed42/RUGG_WALK_SIM_legacy_fixed42_0.db3'
 OUT = ROOT / 'physical_exp/results/5.4_rugg_experiment'
 FIG = OUT / 'figures'
+sys.path.insert(0, str(ROOT / 'physical_exp/common'))
+from thesis_figure_style import (  # noqa: E402
+    create_three_panel, finish_figure, format_axis, plot_method, save_figure,
+)
 LABEL = 'walk'
-LEGACY_Y_SIGN = -1.0
+LEGACY_Y_SIGN = 1.0
 
 def rows(db, topic):
     con = sqlite3.connect(f'file:{db}?mode=ro', uri=True)
@@ -107,29 +112,35 @@ def assess(t,p,v,a,gt_t,gt_p,gt_v_t,gt_v,gt_a_t,gt_a, name):
             'final_velocity_error_mps':ve[last].tolist(),'samples':int(len(t)),
             'dt_median_s':float(np.median(np.diff(t)))}
 
-def plot(gt_t,gt_p,gt_v_t,gt_v,gt_a_t,gt_a, series, end):
-    plt.rcParams.update({'font.size':10,'axes.grid':True,'grid.alpha':.25})
-    colors={'Ground Truth':'#222222','Proposed Method':'#1f77b4','IF+KLD (Legacy)':'#ff7f0e','IMU Integration':'#2ca02c'}
+def plot(gt_t,gt_p,gt_v_t,gt_v,gt_a_t,gt_a, series, end, figure_kind='all'):
     def figure(kind, labels, truth, key, unit, filename, title):
-        fig,ax=plt.subplots(3,1,sharex=True,figsize=(8.2,6.2),dpi=180)
+        if figure_kind != 'all' and kind != figure_kind:
+            return
+        fig,ax=create_three_panel(title)
         truth_t = gt_t if key == 'p' else (gt_v_t if key == 'v' else gt_a_t)
         mask=(truth_t>=0)&(truth_t<=end)
         for i,(aa,label) in enumerate(zip(ax,labels)):
-            aa.plot(truth_t[mask],truth[mask,i],color=colors['Ground Truth'],lw=1.5,label='Ground Truth')
+            plot_method(aa,truth_t[mask],truth[mask,i],'Ground Truth')
             # Range follows truth and proposed; drifting curves remain visible without controlling limits.
             proposed=next(s for s in series if s['name']=='Proposed Method')
             pm=(proposed['t']>=0)&(proposed['t']<=end); vals=np.r_[truth[mask,i],proposed[key][pm,i]]
-            pad=max(0.02,0.08*(np.nanmax(vals)-np.nanmin(vals))); aa.set_ylim(np.nanmin(vals)-pad,np.nanmax(vals)+pad)
+            # Preserve the comparable scale while showing the legacy lateral-position error.
+            if key == 'p' and i == 1:
+                legacy=next(s for s in series if s['name']=='IF+KLD (Legacy)')
+                lm=(legacy['t']>=0)&(legacy['t']<=end)
+                vals=np.r_[vals,legacy['p'][lm,i]]
+            pad=max(0.02,0.08*(np.nanmax(vals)-np.nanmin(vals))); ylim=(np.nanmin(vals)-pad,np.nanmax(vals)+pad)
             for s in series:
                 if key not in s: continue
                 sm=(s['t']>=0)&(s['t']<=end); value=s[key][sm,i]
                 if key == 'a': value=np.degrees(value)
-                aa.plot(s['t'][sm],value,lw=1.0,color=colors[s['name']],label=s['name'])
-            aa.set_ylabel(f'{label} [{unit}]')
-        ax[0].legend(ncol=2,fontsize=8); ax[-1].set_xlabel('Time [s]'); fig.suptitle(title); fig.tight_layout(); fig.savefig(FIG/filename,bbox_inches='tight'); plt.close(fig)
-    figure('p',['p_x','p_y','p_z'],gt_p,'p','m',f'fig_rugg_sim_{LABEL}_position.png','Position Comparison')
-    figure('v',['v_x','v_y','v_z'],gt_v,'v','m/s',f'fig_rugg_sim_{LABEL}_velocity.png','Velocity Comparison')
-    figure('a',['roll','pitch','yaw'],np.degrees(gt_a),'a','deg',f'fig_rugg_sim_{LABEL}_attitude.png','Attitude Comparison')
+                method='IF+KLD' if s['name']=='IF+KLD (Legacy)' else s['name']
+                plot_method(aa,s['t'][sm],value,method)
+            format_axis(aa,label,xlim=(0,end),ylim=ylim)
+        finish_figure(fig,ax); save_figure(fig,FIG/Path(filename).stem)
+    figure('p',[r'$p_x$ [m]',r'$p_y$ [m]',r'$p_z$ [m]'],gt_p,'p','m',f'fig_rugg_sim_{LABEL}_position.png','Position Comparison')
+    figure('v',[r'$v_x$ [m/s]',r'$v_y$ [m/s]',r'$v_z$ [m/s]'],gt_v,'v','m/s',f'fig_rugg_sim_{LABEL}_velocity.png','Velocity Comparison')
+    figure('a',['Roll [deg]','Pitch [deg]','Yaw [deg]'],np.degrees(gt_a),'a','deg',f'fig_rugg_sim_{LABEL}_attitude.png','Attitude Comparison')
 
 def main():
     global SOURCE, LEGACY, LABEL, LEGACY_Y_SIGN
@@ -138,6 +149,8 @@ def main():
     parser.add_argument('--legacy',type=Path,default=LEGACY)
     parser.add_argument('--label',default=LABEL,choices=('walk','wlw'))
     parser.add_argument('--legacy-y-sign',type=float,default=LEGACY_Y_SIGN,choices=(-1.0,1.0))
+    parser.add_argument('--plots-only',action='store_true')
+    parser.add_argument('--figure', choices=('all', 'p'), default='all')
     args=parser.parse_args()
     SOURCE=args.source; LEGACY=args.legacy; LABEL=args.label; LEGACY_Y_SIGN=args.legacy_y_sign
     FIG.mkdir(parents=True,exist_ok=True); t0,t1=triggers(); sc,cc=clock_map()
@@ -150,8 +163,9 @@ def main():
     lt,lp,lv=lt[(lt>=0)&(lt<=end)],lp[(lt>=0)&(lt<=end)],lv[(lt>=0)&(lt<=end)]
     lgtp,lgtv=interp(gpt,gp,lt),interp(gvt,gv,lt); n=min(500,len(lt)); lo=np.mean(lp[:n]-lgtp[:n],axis=0); le=lp-lgtp-lo; lve=lv-lgtv; pr=rmse(le);vr=rmse(lve)
     leg={'name':'IF+KLD (Legacy)','t':lt,'p':lp-lo,'v':lv,'position_rmse_xyz_m':pr.tolist(),'position_rmse_3d_m':float(np.linalg.norm(pr)),'velocity_rmse_xyz_mps':vr.tolist(),'velocity_rmse_3d_mps':float(np.linalg.norm(vr)),'samples':int(len(lt))}
-    plot(gpt,gp,gvt,gv,gat,ga,[prop,leg,imu],end)
+    plot(gpt,gp,gvt,gv,gat,ga,[prop,leg,imu],end,args.figure)
     result={'source_bag':str(SOURCE),'legacy_bag':str(LEGACY),'legacy_y_sign':LEGACY_Y_SIGN,'analysis_window_s':[0.0,float(end)],'methods':{'proposed':{k:v for k,v in prop.items() if k not in ('t','p','v','a','pe','ve')},'legacy':{k:v for k,v in leg.items() if k not in ('t','p','v')},'imu_integration':{k:v for k,v in imu.items() if k not in ('t','p','v','a','pe','ve')}}}
-    (OUT/f'5.4_rugg_simulation_{LABEL}_metrics.json').write_text(json.dumps(result,indent=2)+'\n')
+    if not args.plots_only:
+        (OUT/f'5.4_rugg_simulation_{LABEL}_metrics.json').write_text(json.dumps(result,indent=2)+'\n')
     print(json.dumps(result,indent=2))
 if __name__=='__main__': main()

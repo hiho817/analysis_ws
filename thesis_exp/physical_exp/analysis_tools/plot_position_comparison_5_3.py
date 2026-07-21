@@ -9,9 +9,11 @@ one common time interval per gait.
 
 from __future__ import annotations
 
+import argparse
 import importlib.util
 import json
 from pathlib import Path
+import sys
 
 import matplotlib
 
@@ -25,6 +27,10 @@ ROOT = Path("/home/hiho817/analysis_ws/thesis_exp/physical_exp")
 RESULT = ROOT / "results" / "5.3_flat_experiment"
 FIGURE_DIR = RESULT / "figures"
 ANALYZER = ROOT / "analysis_tools" / "analyze_imu_only_5_3.py"
+sys.path.insert(0, str(ROOT / "common"))
+from thesis_figure_style import (  # noqa: E402
+    create_three_panel, finish_figure, format_axis, plot_method, save_figure,
+)
 
 
 def load_analyzer():
@@ -95,36 +101,16 @@ def position_reference_limits(gt, proposed):
 
 def save_position_plot(gt_t, gt, imu_t, imu, proposed_t, proposed,
                        output_stem):
-    colors = {
-        "Ground Truth": "#111111",
-        "IMU Integration": "#D55E00",
-        "Proposed Method": "#0072B2",
-    }
-    fig, axes = plt.subplots(
-        3, 1, figsize=(11, 8), sharex=True, constrained_layout=True)
-    fig.suptitle("PositionComparison")
+    fig, axes = create_three_panel("Position Comparison")
     x_limits, yz_limits, scale_ratio = position_reference_limits(gt, proposed)
-    for axis, (ax, component) in enumerate(zip(axes, ("x", "y", "z"))):
-        ax.plot(gt_t, gt[:, axis], color=colors["Ground Truth"],
-                linewidth=1.2, label="Ground Truth", zorder=3)
-        ax.plot(proposed_t, proposed[:, axis],
-                color=colors["Proposed Method"], linewidth=1.0,
-                label="Proposed Method", zorder=2)
-        ax.plot(imu_t, imu[:, axis], color=colors["IMU Integration"],
-                linewidth=0.9, label="IMU Integration", zorder=1)
-        ax.set_ylim(x_limits if axis == 0 else yz_limits)
-        handles, legend_labels = ax.get_legend_handles_labels()
-        order = [legend_labels.index(name) for name in
-                 ("Ground Truth", "IMU Integration", "Proposed Method")]
-        ax.legend([handles[index] for index in order],
-                  [legend_labels[index] for index in order],
-                  frameon=True, loc="upper right", fontsize=8)
-        ax.set_ylabel(f"p{component} [m]")
-        ax.grid(True, alpha=0.35, linewidth=0.7)
-    axes[-1].set_xlabel("Time [s]")
-    for suffix in ("png", "pdf"):
-        fig.savefig(FIGURE_DIR / f"{output_stem}.{suffix}", dpi=300)
-    plt.close(fig)
+    for index, (ax, component) in enumerate(zip(axes, ("x", "y", "z"))):
+        plot_method(ax, gt_t, gt[:, index], "Ground Truth")
+        plot_method(ax, proposed_t, proposed[:, index], "Proposed Method")
+        plot_method(ax, imu_t, imu[:, index], "IMU Integration")
+        format_axis(ax, rf"$p_{{{component}}}$ [m]",
+                    ylim=x_limits if index == 0 else yz_limits)
+    finish_figure(fig, axes)
+    save_figure(fig, FIGURE_DIR / output_stem)
     return {
         "x_to_yz_span_ratio": scale_ratio,
         "x_limits_m": list(x_limits),
@@ -134,61 +120,30 @@ def save_position_plot(gt_t, gt, imu_t, imu, proposed_t, proposed,
 
 def save_velocity_plot(gt_t, gt_velocity, imu_t, imu_velocity,
                        proposed_t, proposed_velocity, output_stem):
-    colors = {
-        "Ground Truth": "#111111",
-        "IMU Integration": "#D55E00",
-        "Proposed Method": "#0072B2",
-    }
-    fig, axes = plt.subplots(
-        3, 1, figsize=(11, 8), sharex=True, constrained_layout=True)
-    fig.suptitle("Velocity Comparison")
-    for axis, (ax, component) in enumerate(zip(axes, ("x", "y", "z"))):
-        ax.plot(gt_t, gt_velocity[:, axis], color=colors["Ground Truth"],
-                linewidth=1.2, label="Ground Truth", zorder=3)
-        ax.plot(imu_t, imu_velocity[:, axis], color=colors["IMU Integration"],
-                linewidth=0.9, label="IMU Integration", zorder=1)
-        ax.plot(proposed_t, proposed_velocity[:, axis],
-                color=colors["Proposed Method"], linewidth=1.0,
-                label="Proposed Method", zorder=2)
+    fig, axes = create_three_panel("Velocity Comparison")
+    for index, (ax, component) in enumerate(zip(axes, ("x", "y", "z"))):
+        plot_method(ax, gt_t, gt_velocity[:, index], "Ground Truth")
+        plot_method(ax, proposed_t, proposed_velocity[:, index], "Proposed Method")
+        plot_method(ax, imu_t, imu_velocity[:, index], "IMU Integration")
         # IMU Integration is intentionally excluded from the visible-range
         # calculation because its unconstrained drift can dominate the plot.
-        ax.set_ylim(padded_reference_limits(
-            gt_velocity[:, axis], proposed_velocity[:, axis]))
-        ax.set_ylabel(f"v{component} [m/s]")
-        ax.grid(True, alpha=0.35, linewidth=0.7)
-        ax.legend(frameon=True, loc="upper right", fontsize=8)
-    axes[-1].set_xlabel("Time [s]")
-    for suffix in ("png", "pdf"):
-        fig.savefig(FIGURE_DIR / f"{output_stem}.{suffix}", dpi=300)
-    plt.close(fig)
+        format_axis(ax, rf"$v_{{{component}}}$ [m/s]", ylim=padded_reference_limits(
+            gt_velocity[:, index], proposed_velocity[:, index]))
+    finish_figure(fig, axes)
+    save_figure(fig, FIGURE_DIR / output_stem)
 
 
 def save_attitude_plot(gt_t, gt_rpy, imu_t, imu_rpy,
                        proposed_t, proposed_rpy, output_stem):
-    colors = {
-        "Ground Truth": "#111111",
-        "IMU Integration": "#D55E00",
-        "Proposed Method": "#0072B2",
-    }
-    fig, axes = plt.subplots(
-        3, 1, figsize=(11, 8), sharex=True, constrained_layout=True)
-    fig.suptitle("Attitude Comparison")
-    for axis, (ax, component) in enumerate(
-            zip(axes, ("roll", "pitch", "yaw"))):
-        ax.plot(gt_t, gt_rpy[:, axis], color=colors["Ground Truth"],
-                linewidth=1.2, label="Ground Truth", zorder=3)
-        ax.plot(imu_t, imu_rpy[:, axis], color=colors["IMU Integration"],
-                linewidth=0.9, label="IMU Integration", zorder=1)
-        ax.plot(proposed_t, proposed_rpy[:, axis],
-                color=colors["Proposed Method"], linewidth=1.0,
-                label="Proposed Method", zorder=2)
-        ax.set_ylabel(f"{component} [deg]")
-        ax.grid(True, alpha=0.35, linewidth=0.7)
-        ax.legend(frameon=True, loc="upper right", fontsize=8)
-    axes[-1].set_xlabel("Time [s]")
-    for suffix in ("png", "pdf"):
-        fig.savefig(FIGURE_DIR / f"{output_stem}.{suffix}", dpi=300)
-    plt.close(fig)
+    fig, axes = create_three_panel("Attitude Comparison")
+    for index, (ax, component) in enumerate(
+            zip(axes, ("Roll", "Pitch", "Yaw"))):
+        plot_method(ax, gt_t, gt_rpy[:, index], "Ground Truth")
+        plot_method(ax, proposed_t, proposed_rpy[:, index], "Proposed Method")
+        plot_method(ax, imu_t, imu_rpy[:, index], "IMU Integration")
+        format_axis(ax, f"{component} [deg]")
+    finish_figure(fig, axes)
+    save_figure(fig, FIGURE_DIR / output_stem)
 
 
 def update_report(selections):
@@ -244,6 +199,10 @@ WLW 的三軸姿態以相同的共同時間窗呈現：
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--plots-only", action="store_true",
+                        help="regenerate figures without rewriting report/selection JSON")
+    args = parser.parse_args()
     metrics = json.loads((RESULT / "imu_only_metrics.json").read_text(encoding="utf-8"))
     analyzer = load_analyzer()
     FIGURE_DIR.mkdir(parents=True, exist_ok=True)
@@ -325,9 +284,10 @@ def main():
             "position_axis_scale": position_axis_scale,
             "presentation": "three-panel position, velocity, and attitude time histories with fixed method colors; angles in deg; position and velocity limits use Ground Truth plus Proposed Method only; py and pz share zero-centred limits; px span is an integer multiple of the common Y/Z span",
         }
-    (FIGURE_DIR / "position_comparison_selection.json").write_text(
-        json.dumps(selections, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    update_report(selections)
+    if not args.plots_only:
+        (FIGURE_DIR / "position_comparison_selection.json").write_text(
+            json.dumps(selections, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        update_report(selections)
     print(json.dumps(selections, ensure_ascii=False, indent=2))
 
 

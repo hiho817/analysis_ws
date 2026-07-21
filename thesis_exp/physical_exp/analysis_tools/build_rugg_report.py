@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Build the rugged-ground Walk report from selected NEW/OLD trials."""
 from __future__ import annotations
-import importlib.util, json
+import argparse, importlib.util, json, sys
 from pathlib import Path
 from statistics import mean, stdev
 import matplotlib
@@ -15,10 +15,12 @@ EXP = ROOT / "experiments" / "RUGG_exp"
 OUT = ROOT / "results" / "5.4_rugg_experiment"
 FIG = OUT / "figures"
 REPORT = OUT / "5.4_崎嶇地實驗.md"
+sys.path.insert(0, str(ROOT / "common"))
+from thesis_figure_style import (  # noqa: E402
+    create_three_panel, finish_figure, format_axis, plot_method, save_figure,
+)
 NEW = ["RUGG_Walk_NEW_REAL_1", "RUGG_Walk_NEW_REAL_2", "RUGG_Walk_NEW_REAL_5"]
 OLD = ["RUGG_Walk_OLD_REAL_2", "RUGG_Walk_OLD_REAL_3", "RUGG_Walk_OLD_REAL_5"]
-COL = {"gt": "#222222", "imu": "#D55E00", "new": "#0072B2"}
-
 def load_analyzer():
     p = ROOT / "analysis_tools" / "analyze_imu_only_rugg.py"
     s = importlib.util.spec_from_file_location("rugg_imu", p)
@@ -68,26 +70,28 @@ def representative_plot(a):
     bp-=bp[0]-interp(vi.t_traj,vi.pos_m,np.array([base["t"][bm][0]]))[0]
     xlim,yz,ratio=pos_limits(gt,bp)
     def plot(kind, truth, bt, bv, it, iv, title, labels, stem):
-        fig,axs=plt.subplots(3,1,figsize=(11,8),sharex=True,constrained_layout=True); fig.suptitle(title)
+        fig,axs=create_three_panel(title)
         for i,ax in enumerate(axs):
-            ax.plot(gt_t,truth[:,i],c=COL["gt"],lw=1.2,label="Ground Truth")
-            ax.plot(bt,bv[:,i],c=COL["new"],lw=1,label="Proposed Method")
-            ax.plot(it,iv[:,i],c=COL["imu"],lw=.9,label="IMU Integration")
-            if kind=="p": ax.set_ylim(xlim if i==0 else yz)
-            if kind=="v": ax.set_ylim(ref_lim(truth[:,i],bv[:,i]))
-            ax.set_ylabel(f"{labels[i]} [{'m' if kind=='p' else 'm/s' if kind=='v' else 'deg'}]"); ax.grid(alpha=.3); ax.legend(fontsize=8,loc="upper right")
-        axs[-1].set_xlabel("Time [s]")
-        for ext in ("png","pdf"): fig.savefig(FIG/f"{stem}.{ext}",dpi=300)
-        plt.close(fig)
-    plot("p",gt,base["t"][bm],bp,imu["plot_t"][im],ip,"PositionComparison",["px","py","pz"],"fig_rugg_position_walk")
+            plot_method(ax,gt_t,truth[:,i],"Ground Truth")
+            plot_method(ax,bt,bv[:,i],"Proposed Method")
+            plot_method(ax,it,iv[:,i],"IMU Integration")
+            ylim=xlim if kind=="p" and i==0 else yz if kind=="p" else ref_lim(truth[:,i],bv[:,i]) if kind=="v" else None
+            format_axis(ax,labels[i],ylim=ylim)
+        finish_figure(fig,axs); save_figure(fig,FIG/stem)
+    plot("p",gt,base["t"][bm],bp,imu["plot_t"][im],ip,"Position Comparison",[r"$p_x$ [m]",r"$p_y$ [m]",r"$p_z$ [m]"],"fig_rugg_position_walk")
     gt_v=interp(vi.t_traj,vi.v_body,gt_t); bv=np.c_[base["vx"][bm],base["vy"][bm],base["vz"][bm]]; iv=np.c_[imu["vx"][im],imu["vy"][im],imu["vz"][im]]
-    plot("v",gt_v,base["t"][bm],bv,imu["plot_t"][im],iv,"Velocity Comparison",["vx","vy","vz"],"fig_rugg_velocity_walk")
+    plot("v",gt_v,base["t"][bm],bv,imu["plot_t"][im],iv,"Velocity Comparison",[r"$v_x$ [m/s]",r"$v_y$ [m/s]",r"$v_z$ [m/s]"],"fig_rugg_velocity_walk")
     gt_a=np.degrees(interp(vi.t_traj,vi.rpy,gt_t)); ba=np.degrees(np.c_[base["roll"][bm],base["pitch"][bm],base["yaw"][bm]]); ia=np.degrees(np.c_[imu["roll"][im],imu["pitch"][im],imu["yaw"][im]])
-    plot("a",gt_a,base["t"][bm],ba,imu["plot_t"][im],ia,"Attitude Comparison",["roll","pitch","yaw"],"fig_rugg_attitude_walk")
+    plot("a",gt_a,base["t"][bm],ba,imu["plot_t"][im],ia,"Attitude Comparison",["Roll [deg]","Pitch [deg]","Yaw [deg]"],"fig_rugg_attitude_walk")
     return ratio
 
 def main():
+    parser=argparse.ArgumentParser(); parser.add_argument("--plots-only",action="store_true")
+    args=parser.parse_args()
     FIG.mkdir(parents=True,exist_ok=True); a=load_analyzer(); ratio=representative_plot(a)
+    if args.plots_only:
+        print("generated rugged Walk figures only")
+        return
     n,o=group(NEW),group(OLD,True); imu=json.loads((OUT/"imu_only_metrics.json").read_text())["group_statistics"]["WALK"]
     I=imu
     pnew=n["position"]; pold=o["position"]; vnew=n["velocity"]; vold=o["velocity"]

@@ -20,6 +20,7 @@ from corgi_msgs.msg import ImuStamped
 
 
 ROOT = Path("/home/hiho817/analysis_ws/thesis_exp/physical_exp")
+EXPERIMENTS = ROOT / "experiments" / "FLAT_exp"
 RESULT = ROOT / "results" / "5.3_flat_experiment"
 BAGS = RESULT / "imu_only_bags"
 sys.path.insert(0, str(ROOT / "common"))
@@ -212,14 +213,14 @@ def interp_columns(t_ref, matrix, t):
 def source_bag(exp_id: str):
     if exp_id == "FLAT_Walk_NEW_REAL_3":
         return Path("/home/hiho817/analysis_ws/experiments/20260528/bags/odom_fusion20260528_151411/odom_fusion20260528_151411_0.db3")
-    candidates = list((ROOT / "experiments" / exp_id / "bags").glob("*/*.db3"))
+    candidates = list((EXPERIMENTS / exp_id / "bags").glob("*/*.db3"))
     candidates = [p for p in candidates if "imu_only" not in p.parent.name]
     return max(candidates, key=lambda p: p.stat().st_size)
 
 
 def analyze(exp_id: str):
     gait = "WLW" if "_WLW_" in exp_id else "WALK"
-    exp = ROOT / "experiments" / exp_id
+    exp = EXPERIMENTS / exp_id
     csv = next((exp / "vicon").glob("*.csv"))
     baseline_json = json.loads((exp / "results" / exp_id / "metrics.json").read_text())
     vi = load_vicon(str(csv), contact_threshold_m=0.020 if gait == "WLW" else 0.015,

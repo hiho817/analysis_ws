@@ -2,10 +2,12 @@
 """Append rugged-ground WLW results to the Section 5.4 thesis report."""
 from __future__ import annotations
 
+import argparse
 import importlib.util
 import json
 from pathlib import Path
 from statistics import mean, stdev
+import sys
 
 import matplotlib
 matplotlib.use("Agg")
@@ -17,14 +19,15 @@ ROOT = Path("/home/hiho817/analysis_ws/thesis_exp/physical_exp")
 EXP = ROOT / "experiments" / "RUGG_exp"
 OUT = ROOT / "results" / "5.4_rugg_experiment"
 FIG = OUT / "figures"
+sys.path.insert(0, str(ROOT / "common"))
+from thesis_figure_style import (  # noqa: E402
+    create_three_panel, finish_figure, format_axis, plot_method, save_figure,
+)
 REPORT = OUT / "5.4_崎嶇地實驗.md"
 NEW = ["RUGG_WLW_NEW_REAL_2", "RUGG_WLW_NEW_REAL_3", "RUGG_WLW_NEW_REAL_5"]
 OLD = ["RUGG_WLW_OLD_REAL_1", "RUGG_WLW_OLD_REAL_3", "RUGG_WLW_OLD_REAL_5"]
 EXCLUDED_NEW = ["RUGG_WLW_NEW_REAL_1", "RUGG_WLW_NEW_REAL_4"]
 EXCLUDED_OLD = ["RUGG_WLW_OLD_REAL_2", "RUGG_WLW_OLD_REAL_4"]
-COL = {"gt": "#222222", "old": "#D55E00", "new": "#0072B2"}
-
-
 def load_analyzer(exp_id):
     source = EXP / exp_id / "analyze_impl.py"
     spec = importlib.util.spec_from_file_location("rugg_wlw", source)
@@ -108,33 +111,34 @@ def representative_figures():
     gt_rpy = interpolate(vi.t_traj, gt_rpy, ground_t)
 
     def plot(truth, estimated, imu_t, imu_estimated, ylabel, title, stem, unit):
-        figure, axes = plt.subplots(3, 1, figsize=(11, 8), sharex=True, constrained_layout=True)
-        figure.suptitle(title)
+        figure, axes = create_three_panel(title)
         for axis, name, index in zip(axes, ylabel, range(3)):
-            axis.plot(ground_t, truth[:, index], color=COL["gt"], lw=1.2, label="Ground Truth")
-            axis.plot(et, estimated[:, index], color=COL["new"], lw=1.0, label="Proposed Method")
-            axis.plot(imu_t, imu_estimated[:, index], color="#D55E00", lw=.9, label="IMU Integration")
-            axis.set_ylabel(f"{name} [{unit}]")
+            plot_method(axis, ground_t, truth[:, index], "Ground Truth")
+            plot_method(axis, et, estimated[:, index], "Proposed Method")
+            plot_method(axis, imu_t, imu_estimated[:, index], "IMU Integration")
             # The IMU trace is shown without allowing unbounded drift to expand the scale.
-            axis.set_ylim(limits(truth[:, index], estimated[:, index]))
-            axis.grid(alpha=.3)
-            axis.legend(loc="upper right", fontsize=8)
-        axes[-1].set_xlabel("Time [s]")
-        for extension in ("png", "pdf"):
-            figure.savefig(FIG / f"{stem}.{extension}", dpi=300)
-        plt.close(figure)
+            format_axis(axis, name, ylim=limits(truth[:, index], estimated[:, index]))
+        finish_figure(figure, axes)
+        save_figure(figure, FIG / stem)
 
     imu_pos = imu["plot_pos"]
     imu_vel = np.column_stack([imu[key] for key in ("vx", "vy", "vz")])
     imu_rpy = np.degrees(np.column_stack([imu[key] for key in ("roll", "pitch", "yaw")]))
-    plot(gt_pos, pos, imu["plot_t"], imu_pos, ("px", "py", "pz"), "WLW Position Comparison", "fig_rugg_position_wlw", "m")
-    plot(gt_vel, vel, imu["plot_t"], imu_vel, ("vx", "vy", "vz"), "WLW Velocity Comparison", "fig_rugg_velocity_wlw", "m/s")
-    plot(gt_rpy, rpy, imu["plot_t"], imu_rpy, ("roll", "pitch", "yaw"), "WLW Attitude Comparison", "fig_rugg_attitude_wlw", "deg")
+    plot(gt_pos, pos, imu["plot_t"], imu_pos, (r"$p_x$ [m]", r"$p_y$ [m]", r"$p_z$ [m]"), "Position Comparison", "fig_rugg_position_wlw", "m")
+    plot(gt_vel, vel, imu["plot_t"], imu_vel, (r"$v_x$ [m/s]", r"$v_y$ [m/s]", r"$v_z$ [m/s]"), "Velocity Comparison", "fig_rugg_velocity_wlw", "m/s")
+    plot(gt_rpy, rpy, imu["plot_t"], imu_rpy, ("Roll [deg]", "Pitch [deg]", "Yaw [deg]"), "Attitude Comparison", "fig_rugg_attitude_wlw", "deg")
     return exp_id
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--plots-only", action="store_true")
+    args = parser.parse_args()
     FIG.mkdir(parents=True, exist_ok=True)
+    if args.plots_only:
+        representative = representative_figures()
+        print(f"generated rugged WLW figures only: {representative}")
+        return
     new, old = aggregate(NEW, attitude=True), aggregate(OLD)
     imu_payload = json.loads((OUT / "imu_only_metrics.json").read_text())
     imu = imu_payload["group_statistics"]["WLW"]

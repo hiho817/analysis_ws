@@ -2,6 +2,7 @@
 """Create a WLW-style contact illustration for the walk_openloop simulation."""
 from pathlib import Path
 import sqlite3
+import sys
 
 import matplotlib
 matplotlib.use("Agg")
@@ -15,12 +16,15 @@ from corgi_msgs.msg import GMOContactStateStamped, SimLegContactStamped, Trigger
 
 ROOT = Path("/home/hiho817/analysis_ws/thesis_exp/simulation/FLAT_WLW_NEW_SIM")
 DB = ROOT / "FLAT_WLW_NEW_SIM_0.db3"
-OUT = ROOT / "results" / "FLAT_WLW_NEW_SIM.pdf"
+STYLE_DIR = ROOT.parents[1] / "physical_exp" / "common"
+OUTPUT_DIR = ROOT.parents[1] / "physical_exp" / "results" / "5.2_contact_state_experiment" / "figures"
+sys.path.insert(0, str(STYLE_DIR))
+from thesis_figure_style import (  # noqa: E402
+    CONTACT_COLORS, LINE_WIDTH, create_contact_figure, finish_contact_figure,
+    format_contact_axis, save_figure,
+)
 LEG = "LF"
 MODULE = "module_a"
-
-plt.rcParams.update({"font.size": 10, "axes.labelsize": 10,
-                     "xtick.labelsize": 9, "ytick.labelsize": 9})
 
 
 def sec(stamp):
@@ -91,54 +95,46 @@ def main():
     recall = tp / (tp + fn) if tp + fn else float("nan")
     f1 = 2 * tp / (2 * tp + fp + fn) if 2 * tp + fp + fn else float("nan")
     print(f"{LEG}: precision={precision:.4f}, recall={recall:.4f}, F1={f1:.4f}")
-    contact_color, swing_color = "#dbe6f5", "#f7ead7"
-    good_color, bad_color = "#4daf4a", "#e52b25"
-
-    fig, axes = plt.subplots(4, 1, figsize=(14, 8), sharex=True,
-                             gridspec_kw={"height_ratios": [2.2, 2.2, 1.45, .3]})
-
-    axes[0].plot(t, np.abs(rm), color="#1f77b4", lw=.75, zorder=2)
-    axes[0].axhline(rm_high, color="#333333", ls="--", lw=1.0)
-    axes[0].axhline(rm_low, color="#333333", ls=":", lw=1.3)
-    axes[0].set_ylabel(r"$\sigma_{R_m}\;[\mathrm{N}]$")
-    axes[0].set_ylim(0, max(40, np.percentile(np.abs(rm), 99.8) * 1.05))
-
-    axes[1].plot(t, np.abs(beta), color="#222222", lw=.75, zorder=2)
-    axes[1].axhline(beta_high, color="#333333", ls="--", lw=1.0)
-    axes[1].axhline(beta_low, color="#333333", ls=":", lw=1.3)
-    axes[1].set_ylabel(r"$\sigma_\beta\;[\mathrm{N,m}]$")
-    axes[1].set_ylim(0, 6.0)
-
+    fig, axes = create_contact_figure("Contact-State Detection (WLW, Simulation)")
+    rm_abs, beta_abs = np.abs(rm), np.abs(beta)
+    axes[0].plot(t, rm_abs, color=CONTACT_COLORS["sigma_rm"], lw=LINE_WIDTH, zorder=2)
+    axes[0].axhline(rm_high, color=CONTACT_COLORS["threshold"], ls="--", lw=LINE_WIDTH)
+    axes[0].axhline(rm_low, color=CONTACT_COLORS["threshold"], ls=":", lw=LINE_WIDTH)
+    format_contact_axis(axes[0], r"$\sigma_{R_m}$ [N]", (0, max(40, np.percentile(rm_abs, 99.8) * 1.05)))
+    axes[1].plot(t, beta_abs, color=CONTACT_COLORS["sigma_beta"], lw=LINE_WIDTH, zorder=2)
+    axes[1].axhline(beta_high, color=CONTACT_COLORS["threshold"], ls="--", lw=LINE_WIDTH)
+    axes[1].axhline(beta_low, color=CONTACT_COLORS["threshold"], ls=":", lw=LINE_WIDTH)
+    format_contact_axis(axes[1], r"$\sigma_\beta$ [N m]", (0, 6.0))
     axes[2].set_yticks([])
-    axes[2].set_ylabel("Ground Truth")
-    axes[2].set_ylim(-.15, 1.15)
+    format_contact_axis(axes[2], "Simulation Ground Truth", (-.15, 1.15))
 
     # Add GT contact/swing bands after each axis' data limits are fixed, so the
     # background occupies the whole subplot without affecting autoscaling.
     for ax in axes[:3]:
         y0, y1 = ax.get_ylim()
-        ax.fill_between(t, y0, y1, where=gt, step="post", color=contact_color, zorder=0)
-        ax.fill_between(t, y0, y1, where=~gt, step="post", color=swing_color, zorder=0)
-        ax.grid(True, alpha=.32, zorder=1)
+        ax.fill_between(t, y0, y1, where=gt, step="post", color=CONTACT_COLORS["contact"], zorder=0)
+        ax.fill_between(t, y0, y1, where=~gt, step="post", color=CONTACT_COLORS["swing"], zorder=0)
 
-    rgb = np.where(correct[:, None], np.array([77, 175, 74]), np.array([229, 43, 37])).astype(np.uint8)
+    rgb = np.where(correct[:, None], np.array([0, 158, 115]), np.array([213, 94, 0])).astype(np.uint8)
     axes[3].imshow(rgb[None, :, :], aspect="auto", interpolation="nearest", extent=[t[0], t[-1], 0, 1])
     axes[3].set_yticks([]); axes[3].set_ylabel(LEG)
-    axes[3].set_xlabel("Time [s]")
 
     handles = [
-        Line2D([], [], color="#333", ls="--", label="high threshold"),
-        Line2D([], [], color="#333", ls=":", label="low threshold"),
-        Line2D([], [], color="#1f77b4", label=r"$\sigma_{R_m}\;[\mathrm{N}]$"),
-        Line2D([], [], color="#222", label=r"$\sigma_\beta\;[\mathrm{N,m}]$"),
-        Patch(facecolor=contact_color, label="GT contact"), Patch(facecolor=swing_color, label="GT swing"),
-        Patch(facecolor=good_color, label="correct"), Patch(facecolor=bad_color, label="incorrect"),
+        Line2D([], [], color=CONTACT_COLORS["sigma_rm"], lw=LINE_WIDTH, label=r"$\sigma_{R_m}$"),
+        Line2D([], [], color=CONTACT_COLORS["sigma_beta"], lw=LINE_WIDTH, label=r"$\sigma_\beta$"),
+        Line2D([], [], color=CONTACT_COLORS["threshold"], ls="--", lw=LINE_WIDTH, label="high threshold"),
+        Line2D([], [], color=CONTACT_COLORS["threshold"], ls=":", lw=LINE_WIDTH, label="low threshold"),
+        Patch(facecolor=CONTACT_COLORS["contact"], label="GT contact"),
+        Patch(facecolor=CONTACT_COLORS["swing"], label="GT swing"),
+        Patch(facecolor=CONTACT_COLORS["correct"], label="correct"),
+        Patch(facecolor=CONTACT_COLORS["incorrect"], label="incorrect"),
     ]
-    fig.legend(handles=handles, loc="upper center", ncol=4, frameon=False,
-               fontsize=9, bbox_to_anchor=(.5, 1.01))
-    fig.subplots_adjust(top=.86, hspace=.16, left=.09, right=.99, bottom=.08)
-    fig.savefig(OUT, bbox_inches="tight")
-    print(OUT)
+    finish_contact_figure(fig, axes, handles)
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    out = OUTPUT_DIR / "fig_contact_wlw_sim"
+    save_figure(fig, out)
+    print(out.with_suffix(".pdf"))
+    print(out.with_suffix(".png"))
 
 
 if __name__ == "__main__":

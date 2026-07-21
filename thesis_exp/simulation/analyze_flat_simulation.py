@@ -3,9 +3,11 @@
 
 from __future__ import annotations
 
+import argparse
 import json
 from pathlib import Path
 import sqlite3
+import sys
 
 import matplotlib
 matplotlib.use("Agg")
@@ -27,6 +29,10 @@ FIG = REPORT_DIR / "figures"
 REPORT = REPORT_DIR / "5.3_平地實驗_模擬.md"
 SUMMARY_JSON = REPORT_DIR / "5.3_flat_simulation_metrics.json"
 LEGACY_ROOT = Path("/home/hiho817/corgi_ws/corgi_ros2_ws/bag/thesis_if_kld_sim")
+sys.path.insert(0, str(ROOT / "physical_exp" / "common"))
+from thesis_figure_style import (  # noqa: E402
+    create_three_panel, finish_figure, format_axis, plot_method, save_figure,
+)
 
 CASES = {
     "Walk": {
@@ -47,10 +53,6 @@ CASES = {
         "slug": "wlw",
     },
 }
-
-COLORS = {"gt": "#222222", "imu": "#D55E00", "proposed": "#0072B2",
-          "legacy": "#009E73"}
-
 
 def stamp(s):
     return s.sec + s.nanosec * 1e-9
@@ -276,33 +278,29 @@ def plot_case(label, slug, start, end, gt_pos, gt_bv, gt_tf, proposed, imu,
 
     def make(kind, title, ylabel, truth, pvalue, ivalue, filename,
              legacy=None, legacy_t=None):
-        fig, axes = plt.subplots(3, 1, figsize=(11, 8), sharex=True)
-        axes[0].set_title(title)
+        fig, axes = create_three_panel(title)
         labels = ("x", "y", "z") if kind != "attitude" else ("roll", "pitch", "yaw")
         if kind == "position":
             x_limits, yz_limits, scale_ratio = position_reference_limits(truth, pvalue)
         else:
             scale_ratio = None
         for axis, name, i in zip(axes, labels, range(3)):
-            axis.plot(gt_t, truth[:, i], color=COLORS["gt"], lw=1.8, label="Ground Truth")
-            axis.plot(proposed["t"], pvalue[:, i], color=COLORS["proposed"], lw=1.2, label="Proposed Method")
+            plot_method(axis, gt_t, truth[:, i], "Ground Truth")
+            plot_method(axis, proposed["t"], pvalue[:, i], "Proposed Method")
             if legacy is not None:
-                axis.plot(legacy_t, legacy[:, i], color=COLORS["legacy"], lw=1.1,
-                          label="IF+KLD")
-            axis.plot(imu["t"], ivalue[:, i], color=COLORS["imu"], lw=1.0, label="IMU Integration")
+                plot_method(axis, legacy_t, legacy[:, i], "IF+KLD")
+            plot_method(axis, imu["t"], ivalue[:, i], "IMU Integration")
             if kind == "position":
-                axis.set_ylim(x_limits if i == 0 else yz_limits)
+                ylim = x_limits if i == 0 else yz_limits
             elif kind == "velocity":
-                axis.set_ylim(padded_reference_limits(truth[:, i], pvalue[:, i]))
-            axis.set_ylabel(ylabel.format(name=name))
-            axis.grid(alpha=.25)
-            axis.set_xlim(start, end)
-        axes[0].legend(ncol=4 if legacy is not None else 3, loc="best")
-        axes[-1].set_xlabel("Time [s]")
-        fig.tight_layout()
-        fig.savefig(FIG / filename, dpi=300)
-        fig.savefig(FIG / filename.replace(".png", ".pdf"))
-        plt.close(fig)
+                ylim = padded_reference_limits(truth[:, i], pvalue[:, i])
+            else:
+                ylim = None
+            display_name = name.capitalize() if kind == "attitude" else name
+            format_axis(axis, ylabel.format(name=display_name),
+                        xlim=(start, end), ylim=ylim)
+        finish_figure(fig, axes)
+        save_figure(fig, FIG / Path(filename).stem)
         return scale_ratio
 
     # Plot-only height-origin adjustment.  Apply the same translation to all
@@ -318,10 +316,10 @@ def plot_case(label, slug, start, end, gt_pos, gt_bv, gt_tf, proposed, imu,
                          + np.asarray(pm["position_offset_m"])
                          + position_plot_offset)
     scale_ratio = make(
-        "position", "PositionComparison", "p{name} [m]", gt_p_for_plot,
+        "position", "Position Comparison", "$p_{{{name}}}$ [m]", gt_p_for_plot,
         proposed_p_for_plot, imu_p_for_plot,
         f"fig_sim_{slug}_position.png", legacy_p_for_plot, legacy_p["t"])
-    make("velocity", "Velocity Comparison", "v{name} [m/s]", gt_v,
+    make("velocity", "Velocity Comparison", "$v_{{{name}}}$ [m/s]", gt_v,
          proposed["v"], imu["v"], f"fig_sim_{slug}_velocity.png",
          legacy_v["x"], legacy_v["t"])
     proposed_rpy_for_plot = rpy_deg(proposed["q"])
@@ -459,10 +457,14 @@ def write_report(results):
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--plots-only", action="store_true")
+    args = parser.parse_args()
     FIG.mkdir(parents=True, exist_ok=True)
     results = {label: analyze_case(label, cfg) for label, cfg in CASES.items()}
-    SUMMARY_JSON.write_text(json.dumps(results, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    write_report(results)
+    if not args.plots_only:
+        SUMMARY_JSON.write_text(json.dumps(results, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        write_report(results)
     print(json.dumps({g: {"proposed_p3d": r["proposed_method"]["position_rmse_3d_m"],
                                "if_kld_p3d": r["if_kld_legacy"]["position_rmse_3d_m"],
                                "if_kld_v3d": r["if_kld_legacy"]["velocity_rmse_3d_mps"],

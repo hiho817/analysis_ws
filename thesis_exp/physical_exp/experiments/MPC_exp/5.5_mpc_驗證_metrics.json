@@ -244,7 +244,7 @@
   "open_loop_endpoint": [
     {
       "trial": "RUGG_Walk_NEW_REAL_1",
-      "label": "Open-loop RUGG",
+      "label": "Open-loop Rugged",
       "final_x_m": 2.452957516331639,
       "final_y_m": -0.7022746440279604,
       "abs_final_y_cm": 70.22746440279603,
@@ -252,7 +252,7 @@
     },
     {
       "trial": "RUGG_Walk_NEW_REAL_2",
-      "label": "Open-loop RUGG",
+      "label": "Open-loop Rugged",
       "final_x_m": 2.477812173253756,
       "final_y_m": -0.7725834622808204,
       "abs_final_y_cm": 77.25834622808205,
@@ -260,7 +260,7 @@
     },
     {
       "trial": "RUGG_Walk_NEW_REAL_5",
-      "label": "Open-loop RUGG",
+      "label": "Open-loop Rugged",
       "final_x_m": 2.4889153202427474,
       "final_y_m": -0.602078395995801,
       "abs_final_y_cm": 60.207839599580105,
