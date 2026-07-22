@@ -76,8 +76,8 @@ def representative_plot(a):
             plot_method(ax,bt,bv[:,i],"Proposed Method")
             plot_method(ax,it,iv[:,i],"IMU Integration")
             ylim=xlim if kind=="p" and i==0 else yz if kind=="p" else ref_lim(truth[:,i],bv[:,i]) if kind=="v" else None
-            format_axis(ax,labels[i],ylim=ylim)
-        finish_figure(fig,axs); save_figure(fig,FIG/stem)
+            format_axis(ax,labels[i],ylim=ylim,contact_font_sizes=True)
+        finish_figure(fig,axs,contact_font_sizes=True); save_figure(fig,FIG/stem)
     plot("p",gt,base["t"][bm],bp,imu["plot_t"][im],ip,"Position Comparison",[r"$p_x$ [m]",r"$p_y$ [m]",r"$p_z$ [m]"],"fig_rugg_position_walk")
     gt_v=interp(vi.t_traj,vi.v_body,gt_t); bv=np.c_[base["vx"][bm],base["vy"][bm],base["vz"][bm]]; iv=np.c_[imu["vx"][im],imu["vy"][im],imu["vz"][im]]
     plot("v",gt_v,base["t"][bm],bv,imu["plot_t"][im],iv,"Velocity Comparison",[r"$v_x$ [m/s]",r"$v_y$ [m/s]",r"$v_z$ [m/s]"],"fig_rugg_velocity_walk")

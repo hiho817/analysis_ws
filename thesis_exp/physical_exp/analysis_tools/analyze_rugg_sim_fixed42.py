@@ -136,8 +136,8 @@ def plot(gt_t,gt_p,gt_v_t,gt_v,gt_a_t,gt_a, series, end, figure_kind='all'):
                 if key == 'a': value=np.degrees(value)
                 method='IF+KLD' if s['name']=='IF+KLD (Legacy)' else s['name']
                 plot_method(aa,s['t'][sm],value,method)
-            format_axis(aa,label,xlim=(0,end),ylim=ylim)
-        finish_figure(fig,ax); save_figure(fig,FIG/Path(filename).stem)
+            format_axis(aa,label,xlim=(0,end),ylim=ylim,contact_font_sizes=True)
+        finish_figure(fig,ax,contact_font_sizes=True); save_figure(fig,FIG/Path(filename).stem)
     figure('p',[r'$p_x$ [m]',r'$p_y$ [m]',r'$p_z$ [m]'],gt_p,'p','m',f'fig_rugg_sim_{LABEL}_position.png','Position Comparison')
     figure('v',[r'$v_x$ [m/s]',r'$v_y$ [m/s]',r'$v_z$ [m/s]'],gt_v,'v','m/s',f'fig_rugg_sim_{LABEL}_velocity.png','Velocity Comparison')
     figure('a',['Roll [deg]','Pitch [deg]','Yaw [deg]'],np.degrees(gt_a),'a','deg',f'fig_rugg_sim_{LABEL}_attitude.png','Attitude Comparison')

@@ -117,8 +117,9 @@ def representative_figures():
             plot_method(axis, et, estimated[:, index], "Proposed Method")
             plot_method(axis, imu_t, imu_estimated[:, index], "IMU Integration")
             # The IMU trace is shown without allowing unbounded drift to expand the scale.
-            format_axis(axis, name, ylim=limits(truth[:, index], estimated[:, index]))
-        finish_figure(figure, axes)
+            format_axis(axis, name, ylim=limits(truth[:, index], estimated[:, index]),
+                        contact_font_sizes=True)
+        finish_figure(figure, axes, contact_font_sizes=True)
         save_figure(figure, FIG / stem)
 
     imu_pos = imu["plot_pos"]

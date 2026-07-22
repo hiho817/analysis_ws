@@ -95,7 +95,7 @@ def main():
     recall = tp / (tp + fn) if tp + fn else float("nan")
     f1 = 2 * tp / (2 * tp + fp + fn) if 2 * tp + fp + fn else float("nan")
     print(f"{LEG}: precision={precision:.4f}, recall={recall:.4f}, F1={f1:.4f}")
-    fig, axes = create_contact_figure("Contact-State Detection (Walk, Simulation)")
+    fig, axes = create_contact_figure()
     rm_abs, beta_abs = np.abs(rm), np.abs(beta)
     axes[0].plot(t, rm_abs, color=CONTACT_COLORS["sigma_rm"], lw=LINE_WIDTH, zorder=2)
     axes[0].axhline(rm_high, color=CONTACT_COLORS["threshold"], ls="--", lw=LINE_WIDTH)
@@ -106,7 +106,7 @@ def main():
     axes[1].axhline(beta_low, color=CONTACT_COLORS["threshold"], ls=":", lw=LINE_WIDTH)
     format_contact_axis(axes[1], r"$\sigma_\beta$ [N m]", (0, 6.0))
     axes[2].set_yticks([])
-    format_contact_axis(axes[2], "Simulation Ground Truth", (-.15, 1.15))
+    format_contact_axis(axes[2], "GT", (-.15, 1.15))
 
     # Add GT contact/swing bands after each axis' data limits are fixed, so the
     # background occupies the whole subplot without affecting autoscaling.

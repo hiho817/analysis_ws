@@ -29,14 +29,12 @@ TRIALS = {
         "csv": "FLAT_WALK_NEW_REAL_1.csv", "height_mm": 15,
         "rm": (35., 25.), "beta": (4., .5),
         "stem": "fig_contact_walk_real",
-        "title": "Contact-State Detection (Walk, Experiment)",
     },
     "FLAT_WLW_NEW_REAL_4": {
         "bag": "odom_fusion20260528_161450_replay",
         "csv": "FLAT_WLW_NEW_REAL_4.csv", "height_mm": 20,
         "rm": (50., 25.), "beta": (3., 1.5),
         "stem": "fig_contact_wlw_real",
-        "title": "Contact-State Detection (WLW, Experiment)",
     },
 }
 
@@ -80,7 +78,7 @@ def make(exp_id):
     gt = foot_mm < cfg["height_mm"]
     detected = schmitt(rm, beta, rm_high, rm_low, beta_high, beta_low)
     correct = gt == detected
-    fig, axes = create_contact_figure(cfg["title"])
+    fig, axes = create_contact_figure()
     rm_ylim = (0, max(40, np.nanpercentile(rm, 99.8) * 1.05))
     beta_ylim = (0, max(beta_high * 1.25, np.nanpercentile(beta, 99.8) * 1.05))
     height_ylim = (0, max(cfg["height_mm"] * 1.5, np.nanpercentile(foot_mm, 99.8) * 1.05))
@@ -113,8 +111,8 @@ def make(exp_id):
         Line2D([], [], color=CONTACT_COLORS["threshold"], ls=":", lw=LINE_WIDTH, label="low threshold"),
         Line2D([], [], color=CONTACT_COLORS["g_height"], lw=LINE_WIDTH, label="G Point height"),
         Line2D([], [], color=CONTACT_COLORS["g_height"], ls="--", lw=LINE_WIDTH, label=f"height threshold ({cfg['height_mm']} mm)"),
-        Patch(facecolor=CONTACT_COLORS["contact"], label="contact"),
-        Patch(facecolor=CONTACT_COLORS["swing"], label="swing"),
+        Patch(facecolor=CONTACT_COLORS["contact"], label="GT contact"),
+        Patch(facecolor=CONTACT_COLORS["swing"], label="GT swing"),
         Patch(facecolor=CONTACT_COLORS["correct"], label="correct"),
         Patch(facecolor=CONTACT_COLORS["incorrect"], label="incorrect"),
     ]

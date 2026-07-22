@@ -18,6 +18,13 @@ import numpy as np
 TARGET_X_M = 3.0
 
 
+def format_mpc_axis(axis):
+    """Apply the enlarged Section 5.2--5.4 thesis typography."""
+    axis.xaxis.label.set_size(CONTACT_FONT_SIZE_AXIS_LABEL)
+    axis.yaxis.label.set_size(CONTACT_FONT_SIZE_AXIS_LABEL)
+    axis.tick_params(axis="both", which="both", labelsize=CONTACT_FONT_SIZE_TICK_LABEL)
+
+
 def mean_std(values):
     values = np.asarray(values, dtype=float)
     values = values[np.isfinite(values)]
@@ -120,10 +127,10 @@ def save_mpc_figure(figure, output):
 
 def endpoint_plot(rows, output):
     groups = [
-        ("Flat Proposed Method", group_rows(rows, "Flat", "ESEKF")),
-        ("Flat IF+KLD", group_rows(rows, "Flat", "Legacy")),
-        ("Rugged Proposed Method", group_rows(rows, "Obstacle", "ESEKF")),
-        ("Rugged IF+KLD", group_rows(rows, "Obstacle", "Legacy")),
+        ("Flat\nProposed Method", group_rows(rows, "Flat", "ESEKF")),
+        ("Flat\nIF+KLD", group_rows(rows, "Flat", "Legacy")),
+        ("Rugged\nProposed Method", group_rows(rows, "Obstacle", "ESEKF")),
+        ("Rugged\nIF+KLD", group_rows(rows, "Obstacle", "Legacy")),
     ]
     configure_style()
     fig, axis = plt.subplots(figsize=FIGSIZE)
@@ -139,9 +146,10 @@ def endpoint_plot(rows, output):
                       fmt="D", color="black", capsize=4, markersize=5)
     axis.axhline(TARGET_X_M, color="black", linestyle="--", linewidth=1, label="3.0 m target")
     axis.set_ylabel("Final VICON X [m]")
-    axis.legend(frameon=False)
-    axis.set_xticks(range(len(groups)), [label for label, _ in groups], rotation=18, ha="right")
+    axis.legend(frameon=False, fontsize=CONTACT_FONT_SIZE_LEGEND)
+    axis.set_xticks(range(len(groups)), [label for label, _ in groups], rotation=0, ha="center")
     axis.grid(True, axis="y", alpha=0.25)
+    format_mpc_axis(axis)
     save_mpc_figure(fig, output)
 
 
@@ -168,33 +176,44 @@ def stability_plot(closed, opened, output, closed_label, opened_label):
             axis.scatter(index + jitter, values, color="black", s=18, zorder=3)
         axis.set_ylabel(ylabel)
         axis.grid(True, axis="y", alpha=0.25)
+        format_mpc_axis(axis)
     save_mpc_figure(fig, output)
 
 
 def estimation_plot(metrics, output):
     groups = [
-        ("Flat Proposed Method", [m for m in metrics if m["group"] == "NEW_MPC"]),
-        ("Flat IF+KLD", [m for m in metrics if m["group"] == "OLD_MPC"]),
-        ("Rugged Proposed Method", [m for m in metrics if m["group"] == "NEW_OBS_MPC_GMO"]),
-        ("Rugged IF+KLD", [m for m in metrics if m["group"] == "OLD_OBS_MPC"]),
+        ("Flat\nProposed Method", [m for m in metrics if m["group"] == "NEW_MPC"]),
+        ("Flat\nIF+KLD", [m for m in metrics if m["group"] == "OLD_MPC"]),
+        ("Rugged\nProposed Method", [m for m in metrics if m["group"] == "NEW_OBS_MPC_GMO"]),
+        ("Rugged\nIF+KLD", [m for m in metrics if m["group"] == "OLD_OBS_MPC"]),
     ]
     values = [[m["position"]["RMSE_3D_cm"] for m in group] for _, group in groups]
     labels = [label for label, _ in groups]
     configure_style()
     fig, axis = plt.subplots(figsize=FIGSIZE)
     fig.suptitle("Trajectory Estimation Error", y=0.975)
-    bars = axis.bar(np.arange(4), [np.mean(v) for v in values],
-                    yerr=[np.std(v, ddof=1) for v in values], capsize=5,
+    means = np.asarray([np.mean(value) for value in values])
+    spreads = np.asarray([np.std(value, ddof=1) for value in values])
+    bars = axis.bar(np.arange(4), means,
+                    yerr=spreads, capsize=5,
                     color=["#0072B2", "#E69F00", "#0072B2", "#E69F00"])
     for index, row in enumerate(values):
         axis.scatter(np.full(len(row), index) + np.linspace(-0.08, 0.08, len(row)),
                      row, color="black", s=18, zorder=3)
-    axis.set_xticks(np.arange(4), labels, rotation=18, ha="right")
+    axis.set_xticks(np.arange(4), labels, rotation=0, ha="center")
     axis.set_ylabel("Trajectory position 3D RMSE [cm]")
     axis.grid(True, axis="y", alpha=0.25)
-    for bar in bars:
-        axis.text(bar.get_x() + bar.get_width() / 2, bar.get_height(),
-                  f"{bar.get_height():.1f}", ha="center", va="bottom", fontsize=9)
+    for bar, mean in zip(bars, means):
+        axis.text(
+            bar.get_x() + bar.get_width() * 0.08, mean * 0.78,
+            f"Mean = {mean:.1f}",
+            ha="left", va="top", fontsize=CONTACT_FONT_SIZE_TICK_LABEL,
+            bbox={"facecolor": "white", "edgecolor": "none", "alpha": 0.88,
+                  "pad": 1.0},
+        )
+    upper = max(max(map(max, values)), float(np.max(means + spreads)))
+    axis.set_ylim(0, upper * 1.14)
+    format_mpc_axis(axis)
     save_mpc_figure(fig, output)
 
 
@@ -217,7 +236,8 @@ def consistency_lateral_plot(endpoint_rows, rugg_rows, closed_stability, output)
     axes[0].set_ylabel("Endpoint repeatability: SD(final X) [cm]")
     axes[0].grid(True, axis="y", alpha=0.25)
     for index, value in enumerate(repeatability):
-        axes[0].text(index, value, f"{value:.1f}", ha="center", va="bottom", fontsize=9)
+        axes[0].text(index, value, f"{value:.1f}", ha="center", va="bottom",
+                     fontsize=CONTACT_FONT_SIZE_TICK_LABEL)
 
     selected_closed = {row["trial"] for row in closed_stability}
     lateral_groups = [
@@ -235,6 +255,8 @@ def consistency_lateral_plot(endpoint_rows, rugg_rows, closed_stability, output)
     axes[1].set_xticks([0, 1], [label for label, _ in lateral_groups])
     axes[1].set_ylabel("Normalized lateral offset |Y| / |X| [%]")
     axes[1].grid(True, axis="y", alpha=0.25)
+    for axis in axes:
+        format_mpc_axis(axis)
     save_mpc_figure(fig, output)
 
 
@@ -414,6 +436,8 @@ def report_text(endpoint_rows, rugg_rows, metrics, closed, opened,
 
 def main():
     global FIGSIZE, configure_style, save_figure
+    global CONTACT_FONT_SIZE_AXIS_LABEL, CONTACT_FONT_SIZE_TICK_LABEL
+    global CONTACT_FONT_SIZE_LEGEND
     parser = argparse.ArgumentParser()
     parser.add_argument("experiment_root", type=Path)
     parser.add_argument("--output", type=Path, required=True)
@@ -434,7 +458,14 @@ def main():
     common = root.parent / "common"
     sys.path.insert(0, str(common))
     from corgi_analysis.vicon_loader import load_vicon
-    from thesis_figure_style import FIGSIZE, configure_style, save_figure
+    from thesis_figure_style import (
+        CONTACT_FONT_SIZE_AXIS_LABEL,
+        CONTACT_FONT_SIZE_LEGEND,
+        CONTACT_FONT_SIZE_TICK_LABEL,
+        FIGSIZE,
+        configure_style,
+        save_figure,
+    )
 
     flat_new = [load_metric(mpc_root / f"FLAT_MPC_NEW_REAL_{i}") for i in range(1, 6)]
     flat_old = [load_metric(mpc_root / f"FLAT_MPC_OLD_REAL_{i}") for i in range(1, 6)]

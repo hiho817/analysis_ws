@@ -108,8 +108,9 @@ def save_position_plot(gt_t, gt, imu_t, imu, proposed_t, proposed,
         plot_method(ax, proposed_t, proposed[:, index], "Proposed Method")
         plot_method(ax, imu_t, imu[:, index], "IMU Integration")
         format_axis(ax, rf"$p_{{{component}}}$ [m]",
-                    ylim=x_limits if index == 0 else yz_limits)
-    finish_figure(fig, axes)
+                    ylim=x_limits if index == 0 else yz_limits,
+                    contact_font_sizes=True)
+    finish_figure(fig, axes, contact_font_sizes=True)
     save_figure(fig, FIGURE_DIR / output_stem)
     return {
         "x_to_yz_span_ratio": scale_ratio,
@@ -128,8 +129,9 @@ def save_velocity_plot(gt_t, gt_velocity, imu_t, imu_velocity,
         # IMU Integration is intentionally excluded from the visible-range
         # calculation because its unconstrained drift can dominate the plot.
         format_axis(ax, rf"$v_{{{component}}}$ [m/s]", ylim=padded_reference_limits(
-            gt_velocity[:, index], proposed_velocity[:, index]))
-    finish_figure(fig, axes)
+            gt_velocity[:, index], proposed_velocity[:, index]),
+            contact_font_sizes=True)
+    finish_figure(fig, axes, contact_font_sizes=True)
     save_figure(fig, FIGURE_DIR / output_stem)
 
 
@@ -141,8 +143,8 @@ def save_attitude_plot(gt_t, gt_rpy, imu_t, imu_rpy,
         plot_method(ax, gt_t, gt_rpy[:, index], "Ground Truth")
         plot_method(ax, proposed_t, proposed_rpy[:, index], "Proposed Method")
         plot_method(ax, imu_t, imu_rpy[:, index], "IMU Integration")
-        format_axis(ax, f"{component} [deg]")
-    finish_figure(fig, axes)
+        format_axis(ax, f"{component} [deg]", contact_font_sizes=True)
+    finish_figure(fig, axes, contact_font_sizes=True)
     save_figure(fig, FIGURE_DIR / output_stem)
 
 

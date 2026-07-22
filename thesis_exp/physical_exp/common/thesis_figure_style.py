@@ -37,10 +37,13 @@ CONTACT_SUBPLOTS_ADJUST = {
     "left": 0.13,
     "right": 0.97,
     "bottom": 0.10,
-    "top": 0.80,
+    "top": 0.84,
     "hspace": 0.24,
 }
-CONTACT_LEGEND_BBOX = (0.13, 0.835, 0.84, 0.055)
+CONTACT_LEGEND_BBOX = (0.13, 0.885, 0.84, 0.065)
+CONTACT_FONT_SIZE_AXIS_LABEL = 14
+CONTACT_FONT_SIZE_TICK_LABEL = 10.5
+CONTACT_FONT_SIZE_LEGEND = 10.5
 CONTACT_COLORS = {
     "sigma_rm": "#0072B2",
     "sigma_beta": "#E69F00",
@@ -54,16 +57,20 @@ CONTACT_COLORS = {
 
 METHOD_STYLES = OrderedDict([
     ("Ground Truth", {
-        "color": "#000000", "linestyle": "-", "zorder": 4,
+        "color": "#000000", "linestyle": (0, (4, 3)), "linewidth": 1.0,
+        "alpha": 0.65, "zorder": 5,
     }),
     ("Proposed Method", {
-        "color": "#0072B2", "linestyle": "-", "zorder": 3,
+        "color": "#0072B2", "linestyle": "-", "linewidth": 1.2,
+        "zorder": 4,
     }),
     ("IF+KLD", {
-        "color": "#E69F00", "linestyle": "--", "zorder": 2,
+        "color": "#E69F00", "linestyle": "--", "linewidth": 1.2,
+        "zorder": 3,
     }),
     ("IMU Integration", {
-        "color": "#D55E00", "linestyle": "-.", "zorder": 1,
+        "color": "#D55E00", "linestyle": "-.", "linewidth": 1.2,
+        "zorder": 2,
     }),
 ])
 TIMES_FONT_DIR = Path("/home/hiho817/.local/share/fonts/times-new-roman")
@@ -108,14 +115,21 @@ def create_three_panel(title: str):
 def plot_method(axis, time, values, method: str):
     style = METHOD_STYLES[method]
     return axis.plot(
-        time, values, label=method, linewidth=LINE_WIDTH, alpha=1.0,
+        time, values, label=method,
+        linewidth=style.get("linewidth", LINE_WIDTH),
+        alpha=style.get("alpha", 1.0),
         color=style["color"], linestyle=style["linestyle"],
         zorder=style["zorder"],
     )[0]
 
 
-def format_axis(axis, ylabel: str, xlim=None, ylim=None) -> None:
-    axis.set_ylabel(ylabel, fontsize=FONT_SIZE_AXIS_LABEL)
+def format_axis(axis, ylabel: str, xlim=None, ylim=None,
+                contact_font_sizes: bool = False) -> None:
+    axis_label_size = (CONTACT_FONT_SIZE_AXIS_LABEL if contact_font_sizes
+                       else FONT_SIZE_AXIS_LABEL)
+    tick_label_size = (CONTACT_FONT_SIZE_TICK_LABEL if contact_font_sizes
+                       else FONT_SIZE_TICK_LABEL)
+    axis.set_ylabel(ylabel, fontsize=axis_label_size)
     if xlim is not None:
         axis.set_xlim(*xlim)
     if ylim is not None:
@@ -123,10 +137,16 @@ def format_axis(axis, ylabel: str, xlim=None, ylim=None) -> None:
     axis.grid(True, alpha=GRID_ALPHA, linewidth=GRID_LINE_WIDTH,
               linestyle=":", zorder=0)
     axis.tick_params(axis="both", which="both", direction="in",
-                     labelsize=FONT_SIZE_TICK_LABEL)
+                     labelsize=tick_label_size)
 
 
-def finish_figure(figure, axes) -> None:
+def finish_figure(figure, axes, contact_font_sizes: bool = False) -> None:
+    axis_label_size = (CONTACT_FONT_SIZE_AXIS_LABEL if contact_font_sizes
+                       else FONT_SIZE_AXIS_LABEL)
+    tick_label_size = (CONTACT_FONT_SIZE_TICK_LABEL if contact_font_sizes
+                       else FONT_SIZE_TICK_LABEL)
+    legend_font_size = (CONTACT_FONT_SIZE_LEGEND if contact_font_sizes
+                        else FONT_SIZE_LEGEND)
     handles_by_name = {}
     for axis in axes:
         handles, labels = axis.get_legend_handles_labels()
@@ -136,9 +156,11 @@ def finish_figure(figure, axes) -> None:
         [handles_by_name[name] for name in labels], labels,
         loc="upper center", bbox_to_anchor=(0.5, LEGEND_Y),
         ncol=len(labels), frameon=True, fancybox=False, framealpha=1.0,
-        edgecolor="#808080", fontsize=FONT_SIZE_LEGEND,
+        edgecolor="#808080", fontsize=legend_font_size,
     )
-    axes[-1].set_xlabel("Time [s]", fontsize=FONT_SIZE_AXIS_LABEL)
+    axes[-1].set_xlabel("Time [s]", fontsize=axis_label_size)
+    axes[-1].tick_params(axis="both", which="both", direction="in",
+                         labelsize=tick_label_size)
 
 
 def save_figure(figure, output_stem: Path) -> None:
@@ -148,7 +170,7 @@ def save_figure(figure, output_stem: Path) -> None:
     plt.close(figure)
 
 
-def create_contact_figure(title: str):
+def create_contact_figure(title: str | None = None):
     """Create the shared four-panel contact-state figure geometry."""
     configure_style()
     figure, axes = plt.subplots(
@@ -156,28 +178,30 @@ def create_contact_figure(title: str):
         gridspec_kw={"height_ratios": CONTACT_HEIGHT_RATIOS},
     )
     figure.subplots_adjust(**CONTACT_SUBPLOTS_ADJUST)
-    figure.suptitle(title, y=SUPTITLE_Y, fontsize=FONT_SIZE_FIGURE_TITLE)
+    if title:
+        figure.suptitle(title, y=SUPTITLE_Y, fontsize=FONT_SIZE_FIGURE_TITLE)
     return figure, axes
 
 
 def format_contact_axis(axis, ylabel: str, ylim=None) -> None:
     """Apply the common contact-state axes formatting to a data panel."""
-    axis.set_ylabel(ylabel, fontsize=FONT_SIZE_AXIS_LABEL)
+    axis.set_ylabel(ylabel, fontsize=CONTACT_FONT_SIZE_AXIS_LABEL)
     if ylim is not None:
         axis.set_ylim(*ylim)
     axis.grid(True, alpha=GRID_ALPHA, linewidth=GRID_LINE_WIDTH,
               linestyle=":", zorder=1)
     axis.tick_params(axis="both", which="both", direction="in",
-                     labelsize=FONT_SIZE_TICK_LABEL)
+                     labelsize=CONTACT_FONT_SIZE_TICK_LABEL)
 
 
 def finish_contact_figure(figure, axes, handles) -> None:
     """Place a fixed two-row legend between title and first subplot."""
-    figure.legend(
+    legend = figure.legend(
         handles=handles, loc="upper left", bbox_to_anchor=CONTACT_LEGEND_BBOX,
         mode="expand", ncol=5, frameon=True, fancybox=False, framealpha=1.0,
-        edgecolor="#808080", fontsize=FONT_SIZE_LEGEND,
+        edgecolor="#000000", fontsize=CONTACT_FONT_SIZE_LEGEND,
     )
-    axes[-1].set_xlabel("Time [s]", fontsize=FONT_SIZE_AXIS_LABEL)
+    legend.get_frame().set_linewidth(0.9)
+    axes[-1].set_xlabel("Time [s]", fontsize=CONTACT_FONT_SIZE_AXIS_LABEL)
     axes[-1].tick_params(axis="both", which="both", direction="in",
-                         labelsize=FONT_SIZE_TICK_LABEL)
+                         labelsize=CONTACT_FONT_SIZE_TICK_LABEL)

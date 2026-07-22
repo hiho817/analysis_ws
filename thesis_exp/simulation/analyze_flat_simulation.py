@@ -298,8 +298,9 @@ def plot_case(label, slug, start, end, gt_pos, gt_bv, gt_tf, proposed, imu,
                 ylim = None
             display_name = name.capitalize() if kind == "attitude" else name
             format_axis(axis, ylabel.format(name=display_name),
-                        xlim=(start, end), ylim=ylim)
-        finish_figure(fig, axes)
+                        xlim=(start, end), ylim=ylim,
+                        contact_font_sizes=True)
+        finish_figure(fig, axes, contact_font_sizes=True)
         save_figure(fig, FIG / Path(filename).stem)
         return scale_ratio
 
@@ -459,9 +460,17 @@ def write_report(results):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--plots-only", action="store_true")
+    parser.add_argument("--gait", choices=("all", "walk", "wlw"), default="all",
+                        help="analyze and regenerate only the selected gait")
     args = parser.parse_args()
+    if args.gait != "all" and not args.plots_only:
+        parser.error("--gait requires --plots-only to avoid writing a partial report")
     FIG.mkdir(parents=True, exist_ok=True)
-    results = {label: analyze_case(label, cfg) for label, cfg in CASES.items()}
+    selected = CASES if args.gait == "all" else {
+        label: cfg for label, cfg in CASES.items()
+        if label.lower() == args.gait
+    }
+    results = {label: analyze_case(label, cfg) for label, cfg in selected.items()}
     if not args.plots_only:
         SUMMARY_JSON.write_text(json.dumps(results, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         write_report(results)
